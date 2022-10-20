@@ -1,0 +1,13 @@
+src/shared_lib
+Debug
+Release
+build
+cmake-build-*
+update_rdkit.sh
+.env
+.vscode
+.vs
+CMakeSettings.json
+.idea
+out
+.settings

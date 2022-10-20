@@ -1,0 +1,65 @@
+
+# Gareth Jones 4/06
+
+# Patterns for common charged groups
+
+# Charge groups are defined by smarts, formal and partial charges and a yes/no
+# indicating if the formal charge can appear more than once in a pattern.
+
+# patterns are applied in order- so a later pattern may overide an earlier one
+
+# Charged Amine
+#[NX4] 1 1.0 true
+  
+# Guanidinium
+[NX3H2]=,:C(N)N 1 0.33333 no
+NC(=,:[NX3H2])N 0 0.33333 yes  
+
+# Amidine
+[NX3](*)(*)C=,:[NX3]([H])* 0 0.5 no
+[NX3]([H])(*)=,:C[NX3](*)* 1 0.5 no
+
+# Ortho Aminopryidine
+[nX3]1c([NH2])c[c,n]cc1 1 0.5 no
+[NH2]-c1c[c,n]cc[nX3]1 0 0.5 yes
+
+# Para Aminopryidine
+[nX3]1c[c,n]c([NH2])cc1 1 0.5 no
+[NH2]c1[c,n]c[nX3]cc1 0 0.5 yes
+
+# Carboxylate
+[OX1]C:,=[OX1] -1 -0.5 no
+[OX1]:,=C[OX1] 0 -0.5 yes
+
+# Hydroxamate
+[OX1]N=,:O -1 -0.5 no
+O=,:N[OX1] 0 -0.5 yes
+
+# Tetrazole
+[nX2]1nncn1 0 -0.25 yes
+[nX2]1nnnc1 -1 -0.25 no
+
+# Acylsulponamide
+[NX3H](C=O)S(=O)=O -1 -1.0 no
+
+# Wyeth heterocycle
+[NX3]1C(=O)ONC1(=O) -1 -1.0 no
+
+# Phosphinyl
+
+[OX2]P=,:O -1 -0.5 yes
+O=,:P[OX2] 0 -0.5 no
+[OX2]P(=,:O)[OX2] -1 -0.66667 yes
+O=,:P([OX2])[OX2] 0 -0.66667 no
+
+# Sulphonyl
+[OX2]S(=,:O)=,:O -1 -0.333 no
+O=,:S(=,:O)[OX2] 0 -0.333 yes
+
+# Imidazole
+[nHX3]1c[nHX3]cc1 1 0.5 no
+[nHX3]1c[nX3](C)cc1 1 1.0 no
+
+# Pyridine
+[nX3]1ccccc1 1 1.0 no
+
