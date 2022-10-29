@@ -9,6 +9,7 @@
 #include <GraphMol/DistGeomHelpers/Embedder.h>
 #include <GraphMol/ForceFieldHelpers/MMFF/MMFF.h>
 #include <GraphMol/FileParsers/FileParsers.h>
+#include <ForceField/MMFF/Contribs.h>
 
 using namespace RDKit;
 
@@ -21,9 +22,17 @@ namespace Gape {
         DGeomHelpers::EmbedParameters embedParameters;
         auto confId = EmbedMolecule(mol, embedParameters);
         MMFF::MMFFMolProperties mmffMolProperties(mol);
-        if (mmffMolProperties.isValid()) {
-            forceField = MMFF::constructForceField(mol);
-            ForceFieldsHelper::OptimizeMolecule(*forceField);
+        assert(mmffMolProperties.isValid());
+        forceField = MMFF::constructForceField(mol);
+        ForceFieldsHelper::OptimizeMolecule(*forceField);
+
+        for (auto contrib: forceField->contribs()) {
+           const ForceFields::ForceFieldContrib *ptr = contrib.get();
+           const auto *torsion = dynamic_cast<const MMFF::TorsionAngleContrib *>(ptr);
+           if (torsion != nullptr) {
+               // ForceFields::MMFF::Utils::calcTorsionEnergy
+               std::cerr << "Hello" << std::endl;
+           }
         }
     }
 
@@ -31,7 +40,7 @@ namespace Gape {
         delete forceField;
     }
 
-    std::string SuperpositionMolecule::ToMolBlock() const{
+    std::string SuperpositionMolecule::ToMolBlock() const {
         return MolToMolBlock(mol);
     }
 

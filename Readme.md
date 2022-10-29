@@ -1,7 +1,13 @@
-# Utility Library
+# GAPE C++ Codebase with RDKit Molecular Handling
 
-A C++ library and collection of programs.  Intended to be a C++ version of GAPE, but that is a
-stalled work in progress..
+WIP.  Intended to be a C++ version of GAPE (https://github.com/jones-gareth/gape)
+with custom molecular handling replaced by RDKit.
+
+## Future work
+
+* Use RDKit for structure handling
+* Replace TAFF with RDkit MMFF94s
+* Add GAPE GA representation (fitness function, chromosome, crossover, mutation etc)
 
 ## Includes
 
