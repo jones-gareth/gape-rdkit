@@ -81,8 +81,6 @@ public:
 	 */
 	static void process(const string & fileName, function<void(ConfigFile &)> processor);
 
-
-
 	/**
 	 * Return the path to the configuration directory
 	 *
@@ -96,7 +94,7 @@ public:
 	 * @param configFile
 	 * @return
 	 */
-	static const string configFilePath(string configFile);
+	static string configFilePath(const string &configFile);
 
 
 

@@ -11,7 +11,22 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif ()
 
-# need gtest (Download googletest and 'cmake . ; make')
+# Google test on Windows:
+# md build
+# cd build
+# cmake .. -DCMAKE_INSTALL_PREFIX=c:/gareth/src/googletest/install -DCMAKE_BUILD_TYPE=Release
+# cmake --build .
+# cd lib
+# mv Debug Release
+# cd ..
+# cmake --install .
+# then (from RDKit Anaconda build prompt)
+# cd C:\gareth\src\gape-rdkit\out\build\x64-debug
+# cmake ../../.. -DGTEST_ROOT=/gareth/src/googletest/install
+#
+#
+# need gtest (Download googletest and 'cmake . ; cmake --build .')
+
 if (NOT DEFINED GTEST_ROOT)
     set(GTEST_ROOT /home/packages/googletest)
     set(GTEST_INCLUDE_DIR /home/packages/googletest/googletest/include)
@@ -69,7 +84,8 @@ include_directories(
         ${Boost_INCLUDE_DIRS}
         ${GTEST_INCLUDE_DIRS}
         ${RDBASE}/Code
-        ${EIGEN_INCLUDE_DIR})
+        ${EIGEN_INCLUDE_DIR}
+        ${RDBASE}/External/rapidjson-1.1.0/include)
 link_directories(${LIBS})
 
 # cflags
@@ -88,7 +104,7 @@ endforeach ()
 MESSAGE(STATUS "allSources is ${allSources} ")
 
 # find all C sources
-set(allCSources "")
+set(allCSources "" src/gape/RotatableBond.cpp src/gape/RotatableBond.h src/gape/Gape.cpp src/gape/Gape.h)
 foreach (_dir ${cSrcDirs})
     set(_pattern "src/${_dir}/*.c")
     file(GLOB _srcs ${_pattern})

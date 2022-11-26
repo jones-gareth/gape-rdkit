@@ -3,6 +3,7 @@
 //
 
 #include "gape/SuperpositionMolecule.h"
+#include "gape/Gape.h"
 #include "Reporter.h"
 
 #include <cassert>
@@ -62,12 +63,13 @@ int main(int argc, char *argv[]) {
 
     string inputFile(argv[optind]);
     RDKit::SmilesMolSupplier smilesMolSupplier(inputFile);
+    Gape::Gape gape;
     std::vector<std::shared_ptr<Gape::SuperpositionMolecule>> molecules;
     
     while (!smilesMolSupplier.atEnd()) {
         auto mol = smilesMolSupplier.next();
         mol->setProp("_Name", "Ligand");
-        auto superpositionMolecule = std::make_shared<Gape::SuperpositionMolecule>(*mol);
+        auto superpositionMolecule = std::make_shared<Gape::SuperpositionMolecule>(*mol, gape.gapeSettings);
         delete mol;
         molecules.push_back(superpositionMolecule);
     }

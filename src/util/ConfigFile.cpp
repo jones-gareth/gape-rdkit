@@ -66,7 +66,7 @@ const string ConfigFile::configDirectory() {
 
 }
 
-const string ConfigFile::configFilePath(string configFile) {
+string ConfigFile::configFilePath(const string &configFile) {
 	path configDir = path(configDirectory());
 	path file = path(configFile);
 	file = configDir / file;
@@ -78,7 +78,7 @@ const string ConfigFile::configFilePath(string configFile) {
 		REPORT(Reporter::FATAL) << message;
 		throw runtime_error(message);
 	}
-	return file.native();
+	return file.string();
 }
 
 ConfigFile::ConfigFile(const string & fileName_) :
