@@ -47,7 +47,7 @@ endif ()
 set(EIGEN_INCLUDE_DIR "${EIGEN_ROOT}")
 
 # Set the directories under src which contain cpp files to be compiled
-set(srcDirs util ga mol difgape test ff gape)
+set(srcDirs util ga mol test gape)
 
 set(cSrcDirs '')
 

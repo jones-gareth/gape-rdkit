@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     assert(argc == 2);
 
 
-    Reporter::setMinReportingLevel(Reporter::INFO);
+    Reporter::setMinReportingLevel(Reporter::DEBUG);
 
 
     auto usage =

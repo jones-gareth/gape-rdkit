@@ -5,6 +5,7 @@
 // #include <GraphMol/ForceFieldHelpers/MMFF/MMFF.h>
 
 #include "SuperpositionMolecule.h"
+#include "../util/Reporter.h"
 #include <GraphMol/MolOps.h>
 #include <GraphMol/DistGeomHelpers/Embedder.h>
 #include <GraphMol/ForceFieldHelpers/MMFF/MMFF.h>
@@ -12,6 +13,7 @@
 #include <ForceField/MMFF/Contribs.h>
 
 using namespace RDKit;
+using namespace GarethUtil;
 
 namespace Gape {
 
@@ -46,10 +48,14 @@ namespace Gape {
 
         for (const auto bond: mol.bonds()) {
             bool canFlatten = false;
-            isRotatableBond(*bond, true, canFlatten);
+            isRotatableBond(*bond, canFlatten);
+            if (canFlatten && settings.flattenBonds) {
+                // TODO flatten bond
+            }
         }
-        std::cerr << "mol mum atoms " << mol.getNumAtoms() << " num bonds " << mol.getNumBonds() << " num torsions "
-                  << torsions.size() << " num vdw " << vdwPairs.size() << std::endl;
+
+        REPORT(Reporter::DEBUG) << "mol mum atoms " << mol.getNumAtoms() << " num bonds " << mol.getNumBonds() << " num torsions "
+                  << torsions.size() << " num vdw " << vdwPairs.size();
     }
 
     SuperpositionMolecule::~SuperpositionMolecule() {
@@ -174,7 +180,8 @@ namespace Gape {
     }
 
     RotatableBondType
-    SuperpositionMolecule::isRotatableBond(const RDKit::Bond &bond, const bool flipAmideBonds, bool &canFlatten) const {
+    SuperpositionMolecule::isRotatableBond(const RDKit::Bond &bond, bool &canFlatten) const {
+        bool flipAmideBonds = settings.flipAmideBonds;
         canFlatten = false;
         if (bond.getBondType() != Bond::BondType::SINGLE) {
             return RotatableBondType::None;

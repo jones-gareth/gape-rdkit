@@ -47,7 +47,7 @@ namespace Gape {
         static bool isSp2Carbon(const Atom &atom) ;
         bool atomIsInRing(const Atom &atom) const;
         bool isCOOHCarbon(const Atom &atom, Atom * &o2Atom, Atom *&o3Atom) const;
-        RotatableBondType isRotatableBond(const Bond &bond, bool flipAmideBonds, bool &canFlatten) const;
+        RotatableBondType isRotatableBond(const Bond &bond, bool &canFlatten) const;
 
     };
 
