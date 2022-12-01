@@ -9,7 +9,6 @@
 #define COORDOPS_H_
 
 #include <Eigen/Dense>
-#include "../mol/mol.h"
 
 namespace GarethUtil {
 
@@ -20,8 +19,6 @@ using namespace Eigen;
 
 //using CoordType = double;
 //using CoordData = array<CoordType, 4>;
-
-using namespace GarethMol;
 
 /**
  * Returns the squared distence between two vectors/coordinates

@@ -21,7 +21,7 @@ namespace Gape {
     class SuperpositionMolecule {
 
     public:
-        explicit SuperpositionMolecule(const ROMol &mol, const GapeSettings &settings);
+        explicit SuperpositionMolecule(const ROMol &mol, const Gape &settings);
 
         virtual ~SuperpositionMolecule();
 
@@ -34,7 +34,7 @@ namespace Gape {
     private:
         RWMol mol;
         ForceFields::ForceField *forceField;
-        const GapeSettings &settings;
+        const Gape &settings;
 
         void findFreelyRotatableBonds();
 

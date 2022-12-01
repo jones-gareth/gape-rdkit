@@ -7,6 +7,7 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "../mol/Solvate.h"
 
 namespace Gape {
     std::string defaultConfigStr = R"JSON(
@@ -138,15 +139,27 @@ namespace Gape {
 }
     )JSON";
 
-    GapeSettings Gape::readSettings() {
+    Gape::Gape(const std::string &configFile) {
         rapidjson::Document d;
         d.Parse<rapidjson::kParseCommentsFlag>(defaultConfigStr.c_str());
 
-        GapeSettings settings;
-        settings.flattenBonds = d["molecule"]["flattenBonds"].GetBool();
-        settings.flipAmideBonds = d["molecule"]["flipAmideBonds"].GetBool();
-        settings.solvateStructures = d["molecule"]["solvateStructures"].GetBool();
+        gapeSettings.flattenBonds = d["molecule"]["flattenBonds"].GetBool();
+        gapeSettings.flipAmideBonds = d["molecule"]["flipAmideBonds"].GetBool();
+        gapeSettings.solvateStructures = d["molecule"]["solvateStructures"].GetBool();
 
-        return settings;
+        auto const &jsonSolvationRules = d["solvationRules"];
+        solvationRules.clear();
+        solvationRules.reserve(jsonSolvationRules.Size());
+        for (auto &jsonRule: jsonSolvationRules.GetArray()) {
+            std::string name(jsonRule["name"].GetString());
+            std::string typeName(jsonRule["type"].GetString());
+            assert(typeName == "acid" || typeName == "base");
+            std::string smarts(jsonRule["smarts"].GetString());
+            auto pKa = jsonRule["pKa"].GetDouble();
+            SolvationType solvationType = typeName == "acid" ? SolvationType::Acid : SolvationType::Base;
+            auto rule = std::make_shared<const SolvationRule>(solvationType, name, smarts, pKa);
+            solvationRules.push_back(rule);
+        }
+
     }
 }

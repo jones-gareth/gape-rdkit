@@ -6,6 +6,7 @@
 
 #include "SuperpositionMolecule.h"
 #include "../util/Reporter.h"
+#include "../mol/Solvate.h"
 #include <GraphMol/MolOps.h>
 #include <GraphMol/DistGeomHelpers/Embedder.h>
 #include <GraphMol/ForceFieldHelpers/MMFF/MMFF.h>
@@ -17,11 +18,13 @@ using namespace GarethUtil;
 
 namespace Gape {
 
-    SuperpositionMolecule::SuperpositionMolecule(const ROMol &inputMol, const GapeSettings &settings) : settings(settings) {
+    SuperpositionMolecule::SuperpositionMolecule(const ROMol &inputMol, const Gape &settings) : settings(settings) {
         mol = inputMol;
         // TODO solvate
         MolOps::addHs(mol);
         MolOps::findSSSR(mol);
+
+        Solvate::solvateMolecule(settings.getSolvationRules(), mol);
         DGeomHelpers::EmbedParameters embedParameters;
         auto confId = EmbedMolecule(mol, embedParameters);
         MMFF::MMFFMolProperties mmffMolProperties(mol);
@@ -36,20 +39,20 @@ namespace Gape {
             const ForceFields::ForceFieldContrib *ptr = contrib.get();
             auto *torsion = dynamic_cast<const MMFF::TorsionAngleContrib *>(ptr);
             if (torsion != nullptr) {
-                torsions.push_back(static_cast<boost::shared_ptr<const MMFF::TorsionAngleContrib>>(torsion));
+                torsions.push_back(boost::static_pointer_cast<const MMFF::TorsionAngleContrib>(contrib));
                 // ForceFields::MMFF::Utils::calcTorsionEnergy
                 continue;
             }
             auto *vdw = dynamic_cast<const MMFF::VdWContrib *>(ptr);
             if (vdw != nullptr) {
-                vdwPairs.push_back(static_cast<boost::shared_ptr<const MMFF::VdWContrib>>(vdw));
+                vdwPairs.push_back(boost::static_pointer_cast<const MMFF::VdWContrib>(contrib));
             }
         }
 
         for (const auto bond: mol.bonds()) {
             bool canFlatten = false;
             isRotatableBond(*bond, canFlatten);
-            if (canFlatten && settings.flattenBonds) {
+            if (canFlatten && settings.getGapeSettings().flattenBonds) {
                 // TODO flatten bond
             }
         }
@@ -181,7 +184,7 @@ namespace Gape {
 
     RotatableBondType
     SuperpositionMolecule::isRotatableBond(const RDKit::Bond &bond, bool &canFlatten) const {
-        bool flipAmideBonds = settings.flipAmideBonds;
+        bool flipAmideBonds = settings.getGapeSettings().flipAmideBonds;
         canFlatten = false;
         if (bond.getBondType() != Bond::BondType::SINGLE) {
             return RotatableBondType::None;

@@ -5,34 +5,45 @@
 #ifndef GAPE_GAPE_H
 #define GAPE_GAPE_H
 
+#include <rapidjson/document.h>
+#include <memory>
+#include <vector>
+
 namespace Gape {
 
     struct GapeSettings {
-        bool flattenBonds;
-        bool flipAmideBonds;
-        bool solvateStructures;
+        bool flattenBonds = false;
+        bool flipAmideBonds = false;
+        bool solvateStructures = false;
 
-        GapeSettings() {}
+
+        GapeSettings() = default;
+
         GapeSettings(const GapeSettings &) = delete;
 
         GapeSettings &operator=(GapeSettings &) = delete;
 
-        GapeSettings(GapeSettings&&)=default;
+        GapeSettings(GapeSettings &&) = default;
     };
+
+    class SolvationRule;
 
     class Gape {
     public:
-        const GapeSettings gapeSettings;
 
-        Gape() : gapeSettings(readSettings()) {
-        }
+        explicit Gape(const std::string &configFile = "");
 
         Gape(const Gape &) = delete;
 
         Gape &operator=(Gape &) = delete;
 
+        const GapeSettings &getGapeSettings() const { return gapeSettings; }
+
+        const std::vector<std::shared_ptr<const SolvationRule>> getSolvationRules() const { return solvationRules; }
+
     private:
-        static GapeSettings readSettings();
+        GapeSettings gapeSettings;
+        std::vector<std::shared_ptr<const SolvationRule>> solvationRules;
     };
 }
 

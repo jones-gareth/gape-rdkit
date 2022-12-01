@@ -70,6 +70,8 @@ set(coreLibs
         ${RDBASE}/lib/libRDKitForceFieldHelpers.so
         ${RDBASE}/lib/libRDKitDistGeomHelpers.so
         ${RDBASE}/lib/libRDKitFileParsers.so
+        ${RDBASE}/lib/libRDKitSmilesParse.so
+        ${RDBASE}/lib/libRDKitSubstructMatch.so
         )
 
 # program files (end in *.cxx)- can be in source directories, or prog directory 
@@ -104,7 +106,7 @@ endforeach ()
 MESSAGE(STATUS "allSources is ${allSources} ")
 
 # find all C sources
-set(allCSources "" src/gape/RotatableBond.cpp src/gape/RotatableBond.h src/gape/Gape.cpp src/gape/Gape.h)
+set(allCSources "" src/gape/RotatableBond.cpp src/gape/RotatableBond.h src/gape/Gape.cpp src/gape/Gape.h src/mol/Solvate.cpp src/mol/Solvate.h)
 foreach (_dir ${cSrcDirs})
     set(_pattern "src/${_dir}/*.c")
     file(GLOB _srcs ${_pattern})
