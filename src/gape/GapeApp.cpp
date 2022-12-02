@@ -52,7 +52,7 @@ namespace Gape {
             "pKa": 12.4
         },
         {
-            "name": "Amidine ",
+            "name": "Amidine 2",
             "type": "base",
             "smarts": "[N^2X2]=[C^2X3]-[NX3]",
             "pKa": 12.4
@@ -66,7 +66,7 @@ namespace Gape {
         {
             "name": "Para Aminopryidine",
             "type": "base",
-            "smarts": "[nX2]1:c:[c,n]:n(-[NH2]):c:c:1",
+            "smarts": "[nX2]1:c:[c,n]:c(-[NH2]):c:c:1",
             "pKa": 10.0
         },
         {
@@ -90,7 +90,7 @@ namespace Gape {
         {
             "name": "Tetrazole tautomer 2",
             "type": "acid",
-            "smarts": "[nHX3]1:n:n:n:c:@1",
+            "smarts": "[nHX3]1:n:n:n:c:1",
             "pKa": 3.0
         },
         /*
@@ -120,13 +120,13 @@ namespace Gape {
         {
             "name": "Wyeth heterocycle",
             "type": "acid",
-            "smarts": "[NX3H]1-C(=O)-O-N-C(=O)-1",
+            "smarts": "[#7X3H]1[#6](=O)[#8][#7][#6](=O)1",
             "pKa": 7.0
         },
         {
             "name": "Phosphate",
             "type": "acid",
-            "smarts": "O[f]H-P=O",
+            "smarts": "[OX2H]-P=O",
             "pKa": 6.0
         },
         {

@@ -11,28 +11,6 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif ()
 
-# Google test on Windows:
-# md build
-# cd build
-# cmake .. -DCMAKE_INSTALL_PREFIX=c:/gareth/src/googletest/install -DCMAKE_BUILD_TYPE=Release
-# cmake --build .
-# cd lib
-# mv Debug Release
-# cd ..
-# cmake --install .
-# then (from RDKit Anaconda build prompt)
-# cd C:\gareth\src\gape-rdkit\out\build\x64-debug
-# cmake ../../.. -DGTEST_ROOT=/gareth/src/googletest/install
-#
-#
-# need gtest (Download googletest and 'cmake . ; cmake --build .')
-
-if (NOT DEFINED GTEST_ROOT)
-    set(GTEST_ROOT /home/packages/googletest)
-    set(GTEST_INCLUDE_DIR /home/packages/googletest/googletest/include)
-endif ()
-find_package(GTest REQUIRED)
-
 # boost
 # if (NOT DEFINED BOOST_ROOT)
 # set(Boost_NO_SYSTEM_PATHS ON)
@@ -41,14 +19,33 @@ find_package(GTest REQUIRED)
 find_package(Boost REQUIRED COMPONENTS iostreams filesystem system)
 
 # Eigen
+
+#[[
+# use this to include a local eigen
 if (NOT DEFINED EIGEN_ROOT)
     set(EIGEN_ROOT /home/packages/eigen-3.3.8)
 endif ()
 set(EIGEN_INCLUDE_DIR "${EIGEN_ROOT}")
+#]]
+
+include(ExternalProject)
+set(EIGEN_BUILD_DIR   ${CMAKE_BINARY_DIR}/eigen)
+set(EIGEN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/eigen_include)
+set(EIGEN_INCLUDE_DIR ${EIGEN_INSTALL_DIR})
+ExternalProject_Add(
+        eigen
+        URL https://gitlab.com/libeigen/eigen/-/archive/3.3.9/eigen-3.3.9.tar.gz
+        PREFIX ${EIGEN_BUILD_DIR}
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND
+        ${CMAKE_COMMAND} -E copy_directory ${EIGEN_BUILD_DIR}/src/eigen/Eigen ${EIGEN_INCLUDE_DIR}/Eigen
+        && ${CMAKE_COMMAND} -E copy_directory ${EIGEN_BUILD_DIR}/src/eigen/unsupported ${EIGEN_INCLUDE_DIR}/unsupported
+        TEST_COMMAND ""
+)
 
 # Set the directories under src which contain cpp files to be compiled
 set(srcDirs util ga mol test gape)
-
 set(cSrcDirs '')
 
 # exes to be default compiled
@@ -75,7 +72,7 @@ set(coreLibs
         )
 
 # program files (end in *.cxx)- can be in source directories, or prog directory 
-set(progDirs prog catch_tests)
+set(progDirs prog test)
 
 # library paths- add boost
 set(LIBS ${LIBS} ${Boost_LIBRARY_DIRS})
@@ -88,7 +85,7 @@ include_directories(
         ${RDBASE}/Code
         ${EIGEN_INCLUDE_DIR}
         ${RDBASE}/External/rapidjson-1.1.0/include
-        External)
+        ${RDBASE}/External/catch/catch/single_include)
 link_directories(${LIBS})
 
 # cflags
@@ -107,7 +104,7 @@ endforeach ()
 MESSAGE(STATUS "allSources is ${allSources} ")
 
 # find all C sources
-set(allCSources "")
+set(allCSources "" src/mol/MolUtil.cpp src/mol/MolUtil.h)
 foreach (_dir ${cSrcDirs})
     set(_pattern "src/${_dir}/*.c")
     file(GLOB _srcs ${_pattern})
@@ -127,6 +124,7 @@ include_directories(${allIncludes})
 
 # create library
 add_library(GapeLib ${allSources} ${allCSources})
+add_dependencies(GapeLib eigen)
 
 # add all programs
 add_custom_target(build_all)
@@ -151,8 +149,7 @@ foreach (_dir ${progDirs})
     endforeach (exesourcefile ${APP_SOURCES})
 endforeach ()
 
-# Add gtest programs (in test source directory)
-#[[
+# Add test programs (in test source directory)
 enable_testing()
 add_custom_target(build_and_test ${CMAKE_CTEST_COMMAND} -V)
 
@@ -164,15 +161,4 @@ foreach (exesourcefile ${APP_SOURCES})
     MESSAGE(STATUS " added test " ${exename})
     add_dependencies(build_and_test ${exename})
 endforeach (exesourcefile ${APP_SOURCES})
-#]]
-
-# add all programs- manaual specification
-
-# List of programs - each program has a main method and is located in src/prog
-#set(programs gape testChrom testGa loadMol sdfParser gravity testEnum conformerMatcher)
-#foreach(program ${programs})
-#  add_executable(${program} "src/prog/${program}.cxx")
-#  target_link_libraries(${program} ${coreLibs} GapeLib)
-#  MESSAGE( STATUS " added program " ${program} )
-#endforeach(program)
 

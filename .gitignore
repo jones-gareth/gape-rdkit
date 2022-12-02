@@ -8,6 +8,8 @@ update_rdkit.sh
 .vscode
 .vs
 CMakeSettings.json
+CMakePresets.json
 .idea
 out
 .settings
+eigen_include
