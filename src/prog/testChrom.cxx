@@ -23,8 +23,7 @@
 #include "../ga/LinkedPopLinearSel.h"
 
 using namespace std;
-using namespace GapeGa;
-using namespace GarethUtil;
+using namespace Gape;
 
 void testBinaryChrom(RandomUtil & rng);
 void testIntegerChrom(RandomUtil & rng);

@@ -15,11 +15,11 @@
 #include "../util/export.h"
 #include "StringChromosomeBase.h"
 
-namespace GapeGa {
+namespace Gape {
 
 class GA_EXPORT IntegerStringChromosomePolicy {
 public:
-	IntegerStringChromosomePolicy(GarethUtil::RandomUtil & rng_, int s);
+	IntegerStringChromosomePolicy(Gape::RandomUtil & rng_, int s);
 	virtual ~IntegerStringChromosomePolicy();
 
 	int mutate(int pos, int currentValue) const;
@@ -38,7 +38,7 @@ public:
 	}
 
 private:
-	GarethUtil::RandomUtil & rng;
+	Gape::RandomUtil & rng;
 	const int size;
 	IntegerStringChromosomePolicy(const IntegerStringChromosomePolicy& orig) = delete;
 	IntegerStringChromosomePolicy & operator =(

@@ -10,9 +10,9 @@
 
 #include "IntegerStringChromosomePolicy.h"
 
-namespace GapeGa {
+namespace Gape {
 
-using namespace GarethUtil;
+using namespace Gape;
 
 IntegerStringChromosomePolicy::IntegerStringChromosomePolicy(RandomUtil & rng_,
 		int size_) :

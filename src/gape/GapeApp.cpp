@@ -3,7 +3,7 @@
 //
 
 #include <string>
-#include "Gape.h"
+#include "GapeApp.h"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -139,7 +139,7 @@ namespace Gape {
 }
     )JSON";
 
-    Gape::Gape(const std::string &configFile) {
+    GapeApp::GapeApp(const std::string &configFile) {
         rapidjson::Document d;
         d.Parse<rapidjson::kParseCommentsFlag>(defaultConfigStr.c_str());
 

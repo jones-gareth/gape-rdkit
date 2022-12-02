@@ -2,8 +2,8 @@
 // Created by jones on 11/25/2022.
 //
 
-#ifndef GAPE_GAPE_H
-#define GAPE_GAPE_H
+#ifndef GAPE_GAPEAPP_H
+#define GAPE_GAPEAPP_H
 
 #include <rapidjson/document.h>
 #include <memory>
@@ -26,20 +26,21 @@ namespace Gape {
         GapeSettings(GapeSettings &&) = default;
     };
 
-    class SolvationRule;
+    struct SolvationRule;
 
-    class Gape {
+    class GapeApp {
     public:
 
-        explicit Gape(const std::string &configFile = "");
+        explicit GapeApp(const std::string &configFile = "");
 
-        Gape(const Gape &) = delete;
+        GapeApp(const GapeApp &) = delete;
 
-        Gape &operator=(Gape &) = delete;
+        GapeApp &operator=(GapeApp &) = delete;
 
-        const GapeSettings &getGapeSettings() const { return gapeSettings; }
+        [[nodiscard]] const GapeSettings &getGapeSettings() const { return gapeSettings; }
 
-        const std::vector<std::shared_ptr<const SolvationRule>> getSolvationRules() const { return solvationRules; }
+        [[nodiscard]] std::vector<std::shared_ptr<const SolvationRule>>
+        getSolvationRules() const { return solvationRules; }
 
     private:
         GapeSettings gapeSettings;
@@ -47,4 +48,4 @@ namespace Gape {
     };
 }
 
-#endif //GAPE_GAPE_H
+#endif //GAPE_GAPEAPP_H

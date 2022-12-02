@@ -15,7 +15,7 @@
 #include <random>
 #include "export.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 /*
  * Singleton class to hold a random number generator
@@ -55,5 +55,5 @@ class GA_EXPORT RandomUtil {
   std::uniform_real_distribution<double> realDistribution;
 };
 
-}  // namespace GarethUtil
+}  // namespace Gape
 #endif /* UTILS_H_ */

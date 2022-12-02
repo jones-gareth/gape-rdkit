@@ -14,7 +14,7 @@
 #include <Eigen/Dense>
 #include "CoordOps.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 using namespace Eigen;
@@ -101,6 +101,6 @@ private:
 
 };
 
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* SRC_UTIL_SHAPEMETRICS_H_ */

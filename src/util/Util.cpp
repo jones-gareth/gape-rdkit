@@ -15,7 +15,7 @@
 
 #include "Util.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 
@@ -108,4 +108,4 @@ boost::optional<string> getEnv(const string &name) {
   return string(value);
 }
 
-}  // namespace GarethUtil
+}  // namespace Gape

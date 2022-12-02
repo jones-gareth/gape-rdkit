@@ -5,4 +5,4 @@
 #include "SuperpositionChromosome.h"
 
 namespace Gape {
-} // Gape
+} // GapeApp

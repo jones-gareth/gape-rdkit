@@ -19,7 +19,7 @@
 #include <cassert>
 #include <memory>
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 
@@ -154,6 +154,6 @@ private:
 	vector<T> data;
 };
 
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* ARRAY2D_H_ */

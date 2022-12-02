@@ -7,6 +7,6 @@
 
 #include "Simplex.h"
 
-namespace GarethUtil {
+namespace Gape {
 
-} /* namespace GarethUtil */
+} /* namespace Gape */

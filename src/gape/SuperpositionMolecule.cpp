@@ -14,11 +14,10 @@
 #include <ForceField/MMFF/Contribs.h>
 
 using namespace RDKit;
-using namespace GarethUtil;
 
 namespace Gape {
 
-    SuperpositionMolecule::SuperpositionMolecule(const ROMol &inputMol, const Gape &settings) : settings(settings) {
+    SuperpositionMolecule::SuperpositionMolecule(const ROMol &inputMol, const GapeApp &settings) : settings(settings) {
         mol = inputMol;
         // TODO solvate
         MolOps::addHs(mol);

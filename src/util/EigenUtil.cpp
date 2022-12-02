@@ -5,7 +5,7 @@
 #include "EigenUtil.h"
 #include <iostream>
 
-namespace GarethUtil {
+namespace Gape {
 
     using namespace std;
 

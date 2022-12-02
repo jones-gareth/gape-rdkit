@@ -22,12 +22,13 @@ namespace Gape {
         const std::string name;
         const std::string smarts;
         const double pKa;
-        const ROMol *const query;
+        ROMol * query;
 
         SolvationRule(const SolvationType &solvationType, std::string name, std::string smarts, double pKa)
                 :
-                solvationType(solvationType), name(std::move(name)), smarts(std::move(smarts)), pKa(pKa),
-                query(SmartsToMol(smarts)) {
+                solvationType(solvationType), name(std::move(name)), smarts(std::move(smarts)), pKa(pKa)
+                 {
+            query = SmartsToMol(this->smarts);
         }
 
         ~SolvationRule() {

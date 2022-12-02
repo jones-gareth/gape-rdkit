@@ -9,7 +9,7 @@
 #include "ShapeMetrics.h"
 #include <Eigen/SVD>
 
-namespace GarethUtil {
+namespace Gape {
 
 const Matrix3d ShapeMetrics::determineGyrationTensor(
         const CoordMatrix & coords) {
@@ -71,4 +71,4 @@ void ShapeMetrics::calculateGyrationTensorShapeDescriptors() {
     assert(anisotrophy <= 1.0);
 }
 
-} /* namespace GarethUtil */
+} /* namespace Gape */

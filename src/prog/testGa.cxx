@@ -10,7 +10,7 @@
 #include "Reporter.h"
 #include "BinaryTestGa.h"
 
-using namespace GapeGa;
+using namespace Gape;
 
 int main(int argc, char* argv[]) {
     Reporter::setMinReportingLevel(Reporter::TRACE);

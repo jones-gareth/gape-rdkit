@@ -17,7 +17,7 @@
 
 #include "StringChromosomeBase.h"
 
-namespace GapeGa {
+namespace Gape {
 
 using namespace std;
 

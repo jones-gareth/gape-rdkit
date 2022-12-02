@@ -13,7 +13,7 @@
 
 using namespace std;
 
-namespace GarethUtil {
+namespace Gape {
 
 //****************************************************************************80
 

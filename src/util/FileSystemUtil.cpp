@@ -1,7 +1,7 @@
 
 #include "FileSystemUtil.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 

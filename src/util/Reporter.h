@@ -17,59 +17,60 @@
 #include "Util.h"
 #include "export.h"
 
-namespace GarethUtil {
+namespace Gape {
 
-using namespace std;
+    using namespace std;
 
 /*
  * Our logger class for generic reporting.
  *
  * See http://www.drdobbs.com/cpp/logging-in-c/201804215 for ideas
  */
-class Reporter {
-public:
-	enum ReportingLevel {
-		TRACE, DEBUG, DETAIL, NORMAL, INFO, WARN, FATAL
-	};
-private:
-	static ostream * fileStream;
-	static ReportingLevel minReportingLevel;
-	ReportingLevel reportingLevel;
-	Reporter(const Reporter &);
-	Reporter & operator=(const Reporter &);
-	std::ostringstream os;
-public:
-	Reporter() : reportingLevel(NORMAL){};
-	~Reporter();
-	std::ostringstream& get(int level);
+    class Reporter {
+    public:
+        enum ReportingLevel {
+            TRACE, DEBUG, DETAIL, NORMAL, INFO, WARN, FATAL
+        };
+    private:
+        static ostream *fileStream;
+        static ReportingLevel minReportingLevel;
+        ReportingLevel reportingLevel;
 
-	static void output(const std::string & message);
+        Reporter(const Reporter &);
 
-	static ostream & getFileStream() {
-		return *fileStream;
-	}
+        Reporter &operator=(const Reporter &);
+
+        std::ostringstream os;
+    public:
+        Reporter() : reportingLevel(NORMAL) {};
+
+        ~Reporter();
+
+        static ostream &getFileStream() {
+            return *fileStream;
+        }
 
 
-	static void setFileStream(ostream & fileStream_) {
-		fileStream = &fileStream_;
-	}
+        static void setFileStream(ostream &fileStream_) {
+            fileStream = &fileStream_;
+        }
 
-	static  const ReportingLevel  getMinReportingLevel() {
-		return minReportingLevel;
-	}
+        static ReportingLevel getMinReportingLevel() {
+            return minReportingLevel;
+        }
 
-	static void setMinReportingLevel(const ReportingLevel reportingLevel_) {
-		minReportingLevel = reportingLevel_;
-	}
+        static void setMinReportingLevel(const ReportingLevel reportingLevel_) {
+            minReportingLevel = reportingLevel_;
+        }
 
-	std::ostringstream & get(ReportingLevel level = NORMAL);
+        std::ostringstream &get(ReportingLevel level = NORMAL);
 
-	const static std::string levelToString(ReportingLevel level) {
-		static const std::string labels[] = { "TRACE", "DEBUG", "DETAIL",
-				"NORMAL", "INFO", "WARNING", "FATAL" };
-		return labels[level];
-	}
-};
+        static std::string levelToString(ReportingLevel level) {
+            static const std::string labels[] = {"TRACE", "DEBUG", "DETAIL",
+                                                 "NORMAL", "INFO", "WARNING", "FATAL"};
+            return labels[level];
+        }
+    };
 
 }
 
@@ -79,16 +80,16 @@ public:
 
 #ifndef MIN_REPORTING_LEVEL
 #ifdef NDEBUG
-#define MIN_REPORTING_LEVEL GarethUtil::Reporter::ReportingLevel::DETAIL
+#define MIN_REPORTING_LEVEL Gape::Reporter::ReportingLevel::DETAIL
 #else
-#define MIN_REPORTING_LEVEL GarethUtil::Reporter::ReportingLevel::DEBUG
+#define MIN_REPORTING_LEVEL Gape::Reporter::ReportingLevel::DEBUG
 #endif
 #endif
 
 #define REPORT(level) \
 if (level < MIN_REPORTING_LEVEL) ;\
-else if (level < GarethUtil::Reporter::getMinReportingLevel()) ; \
-else GarethUtil::Reporter().get(level) << __FILE__ << ":" << __LINE__ << " "
+else if (level < Gape::Reporter::getMinReportingLevel()) ; \
+else Gape::Reporter().get(level) << __FILE__ << ":" << __LINE__ << " "
 
 
 #endif /* LOGGER_H_ */

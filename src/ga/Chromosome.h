@@ -14,7 +14,7 @@
 #include <string>
 #include "../util/export.h"
 
-namespace GapeGa {
+namespace Gape {
 
 /*
  * Base class for all GA chromosomes

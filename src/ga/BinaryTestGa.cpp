@@ -10,10 +10,10 @@
 
 #include "BinaryTestGa.h"
 
-namespace GapeGa {
+namespace Gape {
 
 using namespace std;
-using namespace GarethUtil;
+using namespace Gape;
 
 /**
  * Create the operations for the binary test GA.  We have a equal probability

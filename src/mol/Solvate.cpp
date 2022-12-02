@@ -1,5 +1,5 @@
 //
-// Created by jones on 11/27/2022.
+// Created by Gareth Jones on 11/27/2022.
 //
 
 #include "Solvate.h"
@@ -8,7 +8,6 @@
 
 namespace Gape {
     using namespace RDKit;
-    using namespace GarethUtil;
 
     void Solvate::solvateMolecule(const SolvationRuleList &rules, RWMol &mol) {
         // the molecule should have had hydrogens added prior to solvation

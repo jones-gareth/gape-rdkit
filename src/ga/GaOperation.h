@@ -13,7 +13,7 @@
 
 #include <vector>
 
-namespace GapeGa {
+namespace Gape {
 
 template <typename Chromosome>
 class GaOperation {
@@ -104,6 +104,6 @@ void fullMixingAndCrossoverOperation(const std::vector<std::shared_ptr<T>>& pare
   parent1->fullMixingAndCrossover(*parent2, *child1, *child2);
 }
 
-}  // namespace GapeGa
+}  // Gape
 
 #endif /* GAOPERATION_H_ */

@@ -13,7 +13,7 @@
 #ifndef ENUMITER_H_
 #define ENUMITER_H_
 
-namespace GarethUtil {
+namespace Gape {
 
 /**
  * increments a numeric enum and returns the next value
@@ -67,6 +67,6 @@ typename EnumIter<EnumType>::Iterator end(EnumIter<EnumType>) {
 	return typename EnumIter<EnumType>::Iterator(incrementEnum(EnumType::Last));
 }
 
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* ENUMITER_H_ */

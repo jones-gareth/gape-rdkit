@@ -15,7 +15,7 @@
 
 using namespace std;
 
-namespace GarethUtil {
+namespace Gape {
 
 /**
  * A template to facilitate functional programming using lambda expressions on lists.

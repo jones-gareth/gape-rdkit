@@ -5,4 +5,4 @@
 #include "SuperpositionGa.h"
 
 namespace Gape {
-} // Gape
+} // GapeApp

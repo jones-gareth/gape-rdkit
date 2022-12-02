@@ -75,7 +75,7 @@ set(coreLibs
         )
 
 # program files (end in *.cxx)- can be in source directories, or prog directory 
-set(progDirs ${srcDirs} prog)
+set(progDirs prog catch_tests)
 
 # library paths- add boost
 set(LIBS ${LIBS} ${Boost_LIBRARY_DIRS})
@@ -87,7 +87,8 @@ include_directories(
         ${GTEST_INCLUDE_DIRS}
         ${RDBASE}/Code
         ${EIGEN_INCLUDE_DIR}
-        ${RDBASE}/External/rapidjson-1.1.0/include)
+        ${RDBASE}/External/rapidjson-1.1.0/include
+        External)
 link_directories(${LIBS})
 
 # cflags
@@ -106,7 +107,7 @@ endforeach ()
 MESSAGE(STATUS "allSources is ${allSources} ")
 
 # find all C sources
-set(allCSources "" src/gape/RotatableBond.cpp src/gape/RotatableBond.h src/gape/Gape.cpp src/gape/Gape.h src/mol/Solvate.cpp src/mol/Solvate.h)
+set(allCSources "")
 foreach (_dir ${cSrcDirs})
     set(_pattern "src/${_dir}/*.c")
     file(GLOB _srcs ${_pattern})
@@ -125,7 +126,7 @@ MESSAGE(STATUS "allIncludes is  ${allIncludes}")
 include_directories(${allIncludes})
 
 # create library
-add_library(GarethLib ${allSources} ${allCSources})
+add_library(GapeLib ${allSources} ${allCSources})
 
 # add all programs
 add_custom_target(build_all)
@@ -146,11 +147,12 @@ foreach (_dir ${progDirs})
             MESSAGE(STATUS " added program " ${exename})
         endif ()
         add_dependencies(build_all ${exename})
-        target_link_libraries(${exename} GarethLib ${coreLibs})
+        target_link_libraries(${exename} GapeLib ${coreLibs})
     endforeach (exesourcefile ${APP_SOURCES})
 endforeach ()
 
 # Add gtest programs (in test source directory)
+#[[
 enable_testing()
 add_custom_target(build_and_test ${CMAKE_CTEST_COMMAND} -V)
 
@@ -162,7 +164,7 @@ foreach (exesourcefile ${APP_SOURCES})
     MESSAGE(STATUS " added test " ${exename})
     add_dependencies(build_and_test ${exename})
 endforeach (exesourcefile ${APP_SOURCES})
-
+#]]
 
 # add all programs- manaual specification
 
@@ -170,7 +172,7 @@ endforeach (exesourcefile ${APP_SOURCES})
 #set(programs gape testChrom testGa loadMol sdfParser gravity testEnum conformerMatcher)
 #foreach(program ${programs})
 #  add_executable(${program} "src/prog/${program}.cxx")
-#  target_link_libraries(${program} ${coreLibs} GarethLib)
+#  target_link_libraries(${program} ${coreLibs} GapeLib)
 #  MESSAGE( STATUS " added program " ${program} )
 #endforeach(program)
 

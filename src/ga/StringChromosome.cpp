@@ -10,7 +10,7 @@
 
 #include "StringChromosome.h"
 
-namespace GapeGa {
+namespace Gape {
 
 /**
  * A decode to integer function for binary string chromosomes
@@ -112,4 +112,4 @@ void StringChromosome<int, IntegerStringChromosomePolicy>::fullMixingAndCrossove
 }
 
 
-}  // namespace GapeGa
+}  // Gape

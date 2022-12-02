@@ -8,7 +8,7 @@
 #include "Array2D.h"
 #include "Reporter.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 template<>
 void Array2D<double>::normalizeColumns() {

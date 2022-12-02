@@ -13,10 +13,9 @@
 #include "ConnectedGraphFinder.h"
 #include <vector>
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
-using namespace GarethUtil;
 
 /**
  * Class to represent paths between two nodes in a graph.
@@ -275,6 +274,6 @@ private:
 
 };
 
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* SRC_UTIL_SSSR_H_ */

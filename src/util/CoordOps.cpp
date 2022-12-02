@@ -10,7 +10,7 @@
 #include "Util.h"
 #include <cmath>
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace Eigen;
 
@@ -251,4 +251,4 @@ double radiusOfGyration(const CoordMatrix & coords) {
 }
 
 }
-/* namespace GarethUtil */
+/* namespace Gape */

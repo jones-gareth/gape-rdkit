@@ -4,10 +4,10 @@
 #include <boost/optional.hpp>
 #include "Sssr.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
-using namespace GarethUtil;
+using namespace Gape;
 
 /**
  * Check Paths to see if intermediate paths give a new or alternative shortest path.
@@ -278,4 +278,4 @@ const vector<vector<int>> extractSssr(vector<vector<int>> & allRings) {
 
 }
 
-} /* namespace GarethUtil */
+} /* namespace Gape */

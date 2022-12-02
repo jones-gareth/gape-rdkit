@@ -6,7 +6,7 @@
 #define GAPE_SUPERPOSITIONMOLECULE_H
 
 #include <GraphMol/GraphMol.h>
-#include "Gape.h"
+#include "GapeApp.h"
 
 using namespace RDKit;
 namespace ForceFields {
@@ -21,7 +21,7 @@ namespace Gape {
     class SuperpositionMolecule {
 
     public:
-        explicit SuperpositionMolecule(const ROMol &mol, const Gape &settings);
+        explicit SuperpositionMolecule(const ROMol &mol, const GapeApp &settings);
 
         virtual ~SuperpositionMolecule();
 
@@ -34,7 +34,7 @@ namespace Gape {
     private:
         RWMol mol;
         ForceFields::ForceField *forceField;
-        const Gape &settings;
+        const GapeApp &settings;
 
         void findFreelyRotatableBonds();
 

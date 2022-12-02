@@ -19,7 +19,7 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 
@@ -42,6 +42,6 @@ private:
 	string inFile;
 };
 
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* GZIPREADER_H_ */

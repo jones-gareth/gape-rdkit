@@ -14,7 +14,7 @@
 #include <set>
 #include "Reporter.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 /**
  * A template class to perform the Ullman subgraph isomorphism
@@ -225,6 +225,6 @@ private:
 
 };
 
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* SRC_UTIL_ULLMAN_H_ */

@@ -17,7 +17,7 @@
 namespace {
 
 using namespace std;
-using namespace GarethUtil;
+using namespace Gape;
 using namespace ::testing;
 
 /**

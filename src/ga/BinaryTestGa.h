@@ -19,7 +19,7 @@
 #include "LinkedPopLinearSel.h"
 #include "../util/Reporter.h"
 
-namespace GapeGa {
+namespace Gape {
 
 using namespace std;
 

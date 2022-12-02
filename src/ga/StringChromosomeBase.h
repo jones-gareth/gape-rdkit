@@ -25,9 +25,9 @@
 #include <typeinfo>
 #include <memory>
 
-namespace GapeGa {
+namespace Gape {
 
-using namespace GarethUtil;
+using namespace Gape;
 
 template <typename T, typename ChromosomePolicy>
 class StringChromosomeBase {
@@ -254,5 +254,5 @@ T *StringChromosomeBase<T, ChromosomePolicy>::getString() const {
   return string.get();
 }
 
-}  // namespace GapeGa
+}  // Gape
 #endif /* STRINGCHROMOSOME_H_ */

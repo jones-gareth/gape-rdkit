@@ -30,7 +30,7 @@
 /*
  * Utility methods
  */
-namespace GarethUtil {
+namespace Gape {
 
     using namespace std;
 

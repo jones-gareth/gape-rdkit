@@ -36,9 +36,7 @@
 #include "../util/Reporter.h"
 #endif
 
-namespace GapeGa {
-
-using namespace GarethUtil;
+namespace Gape {
 
 template <typename Chromosome, typename PopulationPolicy>
 class LinkedPopLinearSel {
@@ -439,6 +437,6 @@ LinkedPopLinearSel<Chromosome, PopulationPolicy>::findExactMatch(
   return population.end();
 }
 
-}  // namespace GapeGa
+}  // Gape
 
 #endif /* LINKEDPOPLINEARSEL_H_ */

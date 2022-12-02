@@ -7,7 +7,7 @@
 
 #include "GzipWriter.h"
 
-namespace GarethUtil {
+namespace Gape {
 using namespace std;
 
 GzipWriter::GzipWriter(string file) :
@@ -28,4 +28,4 @@ GzipWriter::~GzipWriter() {
 	fileDescriptorSink.close();
 }
 
-} /* namespace GarethUtil */
+} /* namespace Gape */

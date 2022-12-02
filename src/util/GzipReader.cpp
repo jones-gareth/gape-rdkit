@@ -7,7 +7,7 @@
 
 #include "GzipReader.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 
@@ -27,4 +27,4 @@ GzipReader::~GzipReader() {
 	inFileStream.close();
 }
 
-} /* namespace GarethUtil */
+} /* namespace Gape */

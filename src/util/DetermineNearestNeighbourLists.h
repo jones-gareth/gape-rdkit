@@ -11,7 +11,7 @@
 #include <vector>
 #include <numeric>
 
-namespace GarethUtil {
+namespace Gape {
 
 #include "Reporter.h"
 
@@ -115,6 +115,6 @@ private:
 
 };
 
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* SRC_UTIL_DETERMINENEARESTNEIGHBOURLISTS_H_ */

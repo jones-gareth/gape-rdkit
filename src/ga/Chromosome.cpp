@@ -10,7 +10,7 @@
 
 #include "Chromosome.h"
 
-namespace GapeGa {
+namespace Gape {
 
 int Chromosome::idCounter = 0;
 

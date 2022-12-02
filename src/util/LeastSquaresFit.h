@@ -11,7 +11,7 @@
 #include <boost/optional.hpp>
 #include <Eigen/Dense>
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 using namespace Eigen;
@@ -21,6 +21,6 @@ const Transform<double, 3, Affine>  leastSquaresFit(const MatrixXd & xCoords, co
 
 string matrixToString(MatrixXd matrix);
 
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* SRC_UTIL_LEASTSQUARESFIT_H_ */

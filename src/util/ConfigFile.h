@@ -14,7 +14,7 @@
 #include <sstream>
 #include <functional>
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 
@@ -108,6 +108,6 @@ private:
 
 
 };
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* SRC_UTIL_CONFIGFILE_H_ */

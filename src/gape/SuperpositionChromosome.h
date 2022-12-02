@@ -11,6 +11,6 @@ namespace Gape {
 
     };
 
-} // Gape
+} // GapeApp
 
 #endif //GAPE_RDKIT_SUPERPOSITIONCHROMOSOME_H

@@ -17,7 +17,7 @@
 #include "Reporter.h"
 #include "Util.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 using namespace boost::filesystem;
@@ -157,4 +157,4 @@ void ConfigFile::process(const string & fileName, function<void(ConfigFile &)>  
 	}
 }
 
-} /* namespace GarethUtil */
+} /* namespace Gape */

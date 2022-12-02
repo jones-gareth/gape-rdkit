@@ -11,7 +11,7 @@
 #include <stdexcept>
 #include <functional>
 
-namespace GarethUtil {
+namespace Gape {
 
 
 using namespace std;
@@ -140,6 +140,6 @@ private:
     Error error = Error::NO_ERROR;
 };
 
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* SRC_UTIL_SIMPLEX_H_ */

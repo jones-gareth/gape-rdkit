@@ -9,7 +9,7 @@
 
 #include <Eigen/Dense>
 
-namespace GarethUtil {
+namespace Gape {
 
     using namespace std;
 

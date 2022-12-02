@@ -17,7 +17,7 @@
 #include <memory>
 #include <sstream>
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 
@@ -279,6 +279,6 @@ double Array2D<double>::rowSqrDistance(const int i, const int j);
 }
 
 
-/* namespace GarethUtil */
+/* namespace Gape */
 
 #endif /* ARRAY2D_H_ */

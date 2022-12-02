@@ -10,7 +10,7 @@
 
 #include <Eigen/Dense>
 
-namespace GarethUtil {
+namespace Gape {
 
 using CoordMatrix = Eigen::Matrix<double, 4, Eigen::Dynamic, Eigen::ColMajor>;
 using CoordVector = Eigen::Vector4d;
@@ -135,6 +135,6 @@ double torsionAngle(const CoordVector & a, const CoordVector & b,
 double radiusOfGyration(const CoordMatrix & coords);
 
 
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* COORDOPS_H_ */

@@ -10,9 +10,9 @@
 
 #include "BinaryStringChromosomePolicy.h"
 
-namespace GapeGa {
+namespace Gape {
 
-BinaryStringChromosomePolicy::BinaryStringChromosomePolicy(GarethUtil::RandomUtil & rng_) : rng(rng_){
+BinaryStringChromosomePolicy::BinaryStringChromosomePolicy(Gape::RandomUtil & rng_) : rng(rng_){
 }
 
 BinaryStringChromosomePolicy::~BinaryStringChromosomePolicy() {

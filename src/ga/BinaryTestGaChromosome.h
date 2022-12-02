@@ -17,7 +17,7 @@
 
 #include "StringChromosome.h"
 
-namespace GapeGa {
+namespace Gape {
 
 class BinaryTestGaChromosome: public BinaryStringChromosome {
 private:

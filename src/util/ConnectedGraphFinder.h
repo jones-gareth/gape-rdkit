@@ -8,7 +8,7 @@
 #ifndef SRC_UTIL_CONNECTEDGRAPHFINDER_H_
 #define SRC_UTIL_CONNECTEDGRAPHFINDER_H_
 
-namespace GarethUtil {
+namespace Gape {
 
 #include <vector>
 #include <cassert>
@@ -92,6 +92,6 @@ private:
 
 };
 
-} /* namespace GarethUtil */
+} /* namespace Gape */
 
 #endif /* SRC_UTIL_CONNECTEDGRAPHFINDER_H_ */

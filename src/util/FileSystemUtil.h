@@ -9,7 +9,7 @@
 #include "GzipReader.h"
 #include "Util.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 /**
  * Write to a gzipped or normal file using the supplied function

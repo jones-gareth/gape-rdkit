@@ -1,5 +1,4 @@
 #include <iostream>
-#include "RocsSdfParser.h"
 #include "EnumIter.h"
 
 enum class Color {
@@ -7,14 +6,9 @@ enum class Color {
 };
 
 int main() {
-	using namespace GarethUtil;
-	using namespace Difgape;
+	using namespace Gape;
 
 	for (auto e : EnumIter<Color>()) {
 		std::cout << ((int) e) << std::endl;
-	}
-	for (Difgape::ScoreName e : EnumIter<Difgape::ScoreName>()) {
-		std::cout << ((int) e) << " : "
-				<< RocsSdfParser::scoreNameToString(e) << std::endl;
 	}
 }

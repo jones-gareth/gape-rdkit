@@ -11,7 +11,7 @@
 #include "Reporter.h"
 #include "Util.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 

@@ -16,7 +16,7 @@
 #include "IntegerStringChromosomePolicy.h"
 #include "../util/export.h"
 
-namespace GapeGa {
+namespace Gape {
 
 template <typename T, typename ChromosomePolicy>
 class StringChromosome : public StringChromosomeBase<T, ChromosomePolicy> {
@@ -33,7 +33,7 @@ class GA_EXPORT StringChromosome<bool, BinaryStringChromosomePolicy>
   StringChromosome &operator=(const StringChromosome &other) = delete;
 
  public:
-  StringChromosome(int length_, GarethUtil::RandomUtil &rng_,
+  StringChromosome(int length_, Gape::RandomUtil &rng_,
                    BinaryStringChromosomePolicy &chromosomePolicy_)
       : StringChromosomeBase(length_, rng_, chromosomePolicy_) {
     ;
@@ -54,7 +54,7 @@ class GA_EXPORT StringChromosome<int, IntegerStringChromosomePolicy>
   StringChromosome &operator=(const StringChromosome &other) = delete;
 
  public:
-  StringChromosome(int length_, GarethUtil::RandomUtil &rng_,
+  StringChromosome(int length_, Gape::RandomUtil &rng_,
                    IntegerStringChromosomePolicy &chromosomePolicy_)
       : StringChromosomeBase(length_, rng_, chromosomePolicy_) {
     ;
@@ -72,6 +72,6 @@ class GA_EXPORT StringChromosome<int, IntegerStringChromosomePolicy>
 using BinaryStringChromosome =
     StringChromosome<bool, BinaryStringChromosomePolicy>;
 
-}  // namespace GapeGa
+}  // Gape
 
 #endif /* BINARYSTRINGCHROMOSOME_H_ */

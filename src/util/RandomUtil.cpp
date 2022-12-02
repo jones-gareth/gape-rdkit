@@ -13,7 +13,7 @@
 using std::mt19937;
 using std::uniform_real_distribution;
 
-namespace GarethUtil {
+namespace Gape {
 
 // RandomUtil::RandomUtil(uint32_t seed_) :
 //		realDistribution(0, 1){
@@ -40,4 +40,4 @@ RandomUtil &RandomUtil::getInstance() {
   return rng;
 }
 
-}  // namespace GarethUtil
+}  // namespace Gape

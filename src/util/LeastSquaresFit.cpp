@@ -12,7 +12,7 @@
 #include "LeastSquaresFit.h"
 #include "Reporter.h"
 
-namespace GarethUtil {
+namespace Gape {
 
 using namespace std;
 using namespace Eigen;
@@ -151,4 +151,4 @@ string matrixToString(MatrixXd matrix) {
 	return printToString(matrix);
 }
 
-} /* namespace GarethUtil */
+} /* namespace Gape */

@@ -3,7 +3,7 @@
 //
 
 #include "gape/SuperpositionMolecule.h"
-#include "gape/Gape.h"
+#include "gape/GapeApp.h"
 #include "Reporter.h"
 
 #include <cassert>
@@ -11,7 +11,7 @@
 #include <GraphMol/FileParsers/MolSupplier.h>
 
 using namespace std;
-using namespace GarethUtil;
+using namespace Gape;
 
 /**
  * GAPE overlap algorithm
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
     string inputFile(argv[optind]);
     RDKit::SmilesMolSupplier smilesMolSupplier(inputFile);
-    Gape::Gape gape;
+    GapeApp gape;
     std::vector<std::shared_ptr<Gape::SuperpositionMolecule>> molecules;
 
     int ligandNum = 0;
