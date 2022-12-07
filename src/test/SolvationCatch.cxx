@@ -85,7 +85,7 @@ TEST_CASE("Solvation works as expected", "[solvation]") {
         solvateSmiles("OC=O", "[O-]C=O", solvationRules);
     }
 
-    SECTION("Hydroxamate") {
+    SECTION("Nitro") {
         solvateSmiles("ON=O", "[O-]N=O", solvationRules);
     }
 

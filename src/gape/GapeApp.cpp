@@ -76,10 +76,10 @@ namespace Gape {
             "pKa": 4.8
         },
         {
-            "name": "Hydroxamate",
+            "name": "Nitro",
             "type": "acid",
             "smarts": "[OX2H]-N=O",
-            "pKa": 9.4
+            "pKa": 11
         },
         {
             "name": "Tetrazole tautomer 1",
@@ -97,11 +97,11 @@ namespace Gape {
         {"name": "Imidazole 1",
         "type": "base",
         "smarts": "[nX2]1:c:[nX3H]:c:c:1",
-        "pKa": 7.5},
+        "pKa": 6},
         {"name": "Imidazole 2",
         "type": "acid",
         "smarts": [nX2]1:c:[nX3](-C):c:c:@1",
-        "pKa": 7.5},
+        "pKa": 6},
         */
         // correct protonated purine from imidazole rule
         {
