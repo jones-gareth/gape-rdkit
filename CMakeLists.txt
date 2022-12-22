@@ -3,9 +3,11 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 #set(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_COMPILER g++)
-set(CMAKE_C_COMPILER gcc)
-set(RDBASE $ENV{RDBASE})
+#set(CMAKE_CXX_COMPILER g++)
+#set(CMAKE_C_COMPILER gcc)
+if (NOT RDBASE)
+    set(RDBASE $ENV{RDBASE})
+endif()
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -16,7 +18,7 @@ endif ()
 # set(Boost_NO_SYSTEM_PATHS ON)
 # set(BOOST_ROOT /home/packages/boost)
 # endif()
-find_package(Boost REQUIRED COMPONENTS iostreams filesystem system)
+find_package(Boost REQUIRED COMPONENTS iostreams filesystem system program_options)
 
 # Eigen
 
@@ -49,7 +51,21 @@ set(srcDirs util ga mol test gape)
 set(cSrcDirs '')
 
 # exes to be default compiled
-set(allExes TaffForcefieldTest TaffOperations)
+set(allExes gape)
+
+if (WIN32)
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /std:c++17 ")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /std:c++17 ")
+    set(LIB_PREFIX "")
+    set(LIB_SUFFIX ".lib")
+    set(OS_LIBS "")
+elseif (UNIX)
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 ")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 ")
+    set(LIB_PREFIX "libRDKit")
+    set(LIB_SUFFIX ".so")
+    set(OS_LIBS, "m")
+endif()
 
 # libraries to link against 
 set(coreLibs
@@ -57,18 +73,16 @@ set(coreLibs
         ${Boost_IOSTREAMS_LIBRARY}
         ${Boost_FILESYSTEM_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
-        ${GTEST_BOTH_LIBRARIES}
-        pthread
-        m
-        dl
-        ${RDBASE}/lib/libRDKitRDGeneral.so
-        ${RDBASE}/lib/libRDKitGraphMol.so
-        ${RDBASE}/lib/libRDKitForceField.so
-        ${RDBASE}/lib/libRDKitForceFieldHelpers.so
-        ${RDBASE}/lib/libRDKitDistGeomHelpers.so
-        ${RDBASE}/lib/libRDKitFileParsers.so
-        ${RDBASE}/lib/libRDKitSmilesParse.so
-        ${RDBASE}/lib/libRDKitSubstructMatch.so
+        ${Boost_PROGRAM_OPTIONS_LIBRARY}
+        ${OS_LIBS}
+        ${RDBASE}/lib/${LIB_PREFIX}RDGeneral${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}GraphMol${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}ForceField${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}ForceFieldHelpers${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}DistGeomHelpers${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}FileParsers${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}SmilesParse${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}SubstructMatch${LIB_SUFFIX}
         )
 
 # program files (end in *.cxx)- can be in source directories, or prog directory 
@@ -89,9 +103,9 @@ include_directories(
 link_directories(${LIBS})
 
 # cflags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -Wall -g -ggdb -std=c++17 -fmessage-length=0 ")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC -Wall -std=c++17 -fmessage-length=0 ")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
+# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -Wall -g -ggdb -std=c++17 -fmessage-length=0 ")
+# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC -Wall -std=c++17 -fmessage-length=0 ")
 
 # find all sources
 set(allSources "")
@@ -104,7 +118,7 @@ endforeach ()
 MESSAGE(STATUS "allSources is ${allSources} ")
 
 # find all C sources
-set(allCSources "" src/mol/MolUtil.cpp src/mol/MolUtil.h)
+set(allCSources "" src/mol/MolUtil.cpp src/mol/MolUtil.h src/test/RotatableBondCatch.cxx)
 foreach (_dir ${cSrcDirs})
     set(_pattern "src/${_dir}/*.c")
     file(GLOB _srcs ${_pattern})

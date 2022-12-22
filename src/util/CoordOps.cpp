@@ -5,10 +5,11 @@
  *      Author: Gareth Jones
  */
 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include "CoordOps.h"
 #include "Reporter.h"
 #include "Util.h"
-#include <cmath>
 
 namespace Gape {
 

@@ -7,11 +7,11 @@
 #include "SuperpositionMolecule.h"
 #include "../util/Reporter.h"
 #include "../mol/Solvate.h"
+#include "RotatableBond.h"
 #include <GraphMol/MolOps.h>
 #include <GraphMol/DistGeomHelpers/Embedder.h>
 #include <GraphMol/ForceFieldHelpers/MMFF/MMFF.h>
 #include <GraphMol/FileParsers/FileParsers.h>
-#include <ForceField/MMFF/Contribs.h>
 
 using namespace RDKit;
 
@@ -19,58 +19,81 @@ namespace Gape {
 
     SuperpositionMolecule::SuperpositionMolecule(const ROMol &inputMol, const GapeApp &settings) : settings(settings) {
         mol = inputMol;
-        // TODO solvate
-        MolOps::addHs(mol);
+        MolOps::addHs(mol, false, true);
         MolOps::findSSSR(mol);
 
-        Solvate::solvateMolecule(settings.getSolvationRules(), mol);
-        DGeomHelpers::EmbedParameters embedParameters;
-        auto confId = EmbedMolecule(mol, embedParameters);
-        MMFF::MMFFMolProperties mmffMolProperties(mol);
-        assert(mmffMolProperties.isValid());
-        forceField = MMFF::constructForceField(mol, 1000);
-        ForceFieldsHelper::OptimizeMolecule(*forceField);
+        mmffMolProperties = new MMFF::MMFFMolProperties(mol);
+        assert(mmffMolProperties->isValid());
 
-        std::vector<boost::shared_ptr<const MMFF::TorsionAngleContrib>> torsions;
-        std::vector<boost::shared_ptr<const MMFF::VdWContrib>> vdwPairs;
-
-        for (auto contrib: forceField->contribs()) {
-            const ForceFields::ForceFieldContrib *ptr = contrib.get();
-            auto *torsion = dynamic_cast<const MMFF::TorsionAngleContrib *>(ptr);
-            if (torsion != nullptr) {
-                torsions.push_back(boost::static_pointer_cast<const MMFF::TorsionAngleContrib>(contrib));
-                // ForceFields::MMFF::Utils::calcTorsionEnergy
-                continue;
-            }
-            auto *vdw = dynamic_cast<const MMFF::VdWContrib *>(ptr);
-            if (vdw != nullptr) {
-                vdwPairs.push_back(boost::static_pointer_cast<const MMFF::VdWContrib>(contrib));
-            }
-        }
-
-        for (const auto bond: mol.bonds()) {
-            bool canFlatten = false;
-            isRotatableBond(*bond, canFlatten);
-            if (canFlatten && settings.getGapeSettings().flattenBonds) {
-                // TODO flatten bond
-            }
-        }
-
-        REPORT(Reporter::DEBUG) << "mol mum atoms " << mol.getNumAtoms() << " num bonds " << mol.getNumBonds() << " num torsions "
-                  << torsions.size() << " num vdw " << vdwPairs.size();
+        REPORT(Reporter::DEBUG) << "mol mum atoms " << mol.getNumAtoms() << " num bonds " << mol.getNumBonds();
     }
 
-    SuperpositionMolecule::~SuperpositionMolecule() {
+    void SuperpositionMolecule::generate3D() {
+        DGeomHelpers::EmbedParameters embedParameters;
+        auto confId = EmbedMolecule(mol, embedParameters);
+        mmffMolProperties = new MMFF::MMFFMolProperties(mol);
+        assert(mmffMolProperties->isValid());
+        auto forceField = MMFF::constructForceField(mol, mmffMolProperties, 1000);
+        ForceFieldsHelper::OptimizeMolecule(*forceField);
         delete forceField;
     }
 
-    std::string SuperpositionMolecule::ToMolBlock() const {
-        return MolToMolBlock(mol);
+    void SuperpositionMolecule::solvate() {
+        if (settings.getGapeSettings().solvateStructures) {
+            Solvate::solvateMolecule(settings.getSolvationRules(), mol);
+        }
     }
 
     void SuperpositionMolecule::findFreelyRotatableBonds() {
 
+        rotatableBonds.clear();
+        for (const auto bond: mol.bonds()) {
+            bool canFlatten = false;
+            if (const auto rotatableBondType = isRotatableBond(*bond, canFlatten); rotatableBondType !=
+                                                                                   RotatableBondType::None) {
+                const auto rotatableBond = std::make_shared<RotatableBond>(rotatableBondType, bond, this);
+                if (canFlatten && settings.getGapeSettings().flattenBonds) {
+                    // TODO flatten bond
+                }
+                rotatableBonds.push_back(rotatableBond);
+            }
 
+        }
+    }
+
+    void SuperpositionMolecule::findPairsToCheck() {
+        pairsToCheck.clear();
+
+        auto neighborMatrix = MMFF::Tools::buildNeighborMatrix(mol);
+        auto numAtoms = mol.getNumAtoms();
+
+        for (unsigned int i = 0; i < numAtoms; ++i) {
+            for (unsigned int j = i + 1; j < numAtoms; ++j) {
+                if (MMFF::Tools::getTwoBitCell(neighborMatrix, MMFF::Tools::twoBitCellPos(numAtoms, i, j)) >=
+                    MMFF::Tools::RELATION_1_4) {
+                    auto atom0 = mol.getAtomWithIdx(i);
+                    auto atom1 = mol.getAtomWithIdx(j);
+                    bool separatedByRotor = std::find_if(rotatableBonds.begin(), rotatableBonds.end(),
+                                                         [atom0, atom1](const auto &rb) {
+                                                             return rb->isSeparatedByBond(atom0, atom1);
+                                                         }) != rotatableBonds.end();
+                    if (separatedByRotor) {
+                        if (ForceFields::MMFF::MMFFVdWRijstarEps mmffVdWConstants;
+                                mmffMolProperties->getMMFFVdWParams(i, j, mmffVdWConstants)) {
+                            pairsToCheck.emplace_back(i, j, mmffVdWConstants);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    SuperpositionMolecule::~SuperpositionMolecule() {
+        delete mmffMolProperties;
+    }
+
+    std::string SuperpositionMolecule::ToMolBlock() const {
+        return MolToMolBlock(mol);
     }
 
     bool SuperpositionMolecule::isO2(const Atom &atom) const {
@@ -86,7 +109,8 @@ namespace Gape {
     }
 
     bool SuperpositionMolecule::isO3(const RDKit::Atom &atom) const {
-        if (atom.getAtomicNum() != 8 || atom.getTotalDegree() != 2 || atom.getHybridization() != Atom::SP3) {
+        // RDKit will set the hybridization of the OH atom in COOH to SP2- so don't check hybridization here
+        if (atom.getAtomicNum() != 8 || atom.getTotalDegree() != 2) {
             return false;
         }
         // Don't think this is needed
@@ -108,7 +132,7 @@ namespace Gape {
         if (atom1->getAtomicNum() == 6) carbon = atom1;
         if (atom1->getAtomicNum() == 7) nitrogen = atom1;
         if (atom2->getAtomicNum() == 6) carbon = atom2;
-        if (atom2->getAtomicNum() == 6) nitrogen = atom2;
+        if (atom2->getAtomicNum() == 7) nitrogen = atom2;
         if (carbon == nullptr || nitrogen == nullptr) {
             return false;
         }
@@ -135,11 +159,11 @@ namespace Gape {
             return false;
         }
         for (const auto neighbor: mol.atomNeighbors(&atom)) {
-            if (neighbor->getAtomicNum() != 7) {
-                return false;
+            if (isSp2Carbon(*neighbor)) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     bool SuperpositionMolecule::isArginineCarbon(const RDKit::Atom &atom) const {
@@ -188,9 +212,22 @@ namespace Gape {
         if (bond.getBondType() != Bond::BondType::SINGLE) {
             return RotatableBondType::None;
         }
+        auto *atom1 = bond.getBeginAtom();
+        auto *atom2 = bond.getEndAtom();
+        auto hyb = atom1->getHybridization();
+        if (hyb != Atom::HybridizationType::SP3 && hyb != Atom::HybridizationType::SP2) {
+            return RotatableBondType::None;
+        }
+        hyb = atom2->getHybridization();
+        if (hyb != Atom::HybridizationType::SP3 && hyb != Atom::HybridizationType::SP2) {
+            return RotatableBondType::None;
+        }
+        if (atom1->getDegree() == 1 || atom2->getDegree() == 1) {
+            return RotatableBondType::None;
+        }
         if (mol.getRingInfo()->numBondRings(bond.getIdx())) {
             return RotatableBondType::None;
-        };
+        }
         if (isAmideBond(bond)) {
             canFlatten = true;
             return flipAmideBonds ? RotatableBondType::Flip : RotatableBondType::None;
@@ -199,8 +236,6 @@ namespace Gape {
             return RotatableBondType::None;
         }
 
-        auto *atom1 = bond.getBeginAtom();
-        auto *atom2 = bond.getEndAtom();
         if (atom1->getAtomicNum() < atom2->getAtomicNum()) {
             std::swap(atom1, atom2);
         }
@@ -222,12 +257,14 @@ namespace Gape {
             return RotatableBondType::None;
         }
 
-        // COOH is planar
-        if (Atom *o3Atom = nullptr, *o2Atom = nullptr; isCOOHCarbon(*atom2, o2Atom, o3Atom)) {
-            if (o3Atom == atom1) {
-                canFlatten = true;
+        if (atom1->getAtomicNum() == 8 && atom2->getAtomicNum() == 6) {
+            // COOH is planar
+            if (Atom *o3Atom = nullptr, *o2Atom = nullptr; isCOOHCarbon(*atom2, o2Atom, o3Atom)) {
+                if (o3Atom == atom1) {
+                    canFlatten = true;
+                }
+                return RotatableBondType::Flip;
             }
-            return RotatableBondType::Flip;
         }
 
         return RotatableBondType::Full;

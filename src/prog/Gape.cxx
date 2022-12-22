@@ -10,8 +10,11 @@
 #include <boost/format.hpp>
 #include <GraphMol/FileParsers/MolSupplier.h>
 
-using namespace std;
+#include <boost/program_options.hpp>
+
 using namespace Gape;
+using namespace boost::program_options;
+namespace options = boost::program_options;
 
 /**
  * GAPE overlap algorithm
@@ -21,47 +24,35 @@ using namespace Gape;
  * @return
  */
 int main(int argc, char *argv[]) {
-    assert(argc == 2);
-
-
     Reporter::setMinReportingLevel(Reporter::DEBUG);
 
+    std::string inputFile;
+    std::string reportingLevel;
+    options_description desc("Allowed options");
+    desc.add_options()
+            ("help", "Help message")
+            ("inputFile", options::value<std::string>(&inputFile)->required(), "input structures")
+            ("configFile", options::value<std::string>(), "Optional JSON configuration file")
+            ("reportingLevel", options::value<std::string>(&reportingLevel)->default_value("DEBUG"),
+             "Reporting level [TRACE, DEBUG, DETAIL, NORMAL, INFO, WARN, FATAL]");
+
+    options::variables_map vm;
+    options::store(options::parse_command_line(argc, argv, desc), vm);
+
+    if (vm.count("help")) {
+        cerr << desc << endl;
+        return 0;
+    }
+    options::notify(vm);
 
     auto usage =
             (boost::format("usage: %s [-f] [-n <atom_no>] <smarts> <target>\n")
              % argv[0]).str();
 
-    int c;
-    bool queryFile = false;
-    int atomNo = -1;
+    if (vm.count("configFile")) {
 
-    while ((c = getopt(argc, argv, "fn:")) != -1) {
-        switch (c) {
-            case 'f':
-                queryFile = true;
-                cout << "processing file" << endl;
-                break;
-            case 'n':
-                atomNo = atoi(optarg);
-                cout << "matching smiles to atom number " << atomNo << endl;
-                atomNo--;
-                break;
-            case '?':
-                cout << usage;
-                return EXIT_SUCCESS;
-            default:
-                cout << "Unknown option" << endl;
-                cout << usage;
-                return EXIT_FAILURE;
-        }
     }
 
-    if (argc - optind != 1) {
-        cout << usage;
-        return EXIT_FAILURE;
-    }
-
-    string inputFile(argv[optind]);
     RDKit::SmilesMolSupplier smilesMolSupplier(inputFile);
     GapeApp gape;
     std::vector<std::shared_ptr<Gape::SuperpositionMolecule>> molecules;
@@ -73,11 +64,15 @@ int main(int argc, char *argv[]) {
         mol->setProp("_Name", (boost::format("Ligand %d") % ligandNum).str());
         auto superpositionMolecule = std::make_shared<Gape::SuperpositionMolecule>(*mol, gape);
         delete mol;
+        superpositionMolecule->solvate();
+        superpositionMolecule->generate3D();
+        superpositionMolecule->findFreelyRotatableBonds();
+        superpositionMolecule->findPairsToCheck();
         molecules.push_back(superpositionMolecule);
     }
-    
+
     std::ofstream preparedFile("preparedMols.sdf");
-    for (auto &superpositionMolecule : molecules) {
+    for (auto &superpositionMolecule: molecules) {
         preparedFile << superpositionMolecule->ToMolBlock() << "$$$$" << std::endl;
     }
     preparedFile.close();
