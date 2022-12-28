@@ -1,4 +1,4 @@
-O=C1c2cccc3c2[C@H](CCC3)CN1[C@@H]1C[N@H+]2CC[C@@H]1CC2  5ht3_1
-O=C(N[C@@H]1C[N@H+]2CC[C@@H]1CC2)c1cc(Cl)cc2c1O[C@H]1CCCC[C@@H]21   5ht3_2
-C[N@H+]1[C@H]2CC[C@@H]1C[C@@H](NC(=O)NC(=O)c1ccccc1OCC1CC1)C2   5ht3_3
-Cn1cc(C(=O)[C@@H]2CCc3[nH]cnc3C2)c2ccc(N)cc21   5ht3_4
+O=C1c2cccc3c2[C@H](CCC3)CN1[C@@H]1C[N@H+]2CC[C@@H]1CC2 5ht3_1
+O=C(N[C@@H]1C[N@H+]2CC[C@@H]1CC2)c1cc(Cl)cc2c1O[C@H]1CCCC[C@@H]21 5ht3_2
+C[N@H+]1[C@H]2CC[C@@H]1C[C@@H](NC(=O)NC(=O)c1ccccc1OCC1CC1)C2 5ht3_3
+Cn1cc(C(=O)[C@@H]2CCc3[nH]cnc3C2)c2ccc(N)cc21 5ht3_4

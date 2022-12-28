@@ -29,7 +29,8 @@ namespace Gape {
         }else {
             assert(mol.getNumConformers() == 0);
         }
-        REPORT(Reporter::DEBUG) << "mol " << mol.getProp<string>("_Name") << " mum atoms " << mol.getNumAtoms() << " num bonds " << mol.getNumBonds();
+        auto name = mol.getProp<std::string>("_Name");
+        REPORT(Reporter::DEBUG) << "mol " << name << " mum atoms " << mol.getNumAtoms() << " num bonds " << mol.getNumBonds();
     }
 
     void SuperpositionMolecule::generate3D() {
