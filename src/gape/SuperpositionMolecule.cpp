@@ -24,8 +24,12 @@ namespace Gape {
 
         mmffMolProperties = new MMFF::MMFFMolProperties(mol);
         assert(mmffMolProperties->isValid());
-
-        REPORT(Reporter::DEBUG) << "mol mum atoms " << mol.getNumAtoms() << " num bonds " << mol.getNumBonds();
+        if (mol.getNumConformers() == 1) {
+            referenceConformer = mol.getConformer();
+        }else {
+            assert(mol.getNumConformers() == 0);
+        }
+        REPORT(Reporter::DEBUG) << "mol " << mol.getProp<string>("_Name") << " mum atoms " << mol.getNumAtoms() << " num bonds " << mol.getNumBonds();
     }
 
     void SuperpositionMolecule::generate3D() {
@@ -36,11 +40,16 @@ namespace Gape {
         auto forceField = MMFF::constructForceField(mol, mmffMolProperties, 1000);
         ForceFieldsHelper::OptimizeMolecule(*forceField);
         delete forceField;
+        assert(mol.getNumConformers() == 1);
+        referenceConformer = mol.getConformer();
+        for (auto &rotatableBond: rotatableBonds) {
+            rotatableBond->setTorsionAngles();
+        }
     }
 
     void SuperpositionMolecule::solvate() {
         if (settings.getGapeSettings().solvateStructures) {
-            Solvate::solvateMolecule(settings.getSolvationRules(), mol);
+            solvateMolecule(settings.getSolvationRules(), mol);
         }
     }
 
@@ -268,7 +277,14 @@ namespace Gape {
         }
 
         return RotatableBondType::Full;
-
     }
 
+    void SuperpositionMolecule::setConformer(const Conformer &conformer) {
+        assert(mol.getNumConformers() == 1);
+        auto id = mol.getConformer().getId();
+        mol.removeConformer(id);
+        auto conformerPtr = new Conformer(conformer);
+        mol.addConformer(conformerPtr, true);
+        assert(mol.getNumConformers() == 1);
+    }
 } // namespace GAPE

@@ -83,6 +83,7 @@ set(coreLibs
         ${RDBASE}/lib/${LIB_PREFIX}FileParsers${LIB_SUFFIX}
         ${RDBASE}/lib/${LIB_PREFIX}SmilesParse${LIB_SUFFIX}
         ${RDBASE}/lib/${LIB_PREFIX}SubstructMatch${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}RDGeometryLib${LIB_SUFFIX}
         )
 
 # program files (end in *.cxx)- can be in source directories, or prog directory 
@@ -118,7 +119,7 @@ endforeach ()
 MESSAGE(STATUS "allSources is ${allSources} ")
 
 # find all C sources
-set(allCSources "" src/mol/MolUtil.cpp src/mol/MolUtil.h src/test/RotatableBondCatch.cxx)
+set(allCSources "" src/mol/MolUtil.cpp src/mol/MolUtil.h src/test/RotatableBondCatch.cxx src/util/TransformOps.cpp src/util/TransformOps.h src/mol/HydrogenBondingType.cpp src/mol/HydrogenBondingType.h src/test/HydrogenBondingTypeCatch.cxx)
 foreach (_dir ${cSrcDirs})
     set(_pattern "src/${_dir}/*.c")
     file(GLOB _srcs ${_pattern})

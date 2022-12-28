@@ -5,7 +5,9 @@
 #include "RotatableBond.h"
 #include "SuperpositionMolecule.h"
 #include <ForceField/MMFF/Contribs.h>
-#include <mol/MolUtil.h>
+#include <Geometry/Transform3D.h>
+#include "mol/MolUtil.h"
+#include "util/TransformOps.h"
 
 namespace Gape {
     RotatableBond::RotatableBond(RotatableBondType rotatableBondType, const Bond *const bond,
@@ -48,13 +50,25 @@ namespace Gape {
                 }
             }
         }
+        setTorsionAngles();
+    }
+
+    void RotatableBond::setTorsionAngles() {
+        auto const &conformer = molecule->getReferenceConformer();
+        if (conformer.getNumAtoms() == 0) {
+            return;
+        }
+        for (auto &torsion: torsions) {
+            const auto angle = torsionAngle(conformer.getAtomPos(torsion.index0), conformer.getAtomPos(torsion.index1),
+                                            conformer.getAtomPos(torsion.index2), conformer.getAtomPos(torsion.index3));
+            torsion.referenceAngle = angle;
+        }
     }
 
     RotatableBond::~RotatableBond() {
-
     }
 
-    bool RotatableBond::isSeparatedByBond(const Atom * const a1, const Atom * const a2) const {
+    bool RotatableBond::isSeparatedByBond(const Atom *const a1, const Atom *const a2) const {
         if (std::find(atom1List.begin(), atom1List.end(), a1) != atom1List.end() &&
             std::find(atom2List.begin(), atom2List.end(), a2) != atom2List.end()) {
             return true;
@@ -64,5 +78,14 @@ namespace Gape {
             return true;
         }
         return false;
+    }
+
+    void RotatableBond::rotateBond(double angle, Conformer &conf) const {
+        RDGeom::Transform3D rot;
+        assert(conf.getNumAtoms() == molecule->getMol().getNumAtoms());
+        determineRotation(conf.getAtomPos(atom1->getIdx()), conf.getAtomPos(atom2->getIdx()), angle, rot);
+        for (const auto atom: atom1List) {
+            rot.TransformPoint(conf.getAtomPos(atom->getIdx()));
+        }
     }
 }

@@ -55,7 +55,7 @@ namespace Gape {
 
         void findFreelyRotatableBonds();
 
-        std::vector<std::shared_ptr<const RotatableBond>> getRotatableBonds() const { return rotatableBonds; }
+        const std::vector<std::shared_ptr<RotatableBond>> &getRotatableBonds() const { return rotatableBonds; }
 
         void findPairsToCheck();
 
@@ -63,12 +63,17 @@ namespace Gape {
 
         void solvate();
 
+        void setConformer(const Conformer &conformer);
+
+        const Conformer &getReferenceConformer() const {return referenceConformer;}
+
     private:
         RWMol mol;
         MMFF::MMFFMolProperties *mmffMolProperties;
         const GapeApp &settings;
-        std::vector<std::shared_ptr<const RotatableBond>> rotatableBonds;
+        std::vector<std::shared_ptr<RotatableBond>> rotatableBonds;
         std::vector<VdwInfo> pairsToCheck;
+        Conformer referenceConformer;
 
         bool isO2(const Atom &atom) const;
 

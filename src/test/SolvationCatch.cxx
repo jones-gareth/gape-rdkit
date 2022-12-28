@@ -13,7 +13,6 @@
 #include <GraphMol/SmilesParse/SmilesWrite.h>
 
 using namespace Gape;
-using namespace Gape;
 using namespace RDKit;
 
 void

@@ -8,6 +8,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "../mol/Solvate.h"
+#include "../mol/HydrogenBondingType.h"
 
 namespace Gape {
     std::string defaultConfigStr = R"JSON(
@@ -135,7 +136,33 @@ namespace Gape {
             "smarts": "[OX2H]-S(=O)=O",
             "pKa": 1.0
         }
-    ]
+    ],
+    "hydrogenBondingTypes": [
+        /*  Donor and acceptors from Mills & Dean JCAMD, 10 (1996) 607-622.
+
+            Tabs separate fields
+
+            In the case of cis/trans preferences take the probability mean- if
+            only one is present then divide by two
+
+            The sln patterns only support these attributes: f, !h, is= and
+            not=.  Z and Y act as Hev but must match the same elemental types,
+            additionally X != Y.
+
+            The patterns for amide groups will match N.pl3 atoms.  In GAPE
+            these are modeled as planar, not pyramidal.	A correction is
+            applied within GAPE.
+
+            if not set weight defaults to number of atoms
+        */
+        {
+            "type": "acceptor",
+            "name": "Terminal Phosphate",
+            "probability": 0.90,
+            "geometry": "cone",
+            "smarts": "[OX1]=,-P(=,-[OX1])(-*)=,-[OX1]"
+        }
+]
 }
     )JSON";
 
@@ -161,5 +188,41 @@ namespace Gape {
             solvationRules.push_back(rule);
         }
 
+        auto const &jsonHydrogenBondingTypes = d["hydrogenBondingTypes"];
+        hydrogenBondingTypes.clear();
+        hydrogenBondingTypes.reserve(jsonHydrogenBondingTypes.Size());
+        for (auto &jsonType: jsonHydrogenBondingTypes.GetArray()) {
+            std::string name(jsonType["name"].GetString());
+            std::string typeName(jsonType["type"].GetString());
+            assert(typeName == "donor" || typeName == "acceptor");
+            auto probability = jsonType["probability"].GetDouble();
+            HydrogenBondType bondType = typeName == "acceptor" ? HydrogenBondType::Acceptor :  HydrogenBondType::Donor;
+            HydrogenBondGeometry geometry = HydrogenBondGeometry::None;
+            if (bondType==HydrogenBondType::Acceptor) {
+                std::string geometryName(jsonType["geometry"].GetString());
+                if (geometryName == "none") {
+                    geometry = HydrogenBondGeometry::None;
+                }
+                else if (geometryName == "dir") {
+                    geometry = HydrogenBondGeometry::Dir;
+                }
+                else if (geometryName == "cone") {
+                    geometry = HydrogenBondGeometry::Cone;
+                }
+                else if (geometryName == "plane") {
+                    geometry = HydrogenBondGeometry::Plane;
+                }
+                else {
+                    assert(true);
+                }
+            }
+            std::string smarts(jsonType["smarts"].GetString());
+            auto bondingType = std::make_shared<HydrogenBondingType>(bondType, name, probability, geometry, smarts);
+            if (jsonType.HasMember("weight")) {
+                auto weight = jsonType["weight"].GetDouble();
+                bondingType->weight = weight;
+            }
+            hydrogenBondingTypes.push_back(bondingType);
+        }
     }
 }

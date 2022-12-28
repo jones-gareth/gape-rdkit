@@ -18,6 +18,7 @@ namespace Gape {
     public:
         const unsigned int index0, index1, index2, index3;
         const ForceFields::MMFF::MMFFTor mmffTorsion;
+        double referenceAngle;
 
         TorsionInfo(unsigned int idx0, unsigned int idx1, unsigned int idx2, unsigned int idx3,
                     ForceFields::MMFF::MMFFTor mmffTor) : index0(idx0), index1(idx1), index2(idx2), index3(idx3),
@@ -32,13 +33,26 @@ namespace Gape {
         RotatableBondType rotatableBondType;
         std::vector<TorsionInfo> torsions;
 
+        void setTorsionAngles();
+
+        friend SuperpositionMolecule;
+
     public:
-        RotatableBond(RotatableBondType rotatableBondType, const Bond * bond,
+        RotatableBond(RotatableBondType rotatableBondType, const Bond *bond,
                       SuperpositionMolecule *superpositionMolecule);
 
         bool isSeparatedByBond(const Atom *a1, const Atom *a2) const;
 
         RotatableBondType getRotatableBondType() const { return rotatableBondType; }
+
+        void rotateBond(double angle, Conformer &conf) const;
+
+        const std::vector<TorsionInfo> &getTorsions() const { return torsions; }
+
+        const std::vector<const Atom *> &getAtom1List() const { return atom1List; }
+
+        const std::vector<const Atom *> &getAtom2List() const { return atom2List; }
+
 
         ~RotatableBond();
     };

@@ -3,11 +3,12 @@
 //
 
 #include "MolUtil.h"
+#include <ForceField/UFF/TorsionAngle.h>
 
 namespace Gape {
 
     void findAtoms(const Atom *const startAtom, const std::vector<const Atom *> &stopAtoms,
-                                          std::set<const Atom *> &foundAtoms) {
+                   std::set<const Atom *> &foundAtoms) {
         std::vector<const Atom *> atomsToCheck = {startAtom};
 
         while (!atomsToCheck.empty()) {
@@ -35,4 +36,22 @@ namespace Gape {
         findAtoms(startAtom, stopAtoms, foundAtoms);
     }
 
+    double torsionAngle(const RDGeom::Point3D &p1, const RDGeom::Point3D &p2,
+                        const RDGeom::Point3D &p3, const RDGeom::Point3D &p4) {
+
+        RDGeom::Point3D r1 = p1 - p2, r2 = p3 - p2, r3 = p2 - p3, r4 = p4 - p3;
+        RDGeom::Point3D t1 = r1.crossProduct(r2);
+        RDGeom::Point3D t2 = r3.crossProduct(r4);
+        double d1 = t1.length(), d2 = t2.length();
+        double cosPhi = t1.dotProduct(t2) / (d1 * d2);
+        if (cosPhi > 1.0) {
+            cosPhi = 1.0;
+        } else if (cosPhi < -1.0){
+            cosPhi = -1.0;
+        }
+        auto tvp = t1.crossProduct(t2);
+        auto sp2 = tvp.dotProduct(r3);
+        double phi = acos(cosPhi);
+        return sp2 < 0 ? phi : -phi;
+    }
 }

@@ -9,7 +9,7 @@
 namespace Gape {
     using namespace RDKit;
 
-    void Solvate::solvateMolecule(const SolvationRuleList &rules, RWMol &mol) {
+    void solvateMolecule(const SolvationRuleList &rules, RWMol &mol) {
         // the molecule should have had hydrogens added prior to solvation
 
         // the original documentation for this process requires that
@@ -22,8 +22,8 @@ namespace Gape {
             bool matched = false;
 
             for (const auto &solvationRule: rules) {
+                std::string typeStr(solvationRule->solvationType == SolvationType::Acid ? "acid" : "base");
                 for (const auto &match: SubstructMatch(mol, *solvationRule->query)) {
-                    std::string typeStr(solvationRule->solvationType == SolvationType::Acid ? "acid" : "base");
                     REPORT(Reporter::DETAIL) << "Solvation rule " << solvationRule->name << " for " << typeStr
                                              << " matches molecule " << mol.getProp<std::string>("_Name");
                     matched = true;

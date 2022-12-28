@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 
     }
 
-    RDKit::SmilesMolSupplier smilesMolSupplier(inputFile);
+    RDKit::SmilesMolSupplier smilesMolSupplier(inputFile, " ", 0, 1, false, true);
     GapeApp gape;
     std::vector<std::shared_ptr<Gape::SuperpositionMolecule>> molecules;
 
@@ -61,7 +61,9 @@ int main(int argc, char *argv[]) {
     while (!smilesMolSupplier.atEnd()) {
         auto mol = smilesMolSupplier.next();
         ligandNum++;
-        mol->setProp("_Name", (boost::format("Ligand %d") % ligandNum).str());
+        if (!mol->hasProp("_Name")) {
+            mol->setProp("_Name", (boost::format("Ligand %d") % ligandNum).str());
+        }
         auto superpositionMolecule = std::make_shared<Gape::SuperpositionMolecule>(*mol, gape);
         delete mol;
         superpositionMolecule->solvate();

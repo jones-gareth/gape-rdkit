@@ -17,6 +17,8 @@ namespace Gape {
     void
     findAtoms(const Atom *startAtom, const Atom *stopAtom, std::set<const Atom *> &foundAtoms);
 
+    double torsionAngle(const RDGeom::Point3D &p1, const RDGeom::Point3D &p2,
+                        const RDGeom::Point3D &p3, const RDGeom::Point3D &p4);
 
 } // namespace Gape
 #endif //GAPE_MOLUTIL_H
