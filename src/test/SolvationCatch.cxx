@@ -21,7 +21,7 @@ solvateSmiles(const std::string &smilesIn, const std::string expectedSmiles, con
     mol->setProp(common_properties::_Name, "Unknown molecule");
     MolOps::addHs(*mol);
     MolOps::sanitizeMol(*mol);
-    Solvate::solvateMolecule(solvationRules, *mol);
+    solvateMolecule(solvationRules, *mol);
     MolOps::removeAllHs(*mol);
     auto smilesOut = MolToSmiles(*mol);
 

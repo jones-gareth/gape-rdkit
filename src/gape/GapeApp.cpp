@@ -153,7 +153,7 @@ namespace Gape {
             these are modeled as planar, not pyramidal.	A correction is
             applied within GAPE.
 
-            if not set weight defaults to number of atoms
+            If not set weight defaults to number of atoms
         */
         {
             "type": "acceptor",
