@@ -24,21 +24,34 @@ namespace Gape {
         None, Dir, Cone, Plane
     };
 
+    class HydrogenBondingType;
+
+    using HydrogenBondingTypesList = std::vector<std::shared_ptr<const HydrogenBondingType>>;
+
     struct HydrogenBondingType {
         const HydrogenBondType hydrogenBondType;
         const std::string name;
         const double probability;
         const HydrogenBondGeometry geometry;
-        const std::string smarts;
+        std::string smarts;
         ROMol *query;
         double weight;
 
         HydrogenBondingType(const HydrogenBondType hydrogenBondType, const std::string &name, const double probability,
-                            const HydrogenBondGeometry &geometry, const std::string &smarts);
+                            const HydrogenBondGeometry &geometry, const std::string &smarts) ;
+
         ~HydrogenBondingType();
+
+    private:
+        std::vector<int> zWildcards, yWildcards;
+
+        bool matchZandY(const std::vector<std::pair<int, int>> &match, const ROMol &mol) const;
+
+        friend
+        std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
+        findHydrogenBondDonorsAndAcceptors(const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol) ;
     };
 
-    using HydrogenBondingTypesList = std::vector<std::shared_ptr<const HydrogenBondingType>>;
 
     std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
     findHydrogenBondDonorsAndAcceptors(const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol);

@@ -161,8 +161,78 @@ namespace Gape {
             "probability": 0.90,
             "geometry": "cone",
             "smarts": "[OX1]=,-P(=,-[OX1])(-*)=,-[OX1]"
+        },
+        {
+            "type": "acceptor",
+            "name": "Phosphinyl",
+            "probability": 0.64,
+            "geometry": "cone",
+            "smarts": "[OX1]=,-P(=,-*)(-*)=,-[OX1]"
+        },
+        {
+            "type": "acceptor",
+            "name": "Carboxylate",
+            "probability": 0.56,
+            "geometry": "dir",
+            "smarts": "[OX1]=,-C(-*)=,-[OX1]"
+        },
+        {
+            "type": "acceptor",
+            "name": "Asymmetric Het6 N",
+            "probability": 0.54,
+            "geometry": "dir",
+            "smarts": "[#7X2]1~Z~*~*~*~Y~1"
+        },
+        {
+            "type": "acceptor",
+            "name": "Acid O",
+            "probability": 0.40,
+            "geometry": "dir",
+            "smarts": "[OX1]=[P,C,S]-[OH]"
+        },
+        {
+            "type": "acceptor",
+            "name": "Symmetric Het5 N",
+            "probability": 0.48,
+            "geometry": "dir",
+            "smarts": "[#7X2]1~Z~*~*~Z~1"
+        },
+        {
+            "type": "acceptor",
+            "name": "Sulphoxide",
+            "probability": 0.40,
+            "geometry": "cone",
+            "smarts": "[OX1]=S(-*)-*"
+        },
+        {
+            "type": "acceptor",
+            "name": "Primary Amine",
+            "probability": 0.40,
+            "geometry": "dir",
+            "smarts": "[NX3H2]-*"
+        },
+        {
+            "type": "acceptor",
+            "name": "Asymmetric Het5 N",
+            "probability": 0.39,
+            "geometry": "dir",
+            "smarts": "[#7X2]1~Z~*~*~Y~1"
+        },
+        {
+            "type": "acceptor",
+            "name": "Thiocarbonyl",
+            "probability": 0.39,
+            "geometry": "plane",
+            "smarts": "[SX1]=C"
+        },
+        {
+            "type": "acceptor",
+            "name": "Hydroxyl",
+            "probability": 0.38,
+            "geometry": "plane",
+            "smarts": "[OX2H]-*"
         }
-]
+    ]
 }
     )JSON";
 
