@@ -49,12 +49,15 @@ namespace Gape {
 
         friend
         std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
-        findHydrogenBondDonorsAndAcceptors(const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol) ;
+        findHydrogenBondDonorsOrAcceptors(const HydrogenBondType, const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol) ;
     };
 
 
     std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
-    findHydrogenBondDonorsAndAcceptors(const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol);
+    findHydrogenBondDonors(const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol);
+
+    std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
+    findHydrogenBondAcceptors(const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol);
 
 } // Gape
 

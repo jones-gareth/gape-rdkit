@@ -199,7 +199,14 @@ namespace Gape {
         },
         {
             "type": "acceptor",
-            "name": "Sulphoxide",
+            "name": "Terminal Sulfate",
+            "probability": 0.35,
+            "geometry": "cone",
+            "smarts": "[OX1]=,-S(=,-[OX1])=,-[OX1]"
+        },
+        {
+            "type": "acceptor",
+            "name": "Sulfoxide",
             "probability": 0.40,
             "geometry": "cone",
             "smarts": "[OX1]=S(-*)-*"
@@ -231,6 +238,269 @@ namespace Gape {
             "probability": 0.38,
             "geometry": "plane",
             "smarts": "[OX2H]-*"
+        },
+        {
+            "type": "acceptor",
+            "name": "Symmetric Het6 N",
+            "probability": 0.38,
+            "geometry": "dir",
+            "smarts": "[#7X2]1~Z~*:~*~*:~Z~1"
+        },
+        {
+            "type": "acceptor",
+            "name": "Tertiary Amine",
+            "probability": 0.32,
+            "geometry": "dir",
+            "smarts": "[NX3](*)(*)*"
+        },
+        {
+            "type": "acceptor",
+            "name": "Ester O",
+            "probability": 0.17,
+            "geometry": "plane",
+            "smarts": "[OX1]=C(-*)-O-*"
+        },
+        {
+            "type": "acceptor",
+            "name": "Carbamate O",
+            "probability": 0.20,
+            "geometry": "plane",
+            "smarts": "[OX1]=C(-O-*)N-*"
+        },
+        {
+            "type": "acceptor",
+            "name": "Nitrile",
+            "probability": 0.21,
+            "geometry": "dir",
+            "smarts": "[NX1]#C"
+        },
+        {
+            "type": "acceptor",
+            "name": "Imine",
+            "probability": 0.19,
+            "geometry": "dir",
+            "smarts": "[NX2]=C"
+        },
+        /*
+        Dean and Mills have the probability for =O to be 0.18.	 However,  this
+        doesn't square with the importance of this group in QSAR studies.
+        So, based on empirical observation, I've adjusted the probability to
+        that of Thicarbonyl 0.4.
+        {"type": "acceptor", "name": "Ketone", "probability": 0.18, "geometry": "plane", "smarts": "[OX1]=C(-*)")},
+        */
+        {
+            "type": "acceptor",
+            "name": "Ketone",
+            "probability": 0.40,
+            "geometry": "plane",
+            "smarts": "[OX1]=C(-*)"
+        },
+        {
+            "type": "acceptor",
+            "name": "Secondary Amine",
+            "probability": 0.18,
+            "geometry": "dir",
+            "smarts": "[NX3H](-*)-*"
+        },
+        {
+            "type": "acceptor",
+            "name": "Phenol OH",
+            "probability": 0.13,
+            "geometry": "plane",
+            "smarts": "[OX2H1]-c1ccccc1"
+        },
+        {
+            "type": "acceptor",
+            "name": "Ether",
+            "probability": 0.11,
+            "geometry": "plane",
+            "smarts": "[OX2](-*)-*"
+        },
+        /*
+        In GAPE phenyl NH2 is planar
+        {"type": "acceptor", "name": "Phenyl NH2", "probability": 0.08, "geometry": "dir", "smarts": "[NX3H2]-c1ccccc1")},
+        */
+        // two acceptor geometries for Het5 O, depending on if O is aromatic
+        {
+            "type": "acceptor",
+            "name": "Het5 O",
+            "probability": 0.04,
+            "geometry": "plane",
+            "smarts": "[OX2]1-A-,=A-,=A-,=A-1"
+        },
+        {
+            "type": "acceptor",
+            "name": "Het5 O Aromatic",
+            "probability": 0.04,
+            "geometry": "dir",
+            "smarts": "[oX2]1~a~a~a~a~1"
+        },
+        {
+            "type": "acceptor",
+            "name": "Nitro O",
+            "probability": 0.04,
+            "geometry": "dir",
+            "smarts": "[OX1]=,-N=,-[OX1]"
+        },
+        {
+            "type": "acceptor",
+            "name": "Sulphone",
+            "probability": 0.02,
+            "geometry": "dir",
+            "smarts": "[OX1]=S(=O)-*"
+        },
+        {
+            "type": "donor",
+            "name": "Het5 NH",
+            "probability": 0.89,
+            "smarts": "[#7H]1~*~*~*~*~1"
+        },
+        {
+            "type": "donor",
+            "name": "sp2 N+H (1)",
+            "probability": 0.82,
+            "smarts": "[#7H+](-*)~[#6]~[#7]"
+        },
+        {
+            "type": "donor",
+            "name": "sp2 N+H (2)",
+            "probability": 0.82,
+            "smarts": "[#7H](-*)~[#6]~[#7+]"
+        },
+        // added charge to these guys, so pyrrole doesn't match
+        {
+            "type": "donor",
+            "name": "sp2 N+H (3)",
+            "probability": 0.82,
+            "smarts": "[#7H+](:,=*):,-*"
+        },
+        // Currently, don't support partial charge- but may need this pattern in the future
+        /*
+        {
+            "type": "donor",
+            "name": "sp2 N+H (4)",
+            "probability": 0.82,
+            "smarts": "N[f;fcharge=0.5]H(=:Hev)-:Hev"
+        }
+        */
+        {
+            "type": "donor",
+            "name": "Acid OH",
+            "probability": 0.82,
+            "smarts": "[OH]-[C,P,S]=,:O"
+        },
+        {
+            "type": "donor",
+            "name": "sp2 N+H2 (1)",
+            "probability": 0.75,
+            "smarts": "[NH2+]=,:*"
+        },
+        // sp2 pattern for charged ortho amino pyridine
+        {
+            "type": "donor",
+            "name": "sp2 N+H2 (2)",
+            "probability": 0.75,
+            "smarts": "[NH2]c1c[c,n]cc[nH+]1"
+        },
+        // sp2 pattern for charged para amino pyridine
+        {
+            "type": "donor",
+            "name": "sp2 N+H2 (3)",
+            "probability": 0.75,
+            "smarts": "[NH2]c1[c,n]c[nH+]cc1"
+        },
+        {
+            "type": "donor",
+            "name": "sp2 N+H2 (4)",
+            "probability": 0.75,
+            "smarts": "[#7H2+]~[#6]~[#7]"
+        },
+        {
+            "type": "donor",
+            "name": "sp2 N+H2 (5)",
+            "probability": 0.75,
+            "smarts": "[#7H2]~[#6]~[#7+]"
+        },
+        {
+            "type": "donor",
+            "name": "sp3 N+H3",
+            "probability": 0.74,
+            "smarts": "[NH3+]-*"
+        },
+        {
+            "type": "donor",
+            "name": "sp3 N+H2",
+            "probability": 0.73,
+            "smarts": "[NH2+](-*)-*"
+        },
+        /*
+        Dean and Mills have the probability for N+H to be 0.34.  However this
+        doesn't square with the importance of this group in QSAR studies.
+        So, based on empirical observation, I've adjusted the probability to
+        that of N+H2.
+        {"type": "donor", "name": "sp3 N+H", "probability": 0.34, "smarts": "[N+H](*)(*)*"},
+        */
+        {
+            "type": "donor",
+            "name": "sp3 N+H",
+            "probability": 0.73,
+            "smarts": "[N+H](-*)(-*)-*"
+        },
+        {
+            "type": "donor",
+            "name": "OH",
+            "probability": 0.68,
+            "smarts": "[OH]-*"
+        },
+        {
+            "type": "donor",
+            "name": "Primary Amide NH2",
+            "probability": 0.62,
+            "smarts": "[NX3H2]-C=O",
+            "weight": 5
+        },
+        {
+            "type": "donor",
+            "name": "Secondary Amide NH",
+            "probability": 0.54,
+            "smarts": "[NX3H](-*)-C=O",
+            "weight": 5
+        },
+        {
+            "type": "donor",
+            "name": "Phenyl NH",
+            "probability": 0.58,
+            "smarts": "[NHX3](-*)-c1ccccc1"
+        },
+        {
+            "type": "donor",
+            "name": "Phenyl NH2",
+            "probability": 0.46,
+            "smarts": "[NH2X3]-c1ccccc1"
+        },
+        {
+            "type": "donor",
+            "name": "Imine NH",
+            "probability": 0.33,
+            "smarts": "[NX2H]=*"
+        },
+        {
+            "type": "donor",
+            "name": "Phenyl OH",
+            "probability": 0.30,
+            "smarts": "[OX2H1]-c1ccccc1"
+        },
+        {
+            "type": "donor",
+            "name": "Primary Amine NH2",
+            "probability": 0.26,
+            "smarts": "[NX3H2]-*"
+        },
+        {
+            "type": "donor",
+            "name": "Secondary Amine NH",
+            "probability": 0.24,
+            "smarts": "[NX3H1](-*)-*"
         }
     ]
 }
