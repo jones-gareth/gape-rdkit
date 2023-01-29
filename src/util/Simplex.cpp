@@ -2,7 +2,7 @@
  * Simplex.cpp
  *
  *  Created on: May 6, 2016
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #include "Simplex.h"

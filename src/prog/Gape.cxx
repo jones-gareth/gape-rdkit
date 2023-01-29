@@ -2,9 +2,9 @@
 // Created by gareth on 10/19/22.
 //
 
-#include "gape/SuperpositionMolecule.h"
-#include "gape/GapeApp.h"
-#include "Reporter.h"
+#include "../gape/SuperpositionMolecule.h"
+#include "../gape/GapeApp.h"
+#include "../util/Reporter.h"
 
 #include <cassert>
 #include <boost/format.hpp>

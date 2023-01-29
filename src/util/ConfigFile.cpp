@@ -2,7 +2,7 @@
  * ConfigFile.cpp
  *
  *  Created on: Jan 21, 2016
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #include "ConfigFile.h"
@@ -51,7 +51,7 @@ const string ConfigFile::configDirectory() {
 		}
 	}
 
-	for (const auto & path : { "../config", "/home/gjones/src/gape/config" }) {
+	for (const auto & path : { "../config", "/home/Gareth Jones/src/gape/config" }) {
 		if (existsAndIsDirectory(path)) {
 			REPORT(Reporter::NORMAL) << "Using " << path
 					<< " as configuration directory";

@@ -2,7 +2,7 @@
  * LeastSquaresFit.h
  *
  *  Created on: Sep 9, 2015
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #ifndef SRC_UTIL_LEASTSQUARESFIT_H_

@@ -6,7 +6,7 @@
 #define GAPE_FEATURE_H
 
 #include <GraphMol/GraphMol.h>
-#include "SuperpositionMolecule.h"
+#include "../gape/SuperpositionMolecule.h"
 #include "PharmFeatureGeometry.h"
 
 using namespace RDKit;

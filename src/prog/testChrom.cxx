@@ -1,6 +1,6 @@
 /* 
  * File:   testChrom.cpp
- * Author: gjones
+ * Author: Gareth Jones
  *
  * Created on April 12, 2013, 8:52 AM
  */

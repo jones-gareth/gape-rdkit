@@ -1,24 +1,24 @@
 project(Gape)
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_VERBOSE_MAKEFILE ON)
-#set(CMAKE_BUILD_TYPE Debug)
-#set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_CXX_COMPILER g++)
-#set(CMAKE_C_COMPILER gcc)
+set(CMAKE_VS_PLATFORM_TOOLSET v140)
 if (NOT RDBASE)
     set(RDBASE $ENV{RDBASE})
 endif()
 
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Debug")
-endif ()
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # boost
 # if (NOT DEFINED BOOST_ROOT)
 # set(Boost_NO_SYSTEM_PATHS ON)
 # set(BOOST_ROOT /home/packages/boost)
 # endif()
-find_package(Boost REQUIRED COMPONENTS iostreams filesystem system program_options)
+
+# Windows needs dynamic libs for boost
+# see https://github.com/boostorg/program_options/issues/58 for MSVC and boost::program_options issues
+set(Boost_USE_STATIC_LIBS  OFF)
+find_package(Boost REQUIRED COMPONENTS iostreams filesystem serialization system program_options)
 
 # Eigen
 
@@ -48,6 +48,7 @@ ExternalProject_Add(
 
 # include directories
 include_directories(
+        "src"
         "/usr/local/include"
         ${Boost_INCLUDE_DIRS}
         ${RDBASE}/Code
@@ -63,27 +64,33 @@ set(cSrcDirs '')
 # exes to be default compiled
 set(allExes gape)
 
-if (WIN32)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /std:c++17 ")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /std:c++17 ")
+if (MSVC)
+    set(LIB_PREFIX "")
     set(OS_LIBS "")
+    # see https://github.com/boostorg/program_options/issues/58 for MSVC and boost::program_options issues
+    add_definitions( -DBOOST_ALL_NO_LIB )
+    # force all boost libraries to dynamic link (we already disabled
+    # autolinking, so I don't know why we need this, but we do!)
+    add_definitions( -DBOOST_ALL_DYN_LINK )
 elseif (UNIX)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 ")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 ")
+    set(LIB_PREFIX "RDKit")
     set(OS_LIBS, "m")
 endif()
 
-set(RDKit_LIBS RDKitChemReactions RDKitFileParsers RDKitSmilesParse RDKitDepictor
-        RDKitRDGeometryLib RDKitRDGeneral RDKitSubstructMatch RDKitSubgraphs
-        RDKitMolDraw2D RDKitGraphMol RDKitDistGeometry RDKitDistGeomHelpers
-        RDKitMolAlign RDKitOptimizer RDKitForceField RDKitForceFieldHelpers
-        RDKitAlignment RDKitForceField  RDKitMolTransforms RDKitEigenSolvers )
+set(RDKit_LIBS ${LIB_PREFIX}ChemReactions ${LIB_PREFIX}FileParsers ${LIB_PREFIX}SmilesParse ${LIB_PREFIX}Depictor
+        ${LIB_PREFIX}RDGeometryLib ${LIB_PREFIX}RDGeneral ${LIB_PREFIX}SubstructMatch ${LIB_PREFIX}Subgraphs
+        ${LIB_PREFIX}MolDraw2D ${LIB_PREFIX}GraphMol ${LIB_PREFIX}DistGeometry ${LIB_PREFIX}DistGeomHelpers
+        ${LIB_PREFIX}MolAlign ${LIB_PREFIX}Optimizer ${LIB_PREFIX}ForceField ${LIB_PREFIX}ForceFieldHelpers
+        ${LIB_PREFIX}Alignment ${LIB_PREFIX}ForceField  ${LIB_PREFIX}MolTransforms ${LIB_PREFIX}EigenSolvers
+        ${LIB_PREFIX}GenericGroups ${LIB_PREFIX}coordgen ${LIB_PREFIX}RingDecomposerLib ${LIB_PREFIX}Fingerprints
+        ${LIB_PREFIX}DataStructs)
 
 find_package (Threads)
 set(RDKit_THREAD_LIBS Threads::Threads)
 
-# libraries to link against 
-set( LIBS Boost::iostreams Boost::program_options ${RDKit_THREAD_LIBS} z  )
+# libraries to link against
+MESSAGE(STATUS, "Boost libraries are ${Boost_LIBRARIES}")
+set( LIBS ${Boost_LIBRARIES}  ${RDKit_THREAD_LIBS}  )
 
 
 # program files (end in *.cxx)- can be in source directories, or prog directory
@@ -100,7 +107,7 @@ endforeach ()
 MESSAGE(STATUS "allSources is ${allSources} ")
 
 # find all C sources
-set(allCSources "" src/mol/MolUtil.cpp src/mol/MolUtil.h src/test/RotatableBondCatch.cxx src/util/TransformOps.cpp src/util/TransformOps.h src/mol/HydrogenBondingType.cpp src/mol/HydrogenBondingType.h src/test/HydrogenBondingTypeCatch.cxx)
+set(allCSources "")
 foreach (_dir ${cSrcDirs})
     set(_pattern "src/${_dir}/*.c")
     file(GLOB _srcs ${_pattern})
@@ -109,6 +116,7 @@ foreach (_dir ${cSrcDirs})
 endforeach ()
 MESSAGE(STATUS "allCSources is ${allCSources} ")
 
+#[[
 # find all include directories
 set(allIncludes "")
 foreach (_dir ${srcDirs})
@@ -117,6 +125,7 @@ foreach (_dir ${srcDirs})
 endforeach ()
 MESSAGE(STATUS "allIncludes is  ${allIncludes}")
 include_directories(${allIncludes})
+#]]
 
 # create library
 add_library(GapeLib ${allSources} ${allCSources})
@@ -131,17 +140,9 @@ foreach (_dir ${progDirs})
     foreach (exesourcefile ${APP_SOURCES})
         # cut off .cxx.
         get_filename_component(exename ${exesourcefile} NAME_WE)
-        #string( REPLACE ".cxx" "" exename ${exesourcefile} )
-        list(FIND allExes "${exename}" _index)
-        if (${_index} GREATER -1)
-            add_executable(${exename} ${exesourcefile})
-            MESSAGE(STATUS " added program " ${exename} " to all")
-        else ()
-            add_executable(${exename} EXCLUDE_FROM_ALL ${exesourcefile})
-            MESSAGE(STATUS " added program " ${exename})
-        endif ()
-        add_dependencies(build_all ${exename})
-        target_link_libraries(${exename} GapeLib ${LIBS} ${RDKit_LIBS})
+        add_executable(${exename} ${exesourcefile})
+        MESSAGE(STATUS " added program " ${exename})
+        target_link_libraries(${exename} GapeLib ${RDKit_LIBS} ${LIBS} )
     endforeach (exesourcefile ${APP_SOURCES})
 endforeach ()
 

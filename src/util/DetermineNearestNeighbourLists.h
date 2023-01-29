@@ -2,7 +2,7 @@
  * DetermineNearestNeighbourLists.h
  *
  *  Created on: Apr 21, 2016
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #ifndef SRC_UTIL_DETERMINENEARESTNEIGHBOURLISTS_H_

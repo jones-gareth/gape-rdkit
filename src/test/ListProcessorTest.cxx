@@ -4,7 +4,7 @@
  *	Test file for testing list processing
  *
  *  Created on: Apr 29, 2014
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 

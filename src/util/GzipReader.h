@@ -5,7 +5,7 @@
  * Don't let this get out of scope until you've finished all reading.
  *
  *  Created on: May 2, 2014
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #ifndef GZIPREADER_H_

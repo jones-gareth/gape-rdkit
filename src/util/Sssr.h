@@ -2,7 +2,7 @@
  * Sssr.h
  *
  *  Created on: Oct 30, 2015
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #ifndef SRC_UTIL_SSSR_H_

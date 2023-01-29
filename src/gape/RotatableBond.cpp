@@ -6,8 +6,8 @@
 #include "SuperpositionMolecule.h"
 #include <ForceField/MMFF/Contribs.h>
 #include <Geometry/Transform3D.h>
-#include "mol/MolUtil.h"
-#include "util/TransformOps.h"
+#include "../mol/MolUtil.h"
+#include "../util/TransformOps.h"
 
 namespace Gape {
     RotatableBond::RotatableBond(RotatableBondType rotatableBondType, const Bond *const bond,

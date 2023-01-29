@@ -2,7 +2,7 @@
  * ShapeMetrics.h
  *
  *  Created on: Apr 12, 2016
- *      Author: gjones
+ *      Author: Gareth Jones
  *
  * See https://en.wikipedia.org/wiki/Gyration_tensor for information
  * about the gyration tensor and accosiated shape descriptors

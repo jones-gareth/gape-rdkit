@@ -2,7 +2,7 @@
  * Simplex.h
  *
  *  Created on: May 6, 2016
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #ifndef SRC_UTIL_SIMPLEX_H_

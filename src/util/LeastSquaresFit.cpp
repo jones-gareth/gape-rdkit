@@ -2,7 +2,7 @@
  * LeastSquaresFit.cpp
  *
  *  Created on: Sep 9, 2015
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #include <cassert>

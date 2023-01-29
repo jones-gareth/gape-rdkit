@@ -2,7 +2,7 @@
  * Array2D.cpp
  *
  *  Created on: Feb 20, 2016
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #include "Array2D.h"

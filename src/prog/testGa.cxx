@@ -4,11 +4,11 @@
  * A test program for a binary GA
  *
  *  Created on: Apr 26, 2013
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
-#include "Reporter.h"
-#include "BinaryTestGa.h"
+#include "../util/Reporter.h"
+#include "../ga/BinaryTestGa.h"
 
 using namespace Gape;
 

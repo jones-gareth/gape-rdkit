@@ -24,7 +24,7 @@ namespace Gape {
         None, Dir, Cone, Plane
     };
 
-    class HydrogenBondingType;
+    struct HydrogenBondingType;
 
     using HydrogenBondingTypesList = std::vector<std::shared_ptr<const HydrogenBondingType>>;
 

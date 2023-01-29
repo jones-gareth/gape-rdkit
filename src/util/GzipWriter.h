@@ -5,7 +5,7 @@
  * Don't let this object go out of scope until you have finished writing.
  *
  *  Created on: May 2, 2014
- *      Author: gjones
+ *      Author: Gareth Jones
  *
  */
 

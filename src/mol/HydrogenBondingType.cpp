@@ -3,7 +3,7 @@
 //
 
 #include "HydrogenBondingType.h"
-#include "util/Reporter.h"
+#include "../util/Reporter.h"
 #include <GraphMol/Substruct/SubstructMatch.h>
 #include <GraphMol/SmilesParse/SmilesParse.h>
 

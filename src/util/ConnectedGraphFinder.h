@@ -2,7 +2,7 @@
  * ConnectedGraphFinder.h
  *
  *  Created on: Nov 5, 2015
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #ifndef SRC_UTIL_CONNECTEDGRAPHFINDER_H_

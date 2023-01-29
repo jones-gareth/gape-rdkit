@@ -5,10 +5,10 @@
 #define CATCH_CONFIG_MAIN
 
 #include "catch2/catch.hpp"
-#include "gape/GapeApp.h"
-#include "util/Reporter.h"
-#include "mol/HydrogenBondingType.h"
-#include "mol/Solvate.h"
+#include "../gape/GapeApp.h"
+#include "../util/Reporter.h"
+#include "../mol/HydrogenBondingType.h"
+#include "../mol/Solvate.h"
 #include <GraphMol/GraphMol.h>
 #include <GraphMol/MolOps.h>
 #include <GraphMol/SmilesParse/SmilesWrite.h>

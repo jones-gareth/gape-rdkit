@@ -2,7 +2,7 @@
  * Ullman.h
  *
  *  Created on: Sep 1, 2015
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #ifndef SRC_UTIL_ULLMAN_H_

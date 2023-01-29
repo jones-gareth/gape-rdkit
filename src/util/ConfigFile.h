@@ -2,7 +2,7 @@
  * ConfigFile.h
  *
  *  Created on: Jan 21, 2016
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #ifndef SRC_UTIL_CONFIGFILE_H_

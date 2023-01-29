@@ -2,7 +2,7 @@
  * GzipWriter.cpp
  *
  *  Created on: May 2, 2014
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #include "GzipWriter.h"

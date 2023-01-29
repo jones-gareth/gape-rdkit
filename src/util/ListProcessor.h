@@ -2,7 +2,7 @@
  * ListProcessor.h
  *
  *  Created on: Sep 3, 2015
- *      Author: gjones
+ *      Author: Gareth Jones
  */
 
 #ifndef SRC_UTIL_LISTPROCESSOR_H_
