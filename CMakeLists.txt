@@ -46,6 +46,16 @@ ExternalProject_Add(
         TEST_COMMAND ""
 )
 
+# include directories
+include_directories(
+        "/usr/local/include"
+        ${Boost_INCLUDE_DIRS}
+        ${RDBASE}/Code
+        ${EIGEN_INCLUDE_DIR}
+        ${RDBASE}/External/rapidjson-1.1.0/include
+        ${RDBASE}/External/catch/catch/single_include)
+link_directories ( ${RDBASE}/lib )
+
 # Set the directories under src which contain cpp files to be compiled
 set(srcDirs util ga mol test gape)
 set(cSrcDirs '')
@@ -56,57 +66,28 @@ set(allExes gape)
 if (WIN32)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /std:c++17 ")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /std:c++17 ")
-    set(LIB_PREFIX "")
-    set(LIB_SUFFIX ".lib")
     set(OS_LIBS "")
 elseif (UNIX)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 ")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 ")
-    set(LIB_PREFIX "libRDKit")
-    set(LIB_SUFFIX ".so")
     set(OS_LIBS, "m")
 endif()
 
+set(RDKit_LIBS RDKitChemReactions RDKitFileParsers RDKitSmilesParse RDKitDepictor
+        RDKitRDGeometryLib RDKitRDGeneral RDKitSubstructMatch RDKitSubgraphs
+        RDKitMolDraw2D RDKitGraphMol RDKitDistGeometry RDKitDistGeomHelpers
+        RDKitMolAlign RDKitOptimizer RDKitForceField RDKitForceFieldHelpers
+        RDKitAlignment RDKitForceField  RDKitMolTransforms RDKitEigenSolvers )
+
+find_package (Threads)
+set(RDKit_THREAD_LIBS Threads::Threads)
+
 # libraries to link against 
-set(coreLibs
-        ${Boost_IOSTREAMS_LIBRARY}
-        ${Boost_IOSTREAMS_LIBRARY}
-        ${Boost_FILESYSTEM_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
-        ${Boost_PROGRAM_OPTIONS_LIBRARY}
-        ${OS_LIBS}
-        ${RDBASE}/lib/${LIB_PREFIX}RDGeneral${LIB_SUFFIX}
-        ${RDBASE}/lib/${LIB_PREFIX}GraphMol${LIB_SUFFIX}
-        ${RDBASE}/lib/${LIB_PREFIX}ForceField${LIB_SUFFIX}
-        ${RDBASE}/lib/${LIB_PREFIX}ForceFieldHelpers${LIB_SUFFIX}
-        ${RDBASE}/lib/${LIB_PREFIX}DistGeomHelpers${LIB_SUFFIX}
-        ${RDBASE}/lib/${LIB_PREFIX}FileParsers${LIB_SUFFIX}
-        ${RDBASE}/lib/${LIB_PREFIX}SmilesParse${LIB_SUFFIX}
-        ${RDBASE}/lib/${LIB_PREFIX}SubstructMatch${LIB_SUFFIX}
-        ${RDBASE}/lib/${LIB_PREFIX}RDGeometryLib${LIB_SUFFIX}
-        )
+set( LIBS Boost::iostreams Boost::program_options ${RDKit_THREAD_LIBS} z  )
 
-# program files (end in *.cxx)- can be in source directories, or prog directory 
+
+# program files (end in *.cxx)- can be in source directories, or prog directory
 set(progDirs prog test)
-
-# library paths- add boost
-set(LIBS ${LIBS} ${Boost_LIBRARY_DIRS})
-
-# include directories
-include_directories(
-        "/usr/local/include"
-        ${Boost_INCLUDE_DIRS}
-        ${GTEST_INCLUDE_DIRS}
-        ${RDBASE}/Code
-        ${EIGEN_INCLUDE_DIR}
-        ${RDBASE}/External/rapidjson-1.1.0/include
-        ${RDBASE}/External/catch/catch/single_include)
-link_directories(${LIBS})
-
-# cflags
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
-# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -Wall -g -ggdb -std=c++17 -fmessage-length=0 ")
-# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC -Wall -std=c++17 -fmessage-length=0 ")
 
 # find all sources
 set(allSources "")
@@ -160,7 +141,7 @@ foreach (_dir ${progDirs})
             MESSAGE(STATUS " added program " ${exename})
         endif ()
         add_dependencies(build_all ${exename})
-        target_link_libraries(${exename} GapeLib ${coreLibs})
+        target_link_libraries(${exename} GapeLib ${LIBS} ${RDKit_LIBS})
     endforeach (exesourcefile ${APP_SOURCES})
 endforeach ()
 

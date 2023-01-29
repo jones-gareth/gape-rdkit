@@ -34,8 +34,9 @@ namespace Gape {
     }
 
     void SuperpositionMolecule::generate3D() {
-        DGeomHelpers::EmbedParameters embedParameters;
-        auto confId = EmbedMolecule(mol, embedParameters);
+        // DGeomHelpers::EmbedParameters embedParameters;
+        // DGeomHelpers::EmbedMolecule(mol, embedParameters);
+        DGeomHelpers::EmbedMolecule(mol, 10, 1);
         mmffMolProperties = new MMFF::MMFFMolProperties(mol);
         assert(mmffMolProperties->isValid());
         auto forceField = MMFF::constructForceField(mol, mmffMolProperties, 1000);

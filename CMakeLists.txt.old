@@ -1,0 +1,223 @@
+project(Gape)
+cmake_minimum_required(VERSION 2.8)
+set(CMAKE_VERBOSE_MAKEFILE ON)
+#set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_CXX_COMPILER g++)
+#set(CMAKE_C_COMPILER gcc)
+if (NOT RDBASE)
+    set(RDBASE $ENV{RDBASE})
+endif()
+
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug")
+endif ()
+
+# boost
+# if (NOT DEFINED BOOST_ROOT)
+# set(Boost_NO_SYSTEM_PATHS ON)
+# set(BOOST_ROOT /home/packages/boost)
+# endif()
+find_package(Boost REQUIRED COMPONENTS iostreams filesystem system program_options)
+
+# Eigen
+
+#[[
+# use this to include a local eigen
+if (NOT DEFINED EIGEN_ROOT)
+    set(EIGEN_ROOT /home/packages/eigen-3.3.8)
+endif ()
+set(EIGEN_INCLUDE_DIR "${EIGEN_ROOT}")
+#]]
+
+include(ExternalProject)
+set(EIGEN_BUILD_DIR   ${CMAKE_BINARY_DIR}/eigen)
+set(EIGEN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/eigen_include)
+set(EIGEN_INCLUDE_DIR ${EIGEN_INSTALL_DIR})
+ExternalProject_Add(
+        eigen
+        URL https://gitlab.com/libeigen/eigen/-/archive/3.3.9/eigen-3.3.9.tar.gz
+        PREFIX ${EIGEN_BUILD_DIR}
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND
+        ${CMAKE_COMMAND} -E copy_directory ${EIGEN_BUILD_DIR}/src/eigen/Eigen ${EIGEN_INCLUDE_DIR}/Eigen
+        && ${CMAKE_COMMAND} -E copy_directory ${EIGEN_BUILD_DIR}/src/eigen/unsupported ${EIGEN_INCLUDE_DIR}/unsupported
+        TEST_COMMAND ""
+)
+
+# Set the directories under src which contain cpp files to be compiled
+set(srcDirs util ga mol test gape)
+set(cSrcDirs '')
+
+# exes to be default compiled
+set(allExes gape)
+
+if (WIN32)
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /std:c++17 ")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /std:c++17 ")
+    set(LIB_PREFIX "")
+    set(LIB_SUFFIX ".lib")
+    set(OS_LIBS "")
+elseif (UNIX)
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 ")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 ")
+    set(LIB_PREFIX "libRDKit")
+    set(LIB_SUFFIX ".so")
+    set(OS_LIBS, "m")
+endif()
+
+# libraries to link against 
+set(coreLibs
+        ${Boost_IOSTREAMS_LIBRARY}
+        ${Boost_IOSTREAMS_LIBRARY}
+        ${Boost_FILESYSTEM_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_PROGRAM_OPTIONS_LIBRARY}
+        ${OS_LIBS}
+        ${RDBASE}/lib/${LIB_PREFIX}RDGeneral${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}ForceField${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}ForceFieldHelpers${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}FileParsers${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}SmilesParse${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}SubstructMatch${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}RDGeometryLib${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}GraphMol${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}DistGeometry${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}DistGeomHelpers${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}Alignment${LIB_SUFFIX}
+        /home/packages/rdkit.remote/lib/libRDKitDistGeometry.so
+        /home/packages/rdkit.remote/lib/libRDKitAlignment.so
+        /home/packages/rdkit.remote/lib/libRDKitForceFieldHelpers.so.1
+        /home/packages/rdkit.remote/lib/libRDKitSubstructMatch.so.1
+        /home/packages/rdkit.remote/lib/libRDKitForceField.so.1
+        /home/packages/rdkit.remote/lib/libRDKitGraphMol.so.1
+        /home/packages/rdkit.remote/lib/libRDKitRDGeometryLib.so.1
+        /home/packages/rdkit.remote/lib/libRDKitRDGeneral.so.1
+        /home/packages/rdkit.remote/lib/libRDKitEigenSolvers.so.1
+        /home/packages/rdkit.remote/lib/libRDKitSmilesParse.so.1
+        /home/packages/rdkit.remote/lib/libRDKitGenericGroups.so.1
+        /home/packages/rdkit.remote/lib/libRDKitRingDecomposerLib.so.1
+        ${RDBASE}/lib/${LIB_PREFIX}DistGeomHelpers${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}FileParsers${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}DistGeometry${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}ForceFieldHelpers${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}ForceField${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}Optimizer${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}Trajectory${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}ChemTransforms${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}Depictor${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}MolAlign${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}SmilesParse${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}Alignment${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}MolTransforms${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}EigenSolvers${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}SubstructMatch${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}GenericGroups${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}GraphMol${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}RDGeometryLib${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}DataStructs${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}RingDecomposerLib${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}RDGeneral${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}coordgen${LIB_SUFFIX}
+        ${RDBASE}/lib/${LIB_PREFIX}maeparser${LIB_SUFFIX}
+        -lpthread
+        /home/packages/anaconda3/envs/rdkit_build/lib/libboost_system.so
+        /home/packages/anaconda3/envs/rdkit_build/lib/libboost_iostreams.so
+        /home/packages/anaconda3/envs/rdkit_build/lib/libboost_regex.so
+        /home/packages/anaconda3/envs/rdkit_build/lib/libboost_regex.so
+        /home/packages/anaconda3/envs/rdkit_build/lib/libz.so
+        )
+
+# -lpthread  /home/packages/anaconda3/envs/rdkit_build/lib/libboost_system.so  /home/packages/anaconda3/envs/rdkit_build/lib/libboost_iostreams.so  /home/packages/anaconda3/envs/rdkit_build/lib/libboost_regex.so  /home/packages/anaconda3/envs/rdkit_build/lib/libboost_regex.so  /home/packages/anaconda3/envs/rdkit_build/lib/libz.so
+# program files (end in *.cxx)- can be in source directories, or prog directory
+set(progDirs prog test)
+
+# library paths- add boost
+set(LIBS ${LIBS} ${Boost_LIBRARY_DIRS})
+
+# include directories
+include_directories(
+        "/usr/local/include"
+        ${Boost_INCLUDE_DIRS}
+        ${GTEST_INCLUDE_DIRS}
+        ${RDBASE}/Code
+        ${EIGEN_INCLUDE_DIR}
+        ${RDBASE}/External/rapidjson-1.1.0/include
+        ${RDBASE}/External/catch/catch/single_include)
+link_directories(${LIBS})
+
+# cflags
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
+# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -Wall -g -ggdb -std=c++17 -fmessage-length=0 ")
+# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIC -Wall -std=c++17 -fmessage-length=0 ")
+
+# find all sources
+set(allSources "")
+foreach (_dir ${srcDirs})
+    set(_pattern "src/${_dir}/*.cpp")
+    file(GLOB _srcs ${_pattern})
+    #MESSAGE( DBG "_dir is ${_dir} _pattern = ${_pattern} _srcs is ${_srcs}")
+    list(APPEND allSources ${_srcs})
+endforeach ()
+MESSAGE(STATUS "allSources is ${allSources} ")
+
+# find all C sources
+set(allCSources "" src/mol/MolUtil.cpp src/mol/MolUtil.h src/test/RotatableBondCatch.cxx src/util/TransformOps.cpp src/util/TransformOps.h src/mol/HydrogenBondingType.cpp src/mol/HydrogenBondingType.h src/test/HydrogenBondingTypeCatch.cxx)
+foreach (_dir ${cSrcDirs})
+    set(_pattern "src/${_dir}/*.c")
+    file(GLOB _srcs ${_pattern})
+    #MESSAGE( DBG "_dir is ${_dir} _pattern = ${_pattern} _srcs is ${_srcs}")
+    list(APPEND allCSources ${_srcs})
+endforeach ()
+MESSAGE(STATUS "allCSources is ${allCSources} ")
+
+# find all include directories
+set(allIncludes "")
+foreach (_dir ${srcDirs})
+    #MESSAGE( DBG "_dir is ${_dir}")
+    list(APPEND allIncludes "src" "src/${_dir}")
+endforeach ()
+MESSAGE(STATUS "allIncludes is  ${allIncludes}")
+include_directories(${allIncludes})
+
+# create library
+add_library(GapeLib ${allSources} ${allCSources})
+add_dependencies(GapeLib eigen)
+
+# add all programs
+add_custom_target(build_all)
+MESSAGE(STATUS "progDirs is ${progDirs}")
+foreach (_dir ${progDirs})
+    set(_pattern "src/${_dir}/*.cxx")
+    file(GLOB APP_SOURCES ${_pattern})
+    foreach (exesourcefile ${APP_SOURCES})
+        # cut off .cxx.
+        get_filename_component(exename ${exesourcefile} NAME_WE)
+        #string( REPLACE ".cxx" "" exename ${exesourcefile} )
+        list(FIND allExes "${exename}" _index)
+        if (${_index} GREATER -1)
+            add_executable(${exename} ${exesourcefile})
+            MESSAGE(STATUS " added program " ${exename} " to all")
+        else ()
+            add_executable(${exename} EXCLUDE_FROM_ALL ${exesourcefile})
+            MESSAGE(STATUS " added program " ${exename})
+        endif ()
+        add_dependencies(build_all ${exename})
+        target_link_libraries(${exename} GapeLib ${coreLibs})
+    endforeach (exesourcefile ${APP_SOURCES})
+endforeach ()
+
+# Add test programs (in test source directory)
+enable_testing()
+add_custom_target(build_and_test ${CMAKE_CTEST_COMMAND} -V)
+
+set(_pattern "src/test/*.cxx")
+file(GLOB APP_SOURCES ${_pattern})
+foreach (exesourcefile ${APP_SOURCES})
+    get_filename_component(exename ${exesourcefile} NAME_WE)
+    add_test(${exename} ${exename})
+    MESSAGE(STATUS " added test " ${exename})
+    add_dependencies(build_and_test ${exename})
+endforeach (exesourcefile ${APP_SOURCES})
+

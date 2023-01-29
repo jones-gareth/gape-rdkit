@@ -54,4 +54,9 @@ namespace Gape {
         double phi = acos(cosPhi);
         return sp2 < 0 ? phi : -phi;
     }
+
+    double squareDistance(const RDGeom::Point3D &p1, const RDGeom::Point3D &p2) {
+        auto diff = p2 - p1;
+        return diff.lengthSq();
+    }
 }

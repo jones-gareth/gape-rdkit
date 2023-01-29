@@ -20,5 +20,7 @@ namespace Gape {
     double torsionAngle(const RDGeom::Point3D &p1, const RDGeom::Point3D &p2,
                         const RDGeom::Point3D &p3, const RDGeom::Point3D &p4);
 
+    double squareDistance(const RDGeom::Point3D &p1, const RDGeom::Point3D &p2);
+
 } // namespace Gape
 #endif //GAPE_MOLUTIL_H
