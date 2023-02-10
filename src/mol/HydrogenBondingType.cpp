@@ -7,14 +7,15 @@
 #include <GraphMol/Substruct/SubstructMatch.h>
 #include <GraphMol/SmilesParse/SmilesParse.h>
 
-namespace Gape {
-    using namespace RDKit;
+namespace Gape
+{
+	using namespace RDKit;
 
-    HydrogenBondingType::HydrogenBondingType(const HydrogenBondType hydrogenBondType, const std::string &name,
+    HydrogenBondingType::HydrogenBondingType(const HydrogenBondType hydrogenBondType, std::string name,
                                              const double probability, const HydrogenBondGeometry &geometry,
-                                             const std::string &smartsIn) : hydrogenBondType(hydrogenBondType),
-                                                                            name(name), probability(probability),
-                                                                            geometry(geometry), smarts(smartsIn) {
+                                             std::string smartsIn) : hydrogenBondType(hydrogenBondType),
+                                                                     name(std::move(name)), probability(probability),
+                                                                     geometry(geometry), smarts(std::move(smartsIn)) {
         try {
             int wildcardNum = 0;
             for (int i = 0; i < smarts.length(); i++) {
@@ -79,14 +80,12 @@ namespace Gape {
     }
 
     HydrogenBondingType::~HydrogenBondingType() {
-        if (query != nullptr) {
             delete query;
-        }
     }
 
-    std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
+    std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>>
     findHydrogenBondDonorsOrAcceptors(const HydrogenBondType bondType, const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol) {
-        std::map<Atom *, std::shared_ptr<const HydrogenBondingType>> features;
+        std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>> features;
         SubstructMatchParameters params;
         params.uniquify = false;
         for (const auto &bondingType: hydrogenBondingTypes) {
@@ -135,12 +134,12 @@ namespace Gape {
     }
 
 
-    std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
+    std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>>
     findHydrogenBondDonors(const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol) {
         return findHydrogenBondDonorsOrAcceptors(HydrogenBondType::Donor, hydrogenBondingTypes, mol);
     }
 
-    std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
+    std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>>
     findHydrogenBondAcceptors(const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol) {
         return findHydrogenBondDonorsOrAcceptors(HydrogenBondType::Acceptor, hydrogenBondingTypes, mol);
     }

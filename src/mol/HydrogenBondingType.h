@@ -37,8 +37,8 @@ namespace Gape {
         ROMol *query;
         double weight;
 
-        HydrogenBondingType(const HydrogenBondType hydrogenBondType, const std::string &name, const double probability,
-                            const HydrogenBondGeometry &geometry, const std::string &smarts) ;
+        HydrogenBondingType(const HydrogenBondType hydrogenBondType, std::string name, const double probability,
+                            const HydrogenBondGeometry &geometry, std::string smarts) ;
 
         ~HydrogenBondingType();
 
@@ -48,15 +48,15 @@ namespace Gape {
         bool matchZandY(const std::vector<std::pair<int, int>> &match, const ROMol &mol) const;
 
         friend
-        std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
+        std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>>
         findHydrogenBondDonorsOrAcceptors(const HydrogenBondType, const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol) ;
     };
 
 
-    std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
+    std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>>
     findHydrogenBondDonors(const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol);
 
-    std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
+    std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>>
     findHydrogenBondAcceptors(const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol);
 
 } // Gape

@@ -7,8 +7,9 @@ update_rdkit.sh
 .env
 .vscode
 .vs
-CMakeSettings.json
-CMakePresets.json
+# not portable but I don't want to loose these 2
+# CMakeSettings.json
+# CMakePresets.json
 .idea
 out
 .settings

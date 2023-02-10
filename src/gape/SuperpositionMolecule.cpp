@@ -13,6 +13,8 @@
 #include <GraphMol/ForceFieldHelpers/MMFF/MMFF.h>
 #include <GraphMol/FileParsers/FileParsers.h>
 
+#include "mol/HydrogenBondingType.h"
+
 using namespace RDKit;
 
 namespace Gape {
@@ -39,12 +41,12 @@ namespace Gape {
         DGeomHelpers::EmbedMolecule(mol, 10, 1);
         mmffMolProperties = new MMFF::MMFFMolProperties(mol);
         assert(mmffMolProperties->isValid());
-        auto forceField = MMFF::constructForceField(mol, mmffMolProperties, 1000);
+        const auto forceField = MMFF::constructForceField(mol, mmffMolProperties, 1000);
         ForceFieldsHelper::OptimizeMolecule(*forceField);
         delete forceField;
         assert(mol.getNumConformers() == 1);
         referenceConformer = mol.getConformer();
-        for (auto &rotatableBond: rotatableBonds) {
+        for (const auto &rotatableBond: rotatableBonds) {
             rotatableBond->setTorsionAngles();
         }
     }
@@ -283,10 +285,17 @@ namespace Gape {
 
     void SuperpositionMolecule::setConformer(const Conformer &conformer) {
         assert(mol.getNumConformers() == 1);
-        auto id = mol.getConformer().getId();
+        const auto id = mol.getConformer().getId();
         mol.removeConformer(id);
-        auto conformerPtr = new Conformer(conformer);
+        const auto conformerPtr = new Conformer(conformer);
         mol.addConformer(conformerPtr, true);
         assert(mol.getNumConformers() == 1);
     }
+
+    void SuperpositionMolecule::findDonorsAndAcceptors()
+    {
+        donors = findHydrogenBondDonors(settings.getHydrogenBondingTypes(), mol);
+        acceptors = findHydrogenBondAcceptors(settings.getHydrogenBondingTypes(), mol);
+    }
+
 } // namespace GAPE

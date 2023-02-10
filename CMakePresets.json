@@ -1,0 +1,83 @@
+﻿{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "windows",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "CMAKE_INCLUDE_PATH": "C:/tools/Anaconda3/envs/rdkit_build/Library/include",
+        "CMAKE_LIBRARY_PATH": "C:/tools/Anaconda3/envs/rdkit_build/Library/bin"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+     "environment": {
+        "Boost_ROOT": "",
+	      "RDBASE": "c:/gareth/src/rdkit"
+      }
+    },
+    {
+      "name": "x64-debug",
+      "displayName": "x64 Debug",
+      "inherits": "windows"
+   },
+    {
+      "name": "x64-release",
+      "displayName": "x64 Release",
+      "inherits": "windows"
+    },
+    {
+      "name": "linux-debug",
+      "displayName": "Linux Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-g -Wall -O0",
+        "CMAKE_INCLUDE_PATH": "/home/packages/anaconda3/envs/rdkit_build/include",
+        "CMAKE_LIBRARY_PATH": "/home/packages/anaconda3/envs/rdkit_build/lib"
+      },
+      "environment": {
+
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+        }
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-debug",
+      "displayName": "WindowsDebug",
+      "configurePreset": "x64-debug",
+      "jobs": 12,
+      "configuration": "Debug"
+    },
+    {
+      "name": "windows-release",
+      "displayName": "WindowsRelease",
+      "configurePreset": "x64-release",
+      "jobs": 12,
+      "configuration": "Release"
+    }
+  ]
+}

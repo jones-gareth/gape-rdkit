@@ -16,7 +16,7 @@
 using namespace Gape;
 using namespace RDKit;
 
-std::map<Atom *, std::shared_ptr<const HydrogenBondingType>>
+std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>>
 findDonorsOrAcceptors(HydrogenBondType bondType, RWMol &mol, const GapeApp &settings, bool solvate = true) {
     mol.setProp(common_properties::_Name, "Unknown molecule");
     MolOps::addHs(mol);
