@@ -107,4 +107,16 @@ namespace Gape
 		}
 		return ss.str();
 	}
+
+	double Feature::score(const double sqrDistance)
+	{
+		return score(sqrDistance, alpha);
+	}
+
+	double Feature::score(const double sqrDistance, const double a)
+	{
+		const double val = -0.5 * a * sqrDistance;
+		return exp(val);
+	}
+
 } // Gape

@@ -7,7 +7,6 @@
 
 #include <GraphMol/GraphMol.h>
 
-#include <utility>
 #include "../gape/SuperpositionMolecule.h"
 #include "PharmFeatureGeometry.h"
 
@@ -51,7 +50,7 @@ namespace Gape
 		/**
 		 * Molecule containing this feature
 		 */
-		SuperpositionMolecule* molecule;
+		const SuperpositionMolecule* molecule;
 
 		/**
 		 * Set this if we've stored a mapping
@@ -112,7 +111,7 @@ namespace Gape
 		 */
 		double geometricScore;
 
-		Feature(const FeatureType featureType, const int featureSetNumber, const std::string &featureSetName,
+		Feature(const FeatureType featureType, const int featureSetNumber, const std::string& featureSetName,
 		        const bool atomFeature):
 			featureType(featureType), featureSetNumber(featureSetNumber), featureSetName(featureSetName),
 			atomFeature(atomFeature)
@@ -159,7 +158,7 @@ namespace Gape
 		 * @param f
 		 * @return
 		 */
-		virtual double score(const Feature f) const;
+		virtual double score(const Feature& f);
 
 		/**
 		 * Returns a label for the feature to use in mol2 or sdf pharmacophore
@@ -209,6 +208,30 @@ namespace Gape
 		static void setRadius(double r);
 
 		/**
+		 * Determines the integral between two gaussians. The square distance
+		 * between gaussian centers is given. The gaussian parameter for alpha is
+		 * taken for the class variable, so this method only works for the class
+		 * features.
+		 *
+		 * @param sqrDistance
+		 * @return
+		 */
+		static double score(double sqrDistance);
+
+
+		/**
+		 * Determines the integral between two gaussians. The square distance
+		 * between gaussian centers is given as is the alpha parameter for the
+		 * gaussians (both gaussians have the same alpha parameter).
+		 *
+		 * @param sqrDistance
+		 * @param a
+		 * @return
+		 */
+		static double score(double sqrDistance, double a);
+
+
+		/**
 		 * Determine a gaussian alpha parameter from a "radius". It's more intuitive
 		 * to specify a radius rather that alpha.
 		 *
@@ -216,6 +239,7 @@ namespace Gape
 		 * @return
 		 */
 		static double getAlpha(double r);
+
 
 		/**
 		 * Set the alpha used in a gaussian to determine if a point is solvent
