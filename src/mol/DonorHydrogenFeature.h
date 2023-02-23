@@ -29,8 +29,8 @@ namespace Gape
 		 */
 		thread_local static double matchFactor;
 
-		thread_local static double maxDonorAngle;
-		thread_local static double minDonorAngle;
+		thread_local static double maxDonorDonorAngle;
+		thread_local static double minDonorDonorAngle;
 		thread_local static bool scoreDonorAtoms;
 
 		bool charged = false;
@@ -53,7 +53,7 @@ namespace Gape
 		 * 
 		 * @see com.cairn.gape.Feature#getCoordinate()
 		 */
-		RDGeom::Point3D& calculateCoordinate(const Conformer& conformer);
+		RDGeom::Point3D& calculateCoordinate(const Conformer& conformer) override;
 
 
 		/*
@@ -61,15 +61,15 @@ namespace Gape
 		 * 
 		 * @see com.cairn.gape.Feature#info()
 		 */
-		std::string info() const;
+		std::string info() const override;
 
-		std::string pharmLabel() const;
+		std::string pharmLabel() const override;
 
 
 		/*
 		 * Returns similarity between two donor hydrogens. 
 		 *
 		 */
-		double score(const Feature &f);
+		double score(const Feature &otherFeature, const Conformer &conformer, const Conformer &otherConformer) override;
 	};
 }

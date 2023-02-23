@@ -158,7 +158,7 @@ namespace Gape
 		 * @param f
 		 * @return
 		 */
-		virtual double score(const Feature& f);
+		virtual double score(const Feature& otherFeature, const Conformer& conformer, const Conformer& otherConformer);
 
 		/**
 		 * Returns a label for the feature to use in mol2 or sdf pharmacophore
@@ -275,7 +275,7 @@ namespace Gape
 		 *
 		 * @return
 		 */
-		const RDGeom::Point3D& calculateCoordinate(const Conformer& conformer);
+		virtual const RDGeom::Point3D& calculateCoordinate(const Conformer& conformer);
 
 		/**
 		 * As getCoordinate, but returns the saved class copy of the coordinate.

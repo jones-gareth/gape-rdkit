@@ -4,14 +4,15 @@
 #include <boost/algorithm/string.hpp>
 
 #include "HydrogenBondingType.h"
+#include "../util/Reporter.h"
 
 namespace Gape
 {
 	thread_local double DonorHydrogenFeature::hBondLen = 2.9;
 	thread_local double DonorHydrogenFeature::chargeFactor = 2.0;
 
-	thread_local double DonorHydrogenFeature::maxDonorAngle = 120.0 * M_PI / 180.0;
-	thread_local double DonorHydrogenFeature::minDonorAngle = 90 * M_PI / 180.0;
+	thread_local double DonorHydrogenFeature::maxDonorDonorAngle = 120.0 * M_PI / 180.0;
+	thread_local double DonorHydrogenFeature::minDonorDonorAngle = 90 * M_PI / 180.0;
 	thread_local bool DonorHydrogenFeature::scoreDonorAtoms = true;
 
 	std::vector<std::shared_ptr<Feature>> DonorHydrogenFeature::findDonorHydrogens(
@@ -87,92 +88,101 @@ namespace Gape
 		return featureSetName + " " + label + options;
 	}
 
-	double DonorHydrogenFeature::score(const Feature &f)
-{
-			const auto &other = dynamic_cast<const DonorHydrogenFeature&>(f);
+	double DonorHydrogenFeature::score(const Feature& otherFeature, const Conformer& conformer,
+	                                   const Conformer& otherConformer)
+	{
+		const auto& other = dynamic_cast<const DonorHydrogenFeature&>(otherFeature);
 
-			// fitting point Gaussian
-			coordinate.
-			double vol = Feature.score(Coord.sqrDistance(coordinate, other.coordinate));
-			Coord.midPoint(coordinate, other.coordinate, midPoint.get());
+		// fitting point Gaussian
+		const auto sqrDistance = (coordinate - other.coordinate).lengthSq();
+		const auto vol = Feature::score(sqrDistance);
+		const auto midPoint = (coordinate + other.coordinate) / 2.0;
+		const auto mol = molecule->getMol();
+		const auto otherMol = other.molecule->getMol();
 
-			double correct = .0;
-			if (!virtual) {
-				// Corrections to make sure fitting point is solvent accessible
-				double molVol = Feature.solvationPenalty(midPoint.get(), molecule, atom);
-				double otherMolVol = Feature.solvationPenalty(midPoint.get(), other.molecule,
-						other.atom);
+		// Corrections to make sure fitting point is solvent accessible
+		auto molVol = Feature::solvationPenalty(midPoint, mol, conformer, *atom);
+		auto otherMolVol = Feature::solvationPenalty(midPoint, otherMol, otherConformer, *other.atom);
 
-				if (molVol < .0)
-					molVol = .0;
-				if (otherMolVol < .0)
-					otherMolVol = .0;
-				correct = molVol > otherMolVol ? molVol : otherMolVol;
+		if (molVol < .0)
+			molVol = .0;
+		if (otherMolVol < .0)
+			otherMolVol = .0;
+		const auto correct = molVol > otherMolVol ? molVol : otherMolVol;
 
-				if (logDebug) {
-					logger.debug(info() + " " + other.info() + " fitting vol " + vol
-							+ " molA " + molVol + " molB " + otherMolVol);
-				}
-			}
-			double fitScore = vol - correct;
-			if (fitScore < 0)
-				fitScore = 0;
+		REPORT(Reporter::DEBUG) <<
+				info() << " " << other.info() << " fitting vol " << vol
+					<< " molA " << molVol << " molB " << otherMolVol;
 
-			geometricScore = fitScore;
+		double fitScore = vol - correct;
+		if (fitScore < 0)
+			fitScore = 0;
 
-			double score;
-			if (scoreDonorAtoms.get()) {
-				// now check that donor atoms are reasonably positioned.
-				if (fitScore == 0)
-					return .0;
-				Coord.subtract(donorCoord, midPoint.get(), vec1.get());
-				Coord.subtract(other.donorCoord, midPoint.get(), vec2.get());
-				double angle = Coord.angle(vec1.get(), vec2.get());
-				if (logDebug)
-					logger.debug("Angle " + angle + " max " + maxDonorDonorAngle + " min "
-							+ minDonorDonorAngle);
-				double donorScore = .0;
-				if (angle > maxDonorDonorAngle.get())
-					return .0;
-				else if (angle < minDonorDonorAngle.get())
-					donorScore = 1.0;
-				else {
-					donorScore = 1 - (angle - minDonorDonorAngle.get())
-						/ (maxDonorDonorAngle.get() - minDonorDonorAngle.get());
-				}
-
-				if (logDebug)
-					logger.debug(" donor score " + donorScore);
-				score = fitScore * donorScore;
-			}
-			else {
-				score = fitScore;
-				if (fitScore > maximumGaussianScore.get())
-					score = maximumGaussianScore.get();
-			}
-
-			if (logDebug)
-				logger.debug(" geometric score " + geometricScore);
-
-			if (score < .0)
+		geometricScore = fitScore;
+		double score;
+		if (scoreDonorAtoms)
+		{
+			// now check that donor atoms are reasonably positioned.
+			if (fitScore == 0)
+			{
 				return .0;
-
-			// Mills and Dean probabilities for types
-			double prob = hydrogenBondingType.getProbability()
-				+ other.hydrogenBondingType.getProbability();
-			score *= prob;
-
-			// increase for matching types
-			if (hydrogenBondingType.getId() == other.hydrogenBondingType.getId())
-				score *= matchFactor.get();
-
-			// increase if both donors are charged
-			if (charged && other.charged)
-				score *= chargeFactor.get();
-
-			if (logDebug)
-				logger.debug(" type score " + score);
-			return score;
+			}
+			const auto vec1 = donorCoordinate - midPoint;
+			const auto vec2 = other.donorCoordinate - midPoint;
+			const double angle = vec1.angleTo(vec2);
+			REPORT(Reporter::DEBUG) << "Angle " << angle << " max " << maxDonorDonorAngle << " min "
+					<< minDonorDonorAngle;
+			double donorScore = .0;
+			if (angle > maxDonorDonorAngle)
+			{
+				return .0;
+			}
+			if (angle < minDonorDonorAngle)
+			{
+				donorScore = 1.0;
+			}
+			else
+			{
+				donorScore = 1 - (angle - minDonorDonorAngle)
+					/ (maxDonorDonorAngle - minDonorDonorAngle);
+			}
+			REPORT(Reporter::DEBUG) << " donor score " << donorScore;
+			score = fitScore * donorScore;
+		}
+		else
+		{
+			score = fitScore;
+			if (fitScore > maximumGaussianScore)
+			{
+				score = maximumGaussianScore;
+			}
 		}
 
+		REPORT(Reporter::DEBUG) << " geometric score " << geometricScore;
+
+		if (score < .0)
+		{
+			return .0;
+		}
+
+		// Mills and Dean probabilities for types
+		double prob = hydrogenBondingType->probability
+			+ other.hydrogenBondingType->probability;
+		score *= prob;
+
+		// increase for matching types
+		if (hydrogenBondingType->name == other.hydrogenBondingType->name)
+		{
+			score *= matchFactor;
+		}
+
+		// increase if both donors are charged
+		if (charged && other.charged)
+		{
+			score *= chargeFactor;
+		}
+
+		REPORT(Reporter::DEBUG) << " type score " << score;
+		return score;
+	}
 }
