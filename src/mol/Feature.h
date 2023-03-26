@@ -18,7 +18,7 @@ namespace Gape
 	{
 		HydrophobicAtom,
 		DonorInteractionPoint,
-		AcceptorAtom,
+		AcceptorAtomFeature,
 		AromaticRing
 		// TODO UserFeatures
 	};
@@ -45,7 +45,7 @@ namespace Gape
 		/**
 		 * Atom if feature is atom centered
 		 */
-		Atom* atom = nullptr;
+		const Atom* atom = nullptr;
 
 		/**
 		 * Molecule containing this feature
@@ -276,6 +276,8 @@ namespace Gape
 		 * @return
 		 */
 		virtual const RDGeom::Point3D& calculateCoordinate(const Conformer& conformer);
+
+		virtual const PharmFeatureGeometry& getPharmFeatureGeometry(const Conformer& conformer);
 
 		/**
 		 * As getCoordinate, but returns the saved class copy of the coordinate.

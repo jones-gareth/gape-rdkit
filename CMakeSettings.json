@@ -9,7 +9,12 @@
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
-      "ctestCommandArgs": ""
+      "ctestCommandArgs": "",
+      "environments": [
+        {
+          "PATH": "${env.PATH};c:/home/packages/anaconda3/envs/rdkit_build/lib;c:/gareth/src/rdkit/out/build/x64-python-debug/lib/Debug"
+        }
+      ]
     }
   ]
 }

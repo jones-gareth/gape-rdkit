@@ -30,12 +30,18 @@
     {
       "name": "x64-debug",
       "displayName": "x64 Debug",
-      "inherits": "windows"
-   },
+      "inherits": "windows",
+      "environment": {
+        "RDLIB": "c:/gareth/src/rdkit/out/build/x64-python-debug/lib/Debug"
+      }
+    },
     {
       "name": "x64-release",
       "displayName": "x64 Release",
-      "inherits": "windows"
+      "inherits": "windows",
+      "environment": {
+        "RDLIB": "c:/gareth/src/rdkit/out/build/x64-python-release/lib/Release"
+      }
     },
     {
       "name": "linux-debug",
@@ -50,7 +56,8 @@
         "CMAKE_LIBRARY_PATH": "/home/packages/anaconda3/envs/rdkit_build/lib"
       },
       "environment": {
-
+        "RDBASE": "/home/gareth/.vs/rdkit",
+        "RDLIB": "/home/gareth/.vs/rdkit/out/build/linux-debug/lib"
       },
       "condition": {
         "type": "equals",

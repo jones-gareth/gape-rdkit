@@ -5,6 +5,13 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 if (NOT RDBASE)
     set(RDBASE $ENV{RDBASE})
 endif()
+if (NOT RDLIB) 
+    set(RDLIB $ENV{RDLIB})
+endif()
+
+
+MESSAGE(STATUS "RDBASE is  ${RDBASE}")
+MESSAGE(STATUS "RDLIB  is  ${RDLIB}")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -55,7 +62,7 @@ include_directories(
         ${EIGEN_INCLUDE_DIR}
         ${RDBASE}/External/rapidjson-1.1.0/include
         ${RDBASE}/External/catch/catch/single_include)
-link_directories ( ${RDBASE}/lib )
+link_directories ( ${RDLIB} )
 
 # Set the directories under src which contain cpp files to be compiled
 set(srcDirs util ga mol test gape)

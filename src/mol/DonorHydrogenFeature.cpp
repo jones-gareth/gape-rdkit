@@ -41,7 +41,7 @@ namespace Gape
 	}
 
 	DonorHydrogenFeature::DonorHydrogenFeature(const int featureSetNum, const SuperpositionMolecule* spMol,
-	                                           Atom* featureAtom) : DonorHydrogenFeature(featureSetNum)
+	                                           const Atom* featureAtom) : DonorHydrogenFeature(featureSetNum)
 	{
 		molecule = spMol;
 		atom = featureAtom;
@@ -185,4 +185,13 @@ namespace Gape
 		REPORT(Reporter::DEBUG) << " type score " << score;
 		return score;
 	}
+
+	const PharmFeatureGeometry& DonorHydrogenFeature::getPharmFeatureGeometry(const Conformer& conformer)
+	{
+		auto& point1 = conformer.getAtomPos(donor->getIdx());
+		auto& point2 = coordinate;
+		pharmFeatureGeometry = std::make_unique<VectorPharmFeatureGeometry>(point1, point2);
+		return *pharmFeatureGeometry;
+	}
+
 }

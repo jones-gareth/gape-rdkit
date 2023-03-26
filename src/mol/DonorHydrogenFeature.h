@@ -42,7 +42,7 @@ namespace Gape
 		}
 
 		DonorHydrogenFeature(const int featureSetNum, const SuperpositionMolecule* spMol,
-		                     Atom* featureAtom);
+		                     const Atom* featureAtom);
 
 		static std::vector<std::shared_ptr<Feature>> findDonorHydrogens(
 			const SuperpositionMolecule* superpositionMolecule);
@@ -71,5 +71,8 @@ namespace Gape
 		 *
 		 */
 		double score(const Feature &otherFeature, const Conformer &conformer, const Conformer &otherConformer) override;
+
+
+		const PharmFeatureGeometry& getPharmFeatureGeometry(const Conformer& conformer) override;
 	};
 }
