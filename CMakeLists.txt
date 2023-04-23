@@ -97,7 +97,7 @@ set(RDKit_THREAD_LIBS Threads::Threads)
 
 # libraries to link against
 MESSAGE(STATUS, "Boost libraries are ${Boost_LIBRARIES}")
-set( LIBS ${Boost_LIBRARIES}  ${RDKit_THREAD_LIBS}  )
+set( LIBS ${Boost_LIBRARIES}  ${RDKit_THREAD_LIBS}  ${OS_LIBS})
 
 
 # program files (end in *.cxx)- can be in source directories, or prog directory

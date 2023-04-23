@@ -34,10 +34,92 @@ namespace Gape
 		 * origin is the acceptor atom and atom1 is bonded to it. Three lone pairs are
 		 * added to complete sp3 geometry.
 		 */
-		static void addThreePairsToTetrahedral(const RDGeom::Point3D& origin, const RDGeom::Point3D& atom2,
+		static void addThreePairsToTetrahedral(const RDGeom::Point3D& origin, const RDGeom::Point3D& atom1,
 		                                       RDGeom::Point3D& lonePair1, RDGeom::Point3D& lonePair2,
 		                                       RDGeom::Point3D& lonePair3,
 		                                       double lonePairLength);
+		/**
+		 * Acceptor is at origin and is bonded to atom1 and atom2. Two lone pairs
+		 * are added to complete the sp3 geometry.
+		 * 
+		 * @param origin
+		 * @param atom1
+		 * @param atom2
+		 * @param lp1
+		 * @param lp2
+		 * @param lonePairLength
+		 */
+		static void addTwoPairsToTetrahedral(const RDGeom::Point3D& origin, const RDGeom::Point3D& atom1,
+		                                     const RDGeom::Point3D& atom2, RDGeom::Point3D& lonePair1,
+		                                     RDGeom::Point3D& lonePair2, double lonePairLength);
+
+
+		/**
+		 * Add one lone pair to an acceptor bonded to three atoms in sp3 geometry.
+		 * The acceptor is at co-ordinates atom and three atoms (atom2, atom3 and
+		 * atom4) are bonded to it. If C is the centroid of atoms 2, 3 and 4 and C'
+		 * is reflection through the origin, O, then the lone pair is added on OC'
+		 * 
+		 * @param atom
+		 * @param atom2
+		 * @param atom3
+		 * @param atom4
+		 * @param lp
+		 * @param lonePairLength
+		 */
+		static void addOnePairToTetrahedral(const RDGeom::Point3D& origin, const RDGeom::Point3D& atom1,
+		                                    const RDGeom::Point3D& atom2, const RDGeom::Point3D& atom3,
+		                                    RDGeom::Point3D& lonePair1, double lonePairLength);
+
+		/**
+		 * Add one lone pair to the sp2 acceptor with co-ordinates origin. The
+		 * acceptor is bonded to atoms atom1 and atom2.
+		 * 
+		 * @param origin
+		 * @param atom1
+		 * @param atom2
+		 * @param lp
+		 * @param lonePairLength
+		 * @return
+		 */
+		static bool addOnePairToTrigonal(const RDGeom::Point3D& origin, const RDGeom::Point3D& atom1,
+		                                 const RDGeom::Point3D& atom2, RDGeom::Point3D& lonePair1,
+		                                 double lonePairLength);
+
+		/**
+		 * Adds two pair to the acceptor with sp2 geometry at co-ordinates <atom1>.
+		 * The acceptor is bonded to <origin> and <origin> is connected to atom2.
+		 * 
+		 * @param atom1
+		 * @param origin
+		 * @param atom2
+		 * @param lp1
+		 * @param lp2
+		 * @param lonePairLength
+		 * @return
+		 */
+		static bool addTwoPairsToTrigonal(const RDGeom::Point3D& atom1, const RDGeom::Point3D& origin,
+		                                  const RDGeom::Point3D& atom2, RDGeom::Point3D& lonePair1,
+		                                  RDGeom::Point3D& lonePair2, double lonePairLength);
+
+		/**
+		 * Adds two lone pairs to the sp2 acceptor atom1 which is bonded to the atom
+		 * at co-ordinates origin. The plane in which the lone pairs are added is
+		 * undefined
+		 * 
+		 * alpha argument is double the angle between the lone pairs, so we can use
+		 * this transform for the cone feature
+		 * 
+		 * @param atom1
+		 * @param origin
+		 * @param lp1
+		 * @param lp2
+		 * @param alpha
+		 * @param lonePairLength
+		 */
+		static void addTwoPairsRandomlyToTrigonal(const RDGeom::Point3D& atom1, const RDGeom::Point3D& origin,
+		                                          RDGeom::Point3D& lonePair1, RDGeom::Point3D& lonePair2, double alpha,
+		                                          double lonePairLength);
 
 	public:
 		AcceptorAtom(const SuperpositionMolecule* spMol, const Atom* atom);
