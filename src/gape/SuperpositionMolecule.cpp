@@ -292,6 +292,67 @@ namespace Gape {
         assert(mol.getNumConformers() == 1);
     }
 
+    bool SuperpositionMolecule::isNitroOxygen(const Atom& atom) const
+    {
+	    if (atom.getAtomicNum() != 8 || atom.getDegree() != 1)
+	    {
+            return false;
+	    }
+
+        const auto neighbor = mol.atomNeighbors(&atom).begin().current;
+        return isNitroNitrogen(*neighbor);
+    }
+
+	bool SuperpositionMolecule::isNitroNitrogen(const Atom& atom) const
+	{
+	    if (atom.getAtomicNum() != 7 || atom.getDegree() != 3)
+	    {
+            return false;
+	    }
+
+        int numOxy = 0;
+        for (const auto &neighbor: mol.atomNeighbors(&atom))
+        {
+	        if (neighbor->getAtomicNum() == 8 && neighbor->getDegree() == 1)
+	        {
+                numOxy++;
+	        }
+        }
+
+        return numOxy == 2;
+	}
+
+    bool SuperpositionMolecule::isCarboxylateOxygen(const Atom& atom) const
+    {
+	    if (atom.getAtomicNum() != 8 || atom.getDegree() != 1)
+	    {
+            return false;
+	    }
+        const auto neighbor = mol.atomNeighbors(&atom).begin().current;
+        return isCarboxylateCarbon(*neighbor);
+    }
+
+    bool SuperpositionMolecule::isCarboxylateCarbon(const Atom& atom) const
+    {
+	    if (atom.getAtomicNum() != 6 || atom.getDegree() != 3)
+	    {
+            return false;
+	    }
+
+    	int numOxy = 0;
+        for (const auto &neighbor: mol.atomNeighbors(&atom))
+        {
+	        if (neighbor->getAtomicNum() == 8 && neighbor->getDegree() == 1)
+	        {
+                numOxy++;
+	        }
+        }
+
+        return numOxy == 2;
+
+    }
+
+
     void SuperpositionMolecule::findDonorsAndAcceptors()
     {
         donors = findHydrogenBondDonors(settings.getHydrogenBondingTypes(), mol);

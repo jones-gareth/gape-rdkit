@@ -80,7 +80,24 @@ namespace Gape
 
 		const std::map<const Atom*, std::shared_ptr<const HydrogenBondingType>>& getDonors() const { return donors; }
 
-		const std::map<const Atom*, std::shared_ptr<const HydrogenBondingType>>& getAcceptors() const { return acceptors; }
+		const std::map<const Atom*, std::shared_ptr<const HydrogenBondingType>>& getAcceptors() const
+		{
+			return acceptors;
+		}
+
+		/**
+		 * Check to see if this carbon is in a nitro group.
+		 * 
+		 * @return
+		 */
+		bool isNitroOxygen(const Atom& atom) const;
+
+		/**
+		 * Checks to see if this oxygen is in a carboxylate group
+		 * 
+		 * @return
+		 */
+		bool isCarboxylateOxygen(const Atom& atom) const;
 
 	private:
 		RWMol mol;
@@ -111,6 +128,20 @@ namespace Gape
 		bool isCOOHCarbon(const Atom& atom, Atom*& o2Atom, Atom*& o3Atom) const;
 
 		RotatableBondType isRotatableBond(const Bond& bond, bool& canFlatten) const;
+
+		/**
+		 * Check to see if this carbon is in a nitro group.
+		 * 
+		 * @return
+		 */
+		bool isNitroNitrogen(const Atom& atom) const;
+
+		/**
+		 * Checks to see if this carbon is a carboxylate
+		 * 
+		 * @return
+		 */
+		bool isCarboxylateCarbon(const Atom& atom) const;
 	};
 } // namespace GAPE
 

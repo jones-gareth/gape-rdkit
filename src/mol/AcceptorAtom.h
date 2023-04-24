@@ -21,7 +21,23 @@ namespace Gape
 		 */
 		const Atom* atom;
 
+
+		/**
+		 * \brief Number lone pairs
+		 */
 		int numberLonePairs;
+
+		/**
+		 * \brief Hydrogen bonding type of acceptor
+		 */
+		std::shared_ptr<const HydrogenBondingType> hydrogenBondingType;
+
+		/**
+		 * \brief Reference coordinates of lone pairs
+		 */
+		std::vector<RDGeom::Point3D> lonePairs;
+
+		static const double lonePairLength;
 
 		/**
 		 * Adds one LP to atom1 on a line that runs from atom2 through atom1.
@@ -120,6 +136,91 @@ namespace Gape
 		static void addTwoPairsRandomlyToTrigonal(const RDGeom::Point3D& atom1, const RDGeom::Point3D& origin,
 		                                          RDGeom::Point3D& lonePair1, RDGeom::Point3D& lonePair2, double alpha,
 		                                          double lonePairLength);
+
+		/**
+		 * Returns the true number of lone pairs that an acceptor atom has. Differs
+		 * from countLonePairs in that an acceptor with no geometry or cone geometry
+		 * will return the true number of lone pairs (probably 3).
+		 * 
+		 * @param a
+		 * @return
+		 */
+		int countTrueLonePairs() const;
+
+		/**
+		 * Returns a count of lone pairs that need to be added to an atom. Take
+		 * account of a reduced representation whereby an acceptor that accepts in a
+		 * cone is represented by one (rather that 3) lone pairs
+		 * 
+		 * @param a
+		 * @return
+		 */
+		int countLonePairs() const;
+
+		/**
+		 * Adds one lone pair to an sp3 acceptor.
+		 * 
+		 */
+		void add1LpToSp3();
+
+		/**
+		 * Adds one lone pair to an sp2 atom.
+		 * 
+		 */
+		void add1LpToSp2();
+
+		/**
+		 * Adds one lone pair to an sp1 atom.
+		 * 
+		 */
+		void addLpToSp1();
+
+		/**
+		 * Adds two lone pairs to an sp3 atom.
+		 * 
+		 */
+		void add2LpToSp3();
+
+		/**
+		 * Adds two lone pairs to an sp2 atom.
+		 * 
+		 */
+		void add2LpToSp2();
+
+		/**
+		 * Adds two lone pairs to the carboxylic oxygen O.co2 atom. Also used to add
+		 * lone pairs to nitro oxygen.
+		 * 
+		 */
+		void addLpToOco2();
+
+
+		/**
+		 * Adds three lone pairs to an sp3 atom.
+		 * 
+		 */
+		void add3LpToSp3();
+
+		/**
+		 * \brief Add lone pairs to acceptor based on atom hybridization
+		 */
+		void addAtomLonePairs();
+
+		/**
+		 * \brief Add one lone pair to atom regardless of atom hybridization
+		 */
+		void addOnePairToAtom();
+
+		/**
+		 * \brief Add lone pairs to atom based on acceptor geometry
+		 */
+		void addLonePairs();
+
+		/**
+		 * \brief 
+		 * \return validate lone pair lengths are correct
+		 */
+		bool checkLonePairLengths();
 
 	public:
 		AcceptorAtom(const SuperpositionMolecule* spMol, const Atom* atom);
