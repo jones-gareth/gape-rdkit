@@ -7,21 +7,14 @@
 
 #include <GraphMol/GraphMol.h>
 
-#include "../gape/SuperpositionMolecule.h"
 #include "PharmFeatureGeometry.h"
+#include "../gape/SuperpositionCoordinates.h"
 
 using namespace RDKit;
 
 namespace Gape
 {
-	enum FeatureType
-	{
-		HydrophobicAtom,
-		DonorInteractionPoint,
-		AcceptorAtomFeature,
-		AromaticRing
-		// TODO UserFeatures
-	};
+	class SuperpositionMolecule;
 
 	class Feature
 	{
@@ -61,21 +54,22 @@ namespace Gape
 		 * If this feature (in the base molecule) is mapped to a feature in another
 		 * molecule, we can store it here.
 		 */
-		Feature* mappedFeature;
+		// Feature* mappedFeature;
+
 
 		// sqr distance to other feature
-		double squaredDistance;
+		// double squaredDistance;
 
 
 		// These variables are used to track the best mappings so far- for
 		// resolving one-to-one mappings.
-		double bestScore, bestGeometricScore;
+		// double bestScore, bestGeometricScore;
 
 		/**
 		 * If this feature (in another molecule) is mappped to a feature in the base
 		 * molecule, we can store the base molecule feature here.
 		 */
-		Feature* baseFeature;
+		// Feature* baseFeature;
 
 		/**
 		 * A feature normally has an point which can be considered it's interaction
@@ -84,19 +78,20 @@ namespace Gape
 		 * point in chromosome encoding for mapping features and place Gaussians on
 		 * this point for scoring feature overlap.
 		 */
-		RDGeom::Point3D coordinate;
+		// store coordinates in SuperpositionCoordinates
+		// RDGeom::Point3D coordinate;
 
 		/**
 		 * Set this true if we consider this feature to be part of a pharmacophore.
 		 */
-		bool pharmacophorePoint;
+		// bool pharmacophorePoint;
 
 		/**
 		 * number of molecules significantly contribution to this feature if it is a
 		 * pharmacophore point.
 		 *
 		 */
-		int numberMatched;
+		// int numberMatched;
 
 		/**
 		 * Set this true if we can use this feature in chromosome encoding.
@@ -109,7 +104,7 @@ namespace Gape
 		/**
 		 * The score function must set this variable
 		 */
-		double geometricScore;
+		// double geometricScore;
 
 		Feature(const FeatureType featureType, const int featureSetNumber, const std::string& featureSetName,
 		        const bool atomFeature):
@@ -118,6 +113,7 @@ namespace Gape
 		{
 			molecule = nullptr;
 			mapped = false;
+			/*
 			mappedFeature = nullptr;
 			squaredDistance = DBL_MAX;
 			bestGeometricScore = -DBL_MAX;
@@ -126,6 +122,7 @@ namespace Gape
 			pharmacophorePoint = false;
 			baseFeature = nullptr;
 			numberMatched = 0;
+			*/
 		};
 
 		/**
@@ -147,18 +144,14 @@ namespace Gape
 		static void initialize();
 
 		/**
-		 * Geometry of feature
-		 */
-		std::unique_ptr<PharmFeatureGeometry> pharmFeatureGeometry;
-
-		/**
 		 * Each subclass must implement the score method which returns the
 		 * similarity between two features.
 		 *
 		 * @param f
 		 * @return
 		 */
-		virtual double score(const Feature& otherFeature, const Conformer& conformer, const Conformer& otherConformer);
+		virtual double score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+		                     const SuperpositionCoordinates& otherCoordinates);
 
 		/**
 		 * Returns a label for the feature to use in mol2 or sdf pharmacophore
@@ -178,7 +171,7 @@ namespace Gape
 		 *
 		 * @see #pharmLabel()
 		 */
-		std::string featureLabel() const;
+		std::string featureLabel(const SuperpositionCoordinates& superpositionCoordinates) const;
 
 		/**
 		 * Generates a label to use to describe the pharmacophore in the
@@ -261,8 +254,8 @@ namespace Gape
 		 * @param atom
 		 * @return
 		 */
-		double solvationPenalty(const RDGeom::Point3D& point, const ROMol& mol, const Conformer& conformer,
-		                        const Atom& atom) const;
+		double solvationPenalty(const RDGeom::Point3D& point, const ROMol& mol,
+		                        const SuperpositionCoordinates& superpositionCoordinates, const Atom& atom) const;
 
 
 		/**
@@ -275,24 +268,27 @@ namespace Gape
 		 *
 		 * @return
 		 */
-		virtual const RDGeom::Point3D& calculateCoordinate(const Conformer& conformer);
+		virtual void calculateCoordinates(SuperpositionCoordinates& superpositionCoordinates) const;
 
-		virtual const PharmFeatureGeometry& getPharmFeatureGeometry(const Conformer& conformer);
+		virtual std::unique_ptr<PharmFeatureGeometry> getPharmFeatureGeometry(
+			const SuperpositionCoordinates& superpositionCoordinates) const;
 
 		/**
-		 * As getCoordinate, but returns the saved class copy of the coordinate.
+		 * Gets the fitting point for this feature
 		 *
 		 * @return
 		 */
-		const RDGeom::Point3D& getSavedCoordinate() const;
+		virtual const RDGeom::Point3D& getFittingPoint(const SuperpositionCoordinates& superpositionCoordinates) const;
 
 		/**
 		 * Returns the square distance between this feature and the other feature
 		 * mapped to it.
 		 */
-		double calculateSqrDist();
+		double calculateSqrDist(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+		                        const SuperpositionCoordinates& otherCoordinates) const;
 
-		std::string mappingInfo() const;
+		std::string mappingInfo(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+		                        const SuperpositionCoordinates& otherCoordinates) const;
 	};
 } // Gape
 

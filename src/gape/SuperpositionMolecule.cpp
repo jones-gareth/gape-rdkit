@@ -14,6 +14,8 @@
 #include <GraphMol/FileParsers/FileParsers.h>
 
 #include "mol/HydrogenBondingType.h"
+#include "../mol/AcceptorAtomFeature.h"
+#include "../mol/DonorHydrogenFeature.h"
 
 using namespace RDKit;
 
@@ -358,5 +360,12 @@ namespace Gape {
         donors = findHydrogenBondDonors(settings.getHydrogenBondingTypes(), mol);
         acceptors = findHydrogenBondAcceptors(settings.getHydrogenBondingTypes(), mol);
     }
+
+    void SuperpositionMolecule::findFeatures()
+    {
+        features[DonorInteractionPoint] = DonorHydrogenFeature::findDonorHydrogens(this);
+        features[AcceptorAtomFeature] = AcceptorAtomFeature::findAcceptorAtoms(this);
+    }
+
 
 } // namespace GAPE

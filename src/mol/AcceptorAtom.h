@@ -21,7 +21,6 @@ namespace Gape
 		 */
 		const Atom* atom;
 
-
 		/**
 		 * \brief Number lone pairs
 		 */
@@ -224,5 +223,7 @@ namespace Gape
 
 	public:
 		AcceptorAtom(const SuperpositionMolecule* spMol, const Atom* atom);
+
+		const Atom* getAtom() const { return atom; }
 	};
 }

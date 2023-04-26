@@ -88,4 +88,27 @@ namespace Gape {
             rot.TransformPoint(conf.getAtomPos(atom->getIdx()));
         }
     }
+
+	void RotatableBond::rotateBond(double angle, SuperpositionCoordinates &superpositionCoordinates) const {
+        RDGeom::Transform3D rot;
+        auto& conf = superpositionCoordinates.getConformer();
+        assert(conf.getNumAtoms() == molecule->getMol().getNumAtoms());
+        determineRotation(conf.getAtomPos(atom1->getIdx()), conf.getAtomPos(atom2->getIdx()), angle, rot);
+        for (const auto atom: atom1List) {
+            rot.TransformPoint(conf.getAtomPos(atom->getIdx()));
+            for (auto& features : superpositionCoordinates.getFeatureCoordinates())
+            {
+                auto& featureMap = features.second;
+                if (auto featureCoordinate = featureMap.find(atom); featureCoordinate != featureMap.end())
+                {
+	                for (auto& coordinate : featureCoordinate->second)
+	                {
+                        rot.TransformPoint(coordinate);
+	                }
+                }
+            }
+        }
+
+    }
+
 }

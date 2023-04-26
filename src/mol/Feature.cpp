@@ -27,13 +27,16 @@ namespace Gape
 		return format.str();
 	}
 
-	std::string Feature::featureLabel() const
+	std::string Feature::featureLabel(const SuperpositionCoordinates& superpositionCoordinates) const
 	{
+		auto pharmFeatureGeometry = getPharmFeatureGeometry(superpositionCoordinates);
 		auto featureLabel = pharmLabel() + " " + pharmFeatureGeometry->summary();
+		/*
 		if (pharmacophorePoint)
 		{
 			featureLabel = featureLabel + " N_MATCHED=" + std::to_string(numberMatched);
 		}
+		*/
 		return featureLabel;
 	}
 
@@ -58,10 +61,11 @@ namespace Gape
 		solvationAlpha = getAlpha(r);
 	}
 
-	double Feature::solvationPenalty(const RDGeom::Point3D& point, const ROMol& mol, const Conformer& conformer,
-	                                 const Atom& atom) const
-	{
+	double Feature::solvationPenalty(const RDGeom::Point3D& point, const ROMol& mol,
+		const SuperpositionCoordinates& superpositionCoordinates, const Atom& atom) const
+		{
 		double penalty = .0;
+		const auto& conformer = superpositionCoordinates.getConformer();
 
 		for (const auto atom2 : mol.atoms())
 		{
@@ -76,30 +80,22 @@ namespace Gape
 		return penalty - solventVolOk;
 	}
 
-	const RDGeom::Point3D& Feature::calculateCoordinate(const Conformer& conformer)
+	double Feature::calculateSqrDist(const Feature& otherFeature, const SuperpositionCoordinates& coordinates, const SuperpositionCoordinates &otherCoordinates) const
 	{
-		coordinate = conformer.getAtomPos(atom->getIdx());
-		return coordinate;
-	}
-
-	const RDGeom::Point3D& Feature::getSavedCoordinate() const
-	{
-		return coordinate;
-	}
-
-	double Feature::calculateSqrDist()
-	{
-		squaredDistance = (coordinate - mappedFeature->coordinate).lengthSq();
+		const auto& point = getFittingPoint(coordinates);
+		const auto& otherPoint = otherFeature.getFittingPoint(otherCoordinates);
+		const auto squaredDistance = (point - otherPoint).lengthSq();
 		return squaredDistance;
 	}
 
-	std::string Feature::mappingInfo() const
+	std::string Feature::mappingInfo(const Feature& otherFeature, const SuperpositionCoordinates& coordinates, const SuperpositionCoordinates &otherCoordinates) const
 	{
+		const auto squaredDistance = calculateSqrDist(otherFeature, coordinates, otherCoordinates);
 		std::stringstream ss;
 		ss << info();
 		if (mapped)
 		{
-			ss << " --> " << mappedFeature->info() << " sqrDist " << squaredDistance;
+			ss << " --> " << otherFeature.info() << " sqrDist " << squaredDistance;
 		}
 		else
 		{

@@ -35,15 +35,23 @@ namespace Gape {
         const auto acceptorIt = acceptors.find(atom);
         assert(acceptorIt != acceptors.end());
         hydrogenBondingType = acceptorIt->second.get();
-        geometry = hydrogenBondingType->geometry;
         charged = false; //TODO add charge to hydrogen bonding types
-        // TODO determine lone pairs
-        // nLonePairs = atom.getnLonePairs();
         REPORT(Reporter::DEBUG) << "N Lone Pairs " << nLonePairs;
         acceptorAtom = std::make_unique<AcceptorAtom>(molecule, atom);
     }
 
 
+    std::string AcceptorAtomFeature::pharmLabel() const
+    {
+        return  "" ;
+    }
+
+    std::string AcceptorAtomFeature::info() const
+    {
+	    return "";
+    }
 
 
-} // Gape
+
+
+ } // Gape

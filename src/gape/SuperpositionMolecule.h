@@ -8,6 +8,8 @@
 #include <GraphMol/GraphMol.h>
 #include <ForceField/MMFF/Params.h>
 #include "GapeApp.h"
+#include "../mol/Feature.h"
+#include "SuperpositionCoordinates.h"
 
 using namespace RDKit;
 
@@ -70,6 +72,8 @@ namespace Gape
 
 		void generate3D();
 
+		void findFeatures();
+
 		void solvate();
 
 		void setConformer(const Conformer& conformer);
@@ -108,6 +112,7 @@ namespace Gape
 		std::map<const Atom*, std::shared_ptr<const HydrogenBondingType>> donors;
 		std::map<const Atom*, std::shared_ptr<const HydrogenBondingType>> acceptors;
 		Conformer referenceConformer;
+		std::map<const FeatureType, std::vector<std::shared_ptr<Feature>>> features;
 
 		bool isO2(const Atom& atom) const;
 

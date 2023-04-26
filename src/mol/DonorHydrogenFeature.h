@@ -6,6 +6,8 @@ using namespace RDKit;
 
 namespace Gape
 {
+	class HydrogenBondingType;
+
 	class DonorHydrogenFeature : public Feature
 	{
 	private:
@@ -53,8 +55,7 @@ namespace Gape
 		 * 
 		 * @see com.cairn.gape.Feature#getCoordinate()
 		 */
-		RDGeom::Point3D& calculateCoordinate(const Conformer& conformer) override;
-
+		void calculateCoordinates(SuperpositionCoordinates& superpositionCoordinates) const override;
 
 		/*
 		 * Descriptive string for the feature.
@@ -70,9 +71,10 @@ namespace Gape
 		 * Returns similarity between two donor hydrogens. 
 		 *
 		 */
-		double score(const Feature &otherFeature, const Conformer &conformer, const Conformer &otherConformer) override;
+		double score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+			const SuperpositionCoordinates& otherCoordinates) override;
 
 
-		const PharmFeatureGeometry& getPharmFeatureGeometry(const Conformer& conformer) override;
+	  std::unique_ptr<PharmFeatureGeometry> getPharmFeatureGeometry(const SuperpositionCoordinates& superpositionCoordinates) const override;
 	};
 }

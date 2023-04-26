@@ -5,6 +5,7 @@
 
 #include "HydrogenBondingType.h"
 #include "../util/Reporter.h"
+#include "../gape/SuperpositionMolecule.h"
 
 namespace Gape
 {
@@ -58,14 +59,15 @@ namespace Gape
 		charged = false; //TODO add charge to hydrogen bonding types
 	}
 
-	RDGeom::Point3D& DonorHydrogenFeature::calculateCoordinate(const Conformer& conformer)
+	void DonorHydrogenFeature::calculateCoordinates(SuperpositionCoordinates& superpositionCoordinates) const
 	{
+		const auto& conformer = superpositionCoordinates.getConformer();
 		const auto& donorCoord = conformer.getAtomPos(donor->getIdx());
 		const auto& hydrogenCoord = conformer.getAtomPos(atom->getIdx());
 		auto bondVector = donorCoord.directionVector(hydrogenCoord);
 		bondVector *= hBondLen;
-		coordinate = donorCoord + bondVector;
-		return coordinate;
+		const std::vector<RDGeom::Point3D> coordinates{ donorCoord + bondVector };
+		superpositionCoordinates.addFeatureCoordinates(FeatureType::DonorInteractionPoint, atom, coordinates);
 	}
 
 	std::string DonorHydrogenFeature::info() const
@@ -79,7 +81,7 @@ namespace Gape
 	{
 		auto name = boost::to_upper_copy<std::string>(hydrogenBondingType->name);
 		std::replace(name.begin(), name.end(), ' ', '_');
-		std::string options("");
+		std::string options;
 		if (charged)
 		{
 			options += " [charged = yes]";
@@ -88,19 +90,23 @@ namespace Gape
 		return featureSetName + " " + label + options;
 	}
 
-	double DonorHydrogenFeature::score(const Feature& otherFeature, const Conformer& conformer,
-	                                   const Conformer& otherConformer)
+	double DonorHydrogenFeature::score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+		const SuperpositionCoordinates& otherCoordinates)
 	{
 		const auto& other = dynamic_cast<const DonorHydrogenFeature&>(otherFeature);
 
 		// fitting point Gaussian
-		const auto sqrDistance = (coordinate - other.coordinate).lengthSq();
+		const auto& coordinate = coordinates.getFeatureCoordinates(FeatureType::DonorInteractionPoint, atom)[0];
+		const auto& otherCoordinate = otherCoordinates.getFeatureCoordinates(FeatureType::DonorInteractionPoint, atom)[0];
+		const auto sqrDistance = (coordinate - otherCoordinate).lengthSq();
 		const auto vol = Feature::score(sqrDistance);
-		const auto midPoint = (coordinate + other.coordinate) / 2.0;
+		const auto midPoint = (coordinate + otherCoordinate) / 2.0;
 		const auto mol = molecule->getMol();
 		const auto otherMol = other.molecule->getMol();
 
 		// Corrections to make sure fitting point is solvent accessible
+		const auto& conformer = coordinates.getConformer();
+		const auto& otherConformer = otherCoordinates.getConformer();
 		auto molVol = Feature::solvationPenalty(midPoint, mol, conformer, *atom);
 		auto otherMolVol = Feature::solvationPenalty(midPoint, otherMol, otherConformer, *other.atom);
 
@@ -118,7 +124,7 @@ namespace Gape
 		if (fitScore < 0)
 			fitScore = 0;
 
-		geometricScore = fitScore;
+		const auto geometricScore = fitScore;
 		double score;
 		if (scoreDonorAtoms)
 		{
@@ -186,12 +192,13 @@ namespace Gape
 		return score;
 	}
 
-	const PharmFeatureGeometry& DonorHydrogenFeature::getPharmFeatureGeometry(const Conformer& conformer)
+	std::unique_ptr<PharmFeatureGeometry> DonorHydrogenFeature::getPharmFeatureGeometry(const SuperpositionCoordinates& superpositionCoordinates) const
 	{
+		const auto& conformer = superpositionCoordinates.getConformer();
 		auto& point1 = conformer.getAtomPos(donor->getIdx());
-		auto& point2 = coordinate;
-		pharmFeatureGeometry = std::make_unique<VectorPharmFeatureGeometry>(point1, point2);
-		return *pharmFeatureGeometry;
+		auto& point2 = superpositionCoordinates.getFeatureCoordinates(FeatureType::DonorInteractionPoint, atom)[0];
+		auto pharmFeatureGeometry = std::make_unique<VectorPharmFeatureGeometry>(point1, point2);
+		return pharmFeatureGeometry;
 	}
 
 }

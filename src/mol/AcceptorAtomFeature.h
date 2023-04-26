@@ -5,13 +5,13 @@
 #pragma once
 
 #include "Feature.h"
-#include "HydrogenBondingType.h"
 #include "AcceptorAtom.h"
 
 using namespace RDKit;
 
 namespace Gape
 {
+	class HydrogenBondingType;
 	class AcceptorAtomFeature : public Feature
 	{
 	private:
@@ -54,7 +54,7 @@ namespace Gape
 		// I've now stopped using the GASP/GOLD types completely
 
 		// Acceptor geometry e.g. LP, PLANE
-		HydrogenBondGeometry geometry = HydrogenBondGeometry::None;
+		// HydrogenBondGeometry geometry = HydrogenBondGeometry::None;
 
 		/**
 		 * Set for a charged acceptor
@@ -75,5 +75,14 @@ namespace Gape
 
 		static std::vector<std::shared_ptr<Feature>> findAcceptorAtoms(
 			const SuperpositionMolecule* superpositionMolecule);
+
+		double score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+			const SuperpositionCoordinates& otherCoordinates) override;
+		std::string pharmLabel() const override;
+		std::string info() const override;
+		void calculateCoordinates(SuperpositionCoordinates& superpositionCoordinates) const override;
+		std::unique_ptr<PharmFeatureGeometry> getPharmFeatureGeometry(
+			const SuperpositionCoordinates& superpositionCoordinates) const override;
+		const RDGeom::Point3D& getFittingPoint(const SuperpositionCoordinates& superpositionCoordinates) const override;
 	};
 } // Gape

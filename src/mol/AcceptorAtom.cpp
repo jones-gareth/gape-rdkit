@@ -8,7 +8,7 @@
 
 namespace Gape
 {
-	const double AcceptorAtom::lonePairLength = 2.9;
+	const double AcceptorAtom::lonePairLength = 2.9;
 
 	AcceptorAtom::AcceptorAtom(const SuperpositionMolecule* spMol, const Atom* atom) : molecule(spMol), atom(atom)
 	{
