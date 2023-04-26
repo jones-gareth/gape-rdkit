@@ -36,9 +36,6 @@ namespace Gape
 	 */
 	void setUpZAxisTransformation(const RDGeom::Point3D& point1, const RDGeom::Point3D& point2, RDGeom::Transform3D& transformIn, RDGeom::Transform3D& transformOut)
 	{
-		const double x = point1.x;
-		const double y = point1.y;
-		const double z = point1.z;
 		auto diff = point1 - point2;
 		diff.normalize();
 		const double a = diff.x;

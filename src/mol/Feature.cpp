@@ -6,6 +6,7 @@
 #include "Feature.h"
 #include "MolUtil.h"
 #include "../util/Reporter.h"
+#include "gape/SuperpositionMolecule.h"
 
 namespace Gape
 {
@@ -22,8 +23,7 @@ namespace Gape
 
 	std::string Feature::atomLabel() const
 	{
-		int no = featureSetNumber + 1;
-		auto format = boost::format("%s_%d") % featureSetName % featureSetNumber;
+		auto format = boost::format("%s_%d") % featureSetName % (featureSetNumber+1);
 		return format.str();
 	}
 
@@ -61,17 +61,18 @@ namespace Gape
 		solvationAlpha = getAlpha(r);
 	}
 
-	double Feature::solvationPenalty(const RDGeom::Point3D& point, const ROMol& mol,
-		const SuperpositionCoordinates& superpositionCoordinates, const Atom& atom) const
+	double Feature::solvationPenalty(const RDGeom::Point3D& point, 
+		const SuperpositionCoordinates& superpositionCoordinates) const
 		{
 		double penalty = .0;
 		const auto& conformer = superpositionCoordinates.getConformer();
+		const auto& mol = molecule->getMol();
 
 		for (const auto atom2 : mol.atoms())
 		{
 			if (atom2->getAtomicNum() == 0)
 				continue;
-			if (atom2->getIdx() == atom.getIdx())
+			if (atom2->getIdx() == atom->getIdx())
 				continue;
 			const double sqrDist = squareDistance(conformer.getAtomPos(atom2->getIdx()), point);
 			const double val = -0.5 * solvationAlpha * sqrDist;

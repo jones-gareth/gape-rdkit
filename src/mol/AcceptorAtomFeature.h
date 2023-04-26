@@ -39,7 +39,7 @@ namespace Gape
 		 */
 		thread_local static bool scaleLonePairs;
 
-		std::vector<RDGeom::Point3D> lonePairCoords;
+		// std::vector<RDGeom::Point3D> lonePairCoords;
 
 		int nLonePairs = 0;
 
@@ -62,6 +62,16 @@ namespace Gape
 		bool charged = false;
 
 		std::unique_ptr<Gape::AcceptorAtom> acceptorAtom;
+
+		/**
+		 * Determines a point that should be solvent accessible if an acceptor with
+		 * one or two lone pairs is able to accept a hydrogen bond. Note that in the
+		 * acceptor geometry model an acceptor with three sp3 lone pairs has a
+		 * single lone pair in the forward direction.
+		 */
+		void getSolvationPoint(const SuperpositionCoordinates& superpositionCoordinates,
+		                       RDGeom::Point3D& solvationPoint) const;
+
 
 	public:
 		AcceptorAtomFeature(const int featureSetNumber) : Feature(FeatureType::AcceptorAtomFeature, featureSetNumber,

@@ -18,7 +18,6 @@ namespace Gape
 		hydrogenBondingType = it->second;
 
 		numberLonePairs = countLonePairs();
-		addLonePairs();
 	}
 
 	void AcceptorAtom::addOnePairToLinear(const RDGeom::Point3D& atom1, const RDGeom::Point3D& atom2,
@@ -327,7 +326,7 @@ namespace Gape
 		return 0;
 	}
 
-	void AcceptorAtom::add1LpToSp3()
+	void AcceptorAtom::add1LpToSp3(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const
 	{
 		if (auto degree = atom->getDegree(); degree != 3)
 		{
@@ -335,7 +334,6 @@ namespace Gape
 				(boost::format("add1LpToSp3: atom %d has %d connections") % atom->getIdx() % degree).str());
 		}
 
-		const auto& conformer = molecule->getReferenceConformer();
 		const auto& coord = conformer.getAtomPos(atom->getIdx());
 		std::vector<RDGeom::Point3D> otherCoords;
 		for (const auto nbr : molecule->getMol().atomNeighbors(atom))
@@ -349,7 +347,7 @@ namespace Gape
 		lonePairs.push_back(lonePair);
 	}
 
-	void AcceptorAtom::add1LpToSp2()
+	void AcceptorAtom::add1LpToSp2(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const
 	{
 		if (auto degree = atom->getDegree(); degree != 2)
 		{
@@ -357,7 +355,6 @@ namespace Gape
 				(boost::format("add1LpToSp2: atom %d has %d connections") % atom->getIdx() % degree).str());
 		}
 
-		const auto& conformer = molecule->getReferenceConformer();
 		const auto& coord = conformer.getAtomPos(atom->getIdx());
 		std::vector<RDGeom::Point3D> otherCoords;
 		for (const auto nbr : molecule->getMol().atomNeighbors(atom))
@@ -371,7 +368,7 @@ namespace Gape
 		lonePairs.push_back(lonePair);
 	}
 
-	void AcceptorAtom::addLpToSp1()
+	void AcceptorAtom::addLpToSp1(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const
 	{
 		if (auto degree = atom->getDegree(); degree != 1)
 		{
@@ -379,7 +376,6 @@ namespace Gape
 				(boost::format("add1LpToSp1: atom %d has %d connections") % atom->getIdx() % degree).str());
 		}
 
-		const auto& conformer = molecule->getReferenceConformer();
 		const auto& coord = conformer.getAtomPos(atom->getIdx());
 		const auto& atom2 = molecule->getMol().atomNeighbors(atom).begin().current;
 		const auto& coord2 = conformer.getAtomPos(atom2->getIdx());
@@ -390,7 +386,7 @@ namespace Gape
 		lonePairs.push_back(lonePair);
 	}
 
-	void AcceptorAtom::add2LpToSp3()
+	void AcceptorAtom::add2LpToSp3(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const
 	{
 		if (auto degree = atom->getDegree(); degree != 2)
 		{
@@ -398,7 +394,6 @@ namespace Gape
 				(boost::format("add2LpToSp3: atom %d has %d connections") % atom->getIdx() % degree).str());
 		}
 
-		const auto& conformer = molecule->getReferenceConformer();
 		const auto& coord = conformer.getAtomPos(atom->getIdx());
 		std::vector<RDGeom::Point3D> otherCoords;
 		for (const auto nbr : molecule->getMol().atomNeighbors(atom))
@@ -413,7 +408,7 @@ namespace Gape
 		lonePairs.push_back(lonePair2);
 	}
 
-	void AcceptorAtom::add2LpToSp2()
+	void AcceptorAtom::add2LpToSp2(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const
 	{
 		if (auto degree = atom->getDegree(); degree != 1)
 		{
@@ -421,7 +416,6 @@ namespace Gape
 				(boost::format("add2LpToSp2: atom %d has %d connections") % atom->getIdx() % degree).str());
 		}
 
-		const auto& conformer = molecule->getReferenceConformer();
 		const auto& mol = molecule->getMol();
 		const auto otherAtom = mol.atomNeighbors(atom).begin().current;
 		const Atom* thirdAtom = nullptr;
@@ -449,7 +443,7 @@ namespace Gape
 		lonePairs.push_back(lonePair2);
 	}
 
-	void AcceptorAtom::addLpToOco2()
+	void AcceptorAtom::addLpToOco2(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const
 	{
 		if (auto degree = atom->getDegree(); degree != 1)
 		{
@@ -457,7 +451,6 @@ namespace Gape
 				(boost::format("add1LpToOco2: atom %d has %d connections") % atom->getIdx() % degree).str());
 		}
 
-		const auto& conformer = molecule->getReferenceConformer();
 		const auto& mol = molecule->getMol();
 		const auto otherAtom = mol.atomNeighbors(atom).begin().current;
 		const Atom* thirdAtom = nullptr;
@@ -490,7 +483,7 @@ namespace Gape
 		lonePairs.push_back(lonePair2);
 	}
 
-	void AcceptorAtom::add3LpToSp3()
+	void AcceptorAtom::add3LpToSp3(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const
 	{
 		if (auto degree = atom->getDegree(); degree != 1)
 		{
@@ -498,7 +491,6 @@ namespace Gape
 				(boost::format("add3LpToSp3: atom % d has % d connections") % atom->getIdx() % degree).str());
 		}
 
-		const auto& conformer = molecule->getReferenceConformer();
 		const auto& coord = conformer.getAtomPos(atom->getIdx());
 		const auto& atom2 = molecule->getMol().atomNeighbors(atom).begin().current;
 		const auto& coord2 = conformer.getAtomPos(atom2->getIdx());
@@ -511,42 +503,40 @@ namespace Gape
 		lonePairs.push_back(lonePair3);
 	}
 
-	void AcceptorAtom::addAtomLonePairs()
+	void AcceptorAtom::addAtomLonePairs(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const
 	{
-		const auto geometry = hydrogenBondingType->geometry;
-
 		// Hardwire carboxylic acid
 		if (molecule->isCarboxylateOxygen(*atom))
 		{
-			addLpToOco2();
+			addLpToOco2(conformer, lonePairs);
 		}
 		// hardwire nitro group
 		else if (molecule->isNitroOxygen(*atom))
 		{
-			addLpToOco2();
+			addLpToOco2(conformer, lonePairs);
 		}
 		else
 		{
 			if (atom->getHybridization() == Atom::SP3)
 			{
 				if (numberLonePairs == 1)
-					add1LpToSp3();
+					add1LpToSp3(conformer, lonePairs);
 				else if (numberLonePairs == 2)
-					add2LpToSp3();
+					add2LpToSp3(conformer, lonePairs);
 				else if (numberLonePairs == 3)
-					add3LpToSp3();
+					add3LpToSp3(conformer, lonePairs);
 			}
 			else if (atom->getHybridization() == Atom::SP2)
 			{
 				if (numberLonePairs == 1)
-					add1LpToSp2();
+					add1LpToSp2(conformer, lonePairs);
 				else if (numberLonePairs == 2)
-					add2LpToSp2();
+					add2LpToSp2(conformer, lonePairs);
 			}
 			else if (atom->getHybridization() == Atom::SP)
 			{
 				if (numberLonePairs == 1)
-					addLpToSp1();
+					addLpToSp1(conformer, lonePairs);
 			}
 			else
 			{
@@ -556,21 +546,20 @@ namespace Gape
 			}
 		}
 
-		assert(checkLonePairLengths());
 	}
 
-	void AcceptorAtom::addOnePairToAtom()
+	void AcceptorAtom::addOnePairToAtom(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const
 	{
 		switch (atom->getDegree())
 		{
 		case 1:
-			addLpToSp1();
+			addLpToSp1(conformer, lonePairs);
 			break;
 		case 2:
-			add1LpToSp2();
+			add1LpToSp2(conformer, lonePairs);
 			break;
 		case 3:
-			add1LpToSp3();
+			add1LpToSp3(conformer, lonePairs);
 			break;
 		default:
 			throw std::domain_error(
@@ -580,28 +569,30 @@ namespace Gape
 		}
 	}
 
-	void AcceptorAtom::addLonePairs()
+	void AcceptorAtom::addLonePairs(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const
 	{
 		switch (hydrogenBondingType->geometry)
 		{
 		case Dir:
-			addAtomLonePairs();
+			addAtomLonePairs(conformer, lonePairs);
 			break;
 		case Plane:
 			assert(numberLonePairs == 2);
-			addAtomLonePairs();
+			addAtomLonePairs(conformer, lonePairs);
 			break;
 		case Cone:
 		case None:
 			assert(numberLonePairs == 1);
-			addOnePairToAtom();
+			addOnePairToAtom(conformer, lonePairs);
 			break;
 		}
+
+		assert(checkLonePairLengths(conformer, lonePairs));
 	}
 
-	bool AcceptorAtom::checkLonePairLengths()
+	bool AcceptorAtom::checkLonePairLengths(const Conformer& conformer, const std::vector<RDGeom::Point3D>& lonePairs) const
 	{
-		const auto& atomCoord = molecule->getReferenceConformer().getAtomPos(atom->getIdx());
+		const auto& atomCoord = conformer.getAtomPos(atom->getIdx());
 		for (const auto& lonePair: lonePairs)
 		{
 			const auto diff = lonePair - atomCoord;

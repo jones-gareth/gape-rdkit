@@ -31,11 +31,6 @@ namespace Gape
 		 */
 		std::shared_ptr<const HydrogenBondingType> hydrogenBondingType;
 
-		/**
-		 * \brief Reference coordinates of lone pairs
-		 */
-		std::vector<RDGeom::Point3D> lonePairs;
-
 		static const double lonePairLength;
 
 		/**
@@ -160,70 +155,71 @@ namespace Gape
 		 * Adds one lone pair to an sp3 acceptor.
 		 * 
 		 */
-		void add1LpToSp3();
+		void add1LpToSp3(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const;
 
 		/**
 		 * Adds one lone pair to an sp2 atom.
 		 * 
 		 */
-		void add1LpToSp2();
+		void add1LpToSp2(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const;
 
 		/**
 		 * Adds one lone pair to an sp1 atom.
 		 * 
 		 */
-		void addLpToSp1();
+		void addLpToSp1(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const;
 
 		/**
 		 * Adds two lone pairs to an sp3 atom.
 		 * 
 		 */
-		void add2LpToSp3();
+		void add2LpToSp3(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const;
 
 		/**
 		 * Adds two lone pairs to an sp2 atom.
 		 * 
 		 */
-		void add2LpToSp2();
+		void add2LpToSp2(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const;
 
 		/**
 		 * Adds two lone pairs to the carboxylic oxygen O.co2 atom. Also used to add
 		 * lone pairs to nitro oxygen.
 		 * 
 		 */
-		void addLpToOco2();
-
+		void addLpToOco2(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const;
 
 		/**
 		 * Adds three lone pairs to an sp3 atom.
 		 * 
 		 */
-		void add3LpToSp3();
+		void add3LpToSp3(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const;
 
 		/**
 		 * \brief Add lone pairs to acceptor based on atom hybridization
 		 */
-		void addAtomLonePairs();
+		void addAtomLonePairs(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const;
 
 		/**
 		 * \brief Add one lone pair to atom regardless of atom hybridization
 		 */
-		void addOnePairToAtom();
+		void addOnePairToAtom(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const;
 
-		/**
-		 * \brief Add lone pairs to atom based on acceptor geometry
-		 */
-		void addLonePairs();
-
-		/**
-		 * \brief 
-		 * \return validate lone pair lengths are correct
-		 */
-		bool checkLonePairLengths();
 
 	public:
 		AcceptorAtom(const SuperpositionMolecule* spMol, const Atom* atom);
 
 		const Atom* getAtom() const { return atom; }
+
+		/**
+		 * \brief Add lone pairs to atom based on acceptor geometry
+		 */
+		void addLonePairs(const Conformer& conformer, std::vector<RDGeom::Point3D>& lonePairs) const;
+
+		/**
+		 * \brief 
+		 * \return validate lone pair lengths are correct
+		 */
+		bool checkLonePairLengths(const Conformer& conformer, const std::vector<RDGeom::Point3D>& lonePairs) const;
+
 	};
 }

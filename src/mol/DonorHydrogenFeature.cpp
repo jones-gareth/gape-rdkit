@@ -100,15 +100,14 @@ namespace Gape
 		const auto& otherCoordinate = otherCoordinates.getFeatureCoordinates(FeatureType::DonorInteractionPoint, atom)[0];
 		const auto sqrDistance = (coordinate - otherCoordinate).lengthSq();
 		const auto vol = Feature::score(sqrDistance);
+		// TODO - check for maximum Gaussian score?
 		const auto midPoint = (coordinate + otherCoordinate) / 2.0;
 		const auto mol = molecule->getMol();
 		const auto otherMol = other.molecule->getMol();
 
 		// Corrections to make sure fitting point is solvent accessible
-		const auto& conformer = coordinates.getConformer();
-		const auto& otherConformer = otherCoordinates.getConformer();
-		auto molVol = Feature::solvationPenalty(midPoint, mol, conformer, *atom);
-		auto otherMolVol = Feature::solvationPenalty(midPoint, otherMol, otherConformer, *other.atom);
+		auto molVol = solvationPenalty(midPoint, coordinates);
+		auto otherMolVol = otherFeature.solvationPenalty(midPoint, otherCoordinates);
 
 		if (molVol < .0)
 			molVol = .0;

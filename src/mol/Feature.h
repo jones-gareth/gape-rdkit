@@ -254,8 +254,8 @@ namespace Gape
 		 * @param atom
 		 * @return
 		 */
-		double solvationPenalty(const RDGeom::Point3D& point, const ROMol& mol,
-		                        const SuperpositionCoordinates& superpositionCoordinates, const Atom& atom) const;
+		double solvationPenalty(const RDGeom::Point3D& point, 
+		                        const SuperpositionCoordinates& superpositionCoordinates) const;
 
 
 		/**
