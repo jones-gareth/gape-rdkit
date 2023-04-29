@@ -5,6 +5,7 @@
 #ifndef GAPE_TRANSFORMOPS_H
 #define GAPE_TRANSFORMOPS_H
 
+#include <Geometry/point.h>
 #include <Geometry/Transform3D.h>
 
 namespace Gape
@@ -34,5 +35,17 @@ namespace Gape
 	 */
 	void setUpZAxisTransformation(const RDGeom::Point3D& point1, const RDGeom::Point3D& point2,
 	                              RDGeom::Transform3D& transformIn, RDGeom::Transform3D& transformOut);
+
+
+	/**
+	 * Determines the angle between vectors (p1-p2) and (p3-p4).
+	 * 
+	 * @param p1
+	 * @param p2
+	 * @param p3
+	 * @param p4
+	 * @return
+	 */
+	double angleBetween(const RDGeom::Point3D& p1, const RDGeom::Point3D& p2, const RDGeom::Point3D& p3, const RDGeom::Point3D& p4);
 } //namespace Gape
 #endif //GAPE_TRANSFORMOPS_H

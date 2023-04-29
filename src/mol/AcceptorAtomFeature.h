@@ -15,6 +15,8 @@ namespace Gape
 	class AcceptorAtomFeature : public Feature
 	{
 	private:
+
+
 		const HydrogenBondingType* hydrogenBondingType = nullptr;
 
 		/**
@@ -33,21 +35,17 @@ namespace Gape
 		 * type. May be changed.
 		 */
 		thread_local static double matchFactor;
-		/**
-		 * For scoring functions based on lone pair overlap we can scale totals
-		 * based on the number of lone-pairs
-		 */
-		thread_local static bool scaleLonePairs;
 
+		// Now stored in SuperpositionCoordinates
 		// std::vector<RDGeom::Point3D> lonePairCoords;
 
 		int nLonePairs = 0;
 
+		// We could cache these if we're spending a lot of time calculating them
 		// Coordinate for storing a point that should be solvent accessible
-		RDGeom::Point3D solvationPoint;
-
+		// 	RDGeom::Point3D solvationPoint;
 		// Normal coordinate- for planar acceptors
-		RDGeom::Point3D normal;
+		// RDGeom::Point3D normal;
 
 
 		// The default is to use Mills and Dean types in preference to GASP/GOLD
@@ -73,7 +71,18 @@ namespace Gape
 		                       RDGeom::Point3D& solvationPoint) const;
 
 
+
 	public:
+
+		thread_local static double maxLonePairLonePairAngle;
+		thread_local static double minLonePairLonePairAngle;
+		thread_local static double maxForwardAcceptorAngle;
+		thread_local static double minForwardAcceptorAngle;
+		thread_local static double maxPlanePlaneAngle;
+		thread_local static double minPlanePlaneAngle;
+		thread_local static double maxPlaneLonePairAngle;
+		thread_local static double minPlaneLonePairAngle;
+
 		AcceptorAtomFeature(const int featureSetNumber) : Feature(FeatureType::AcceptorAtomFeature, featureSetNumber,
 		                                                          "ACCEPTOR_ATOM", true)
 		{

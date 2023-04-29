@@ -71,4 +71,13 @@ namespace Gape
 		transformIn.assign(yRot * xRot * trans);
 		transformOut.assign(invTrans * invXRot * invYRot);
 	}
+
+
+	double angleBetween(const RDGeom::Point3D& p1, const RDGeom::Point3D& p2, const RDGeom::Point3D& p3, const RDGeom::Point3D& p4)
+	{
+		const auto v1 = p1 - p2;
+		const auto v2 = p3 - p4;
+		const auto angle = v1.angleTo(v2);
+		return angle;
+	}
 }

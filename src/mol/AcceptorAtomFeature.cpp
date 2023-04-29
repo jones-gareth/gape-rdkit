@@ -8,9 +8,117 @@
 
 #include "HydrogenBondingType.h"
 #include "../util/Reporter.h"
+#include <util/TransformOps.h>
 
 namespace Gape
 {
+	thread_local double AcceptorAtomFeature::maxLonePairLonePairAngle = 60.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::minLonePairLonePairAngle = 30.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::maxForwardAcceptorAngle = 90.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::minForwardAcceptorAngle = 60.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::maxPlanePlaneAngle = 60.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::minPlanePlaneAngle = 30.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::maxPlaneLonePairAngle = 60.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::minPlaneLonePairAngle = 30.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::hBondLen = 2.9;
+	thread_local double AcceptorAtomFeature::chargeFactor = 2.0;
+	thread_local double AcceptorAtomFeature::matchFactor = 1.0;
+
+	namespace Detail
+	{
+		/**
+		 * Scoring function for an angle constraint. Returns 1 if angle < min, 0 if
+		 * angle > max and linear interpolates otherwise.
+		 * 
+		 * @param angle
+		 * @param max
+		 * @param min
+		 * @return
+		 */
+		double scoreAngle(double angle, double max, double min)
+		{
+			if (angle > max)
+				return .0;
+			if (angle < min)
+				return 1.0;
+			return 1 - (angle - min) / (max - min);
+		}
+
+		void getPlaneNormal(const RDGeom::Point3D& point, const std::vector<RDGeom::Point3D>& lonePairs,
+		                    RDGeom::Point3D& normal)
+		{
+			assert(lonePairs.size() == 2);
+			const auto v1 = lonePairs[0] - point;
+			const auto v2 = lonePairs[1] - point;
+			normal = v1.crossProduct(v2);
+		}
+
+		/**
+		 * For two acceptors that each accept along a single lone pair, use angle
+		 * constraints to check that they have compatible orientation.
+		 */
+		double lonePairLonePairScore(const RDGeom::Point3D& coordinate, const RDGeom::Point3D& otherCoordinate,
+		                             const std::vector<RDGeom::Point3D>& lonePairs,
+		                             const std::vector<RDGeom::Point3D>& otherLonePairs)
+		{
+			assert(lonePairs.size() == 1);
+			assert(otherLonePairs.size() == 1);
+
+			const auto& lonePair = lonePairs[0];
+			const auto& otherLonePair = otherLonePairs[0];
+
+			auto angle = angleBetween(lonePair, coordinate, otherLonePair, otherCoordinate);
+			if (angle > M_PI)
+				angle = M_PI;
+			REPORT(Reporter::DEBUG) << "LP LP angle " << (angle * 180.0 / M_PI);
+			const auto score = scoreAngle(angle, AcceptorAtomFeature::maxLonePairLonePairAngle,
+			                              AcceptorAtomFeature::minLonePairLonePairAngle);
+			return score;
+		}
+
+
+		/**
+		 * For two acceptors that each accept along a plane of two lone pairs, use
+		 * angle constraints to check that they have compatible orientation.
+		 */
+		double planePlaneScore(const RDGeom::Point3D& coordinate, const RDGeom::Point3D& otherCoordinate,
+		                       const std::vector<RDGeom::Point3D>& lonePairs,
+		                       const std::vector<RDGeom::Point3D>& otherLonePairs)
+		{
+			assert(lonePairs.size() == 2);
+			assert(otherLonePairs.size() == 2);
+
+			RDGeom::Point3D normal, otherNormal;
+			getPlaneNormal(coordinate, lonePairs, normal);
+			getPlaneNormal(otherCoordinate, otherLonePairs, otherNormal);
+			auto angle = normal.angleTo(otherNormal);
+			if (angle > M_PI / 2.0) angle = M_PI - angle;
+			REPORT(Reporter::DEBUG) << "Plane plane angle " << (angle * 180.0 / M_PI);
+			const auto score = scoreAngle(angle, AcceptorAtomFeature::maxPlanePlaneAngle,
+			                              AcceptorAtomFeature::minPlanePlaneAngle);
+			return score;
+		}
+
+		double planeLonePairScore(const RDGeom::Point3D& coordinate, const RDGeom::Point3D& otherCoordinate,
+		                          const std::vector<RDGeom::Point3D>& lonePairs,
+		                          const std::vector<RDGeom::Point3D>& otherLonePairs)
+		{
+			assert(lonePairs.size() == 2);
+			assert(otherLonePairs.size() == 1);
+
+			RDGeom::Point3D normal;
+			getPlaneNormal(coordinate, lonePairs, normal);
+			const auto v = otherLonePairs[0] - otherCoordinate;
+			auto angle = normal.angleTo(v);
+			angle = angle - M_PI / 2.0;
+			if (angle < 0)
+				angle = -angle;
+			const auto score = scoreAngle(angle, AcceptorAtomFeature::maxPlaneLonePairAngle,
+			                              AcceptorAtomFeature::minPlaneLonePairAngle);
+			return score;
+		}
+	}
+
 	void AcceptorAtomFeature::getSolvationPoint(const SuperpositionCoordinates& superpositionCoordinates,
 	                                            RDGeom::Point3D& solvationPoint) const
 	{
@@ -34,10 +142,6 @@ namespace Gape
 		}
 	}
 
-	thread_local double AcceptorAtomFeature::hBondLen = 2.9;
-	thread_local double AcceptorAtomFeature::chargeFactor = 2.0;
-	thread_local double AcceptorAtomFeature::matchFactor = 1.0;
-	thread_local bool AcceptorAtomFeature::scaleLonePairs = true;
 
 	std::vector<std::shared_ptr<Feature>>
 	AcceptorAtomFeature::findAcceptorAtoms(const SuperpositionMolecule* superpositionMolecule)
@@ -134,5 +238,64 @@ namespace Gape
 		accScore -= correct;
 		if (accScore <= 0)
 			return 0;
+
+		// Both acceptors pointing in the same direction?
+		const auto angle = angleBetween(solvationPoint, coordinate, otherSolvationPoint, otherCoordinate);
+		const auto forwardScore = Detail::scoreAngle(angle, maxForwardAcceptorAngle, minForwardAcceptorAngle);
+		if (forwardScore <= .0)
+			return .0;
+
+		// Compatible geometries?
+		double geometryScore = .0;
+		const auto geometry = hydrogenBondingType->geometry;
+		const auto otherGeometry = other.hydrogenBondingType->geometry;
+		const auto& lonePairs = coordinates.getFeatureCoordinates(FeatureType::AcceptorAtomFeature, atom);
+		const auto& otherLonePairs = otherCoordinates.
+			getFeatureCoordinates(FeatureType::AcceptorAtomFeature, other.atom);
+
+		if (geometry == None || otherGeometry == None || geometry == Cone || otherGeometry == Cone)
+			// For acceptors that accept in a cone or have no directionality
+			// assume that the general forward constraint is sufficient.
+			geometryScore = 1.0;
+
+		else if (geometry == Dir && otherGeometry == Dir)
+			geometryScore = Detail::lonePairLonePairScore(coordinate, otherCoordinate, lonePairs, otherLonePairs);
+
+		else if (geometry == Plane && otherGeometry == Plane)
+			geometryScore = Detail::planePlaneScore(coordinate, otherCoordinate, lonePairs, otherLonePairs);
+
+		else if (geometry == Plane && otherGeometry == Dir)
+			geometryScore = Detail::planeLonePairScore(coordinate, otherCoordinate, lonePairs, otherLonePairs);
+
+		else if (geometry == Dir && otherGeometry == Plane)
+			// ignore swapped argument warning
+			geometryScore = Detail::planeLonePairScore(otherCoordinate, coordinate, otherLonePairs, lonePairs);
+
+		assert(!isnan(geometryScore));
+
+		double score = accScore * forwardScore * geometryScore;
+		const auto geometricScore = score;
+		// Type matching scale up
+		double prob = hydrogenBondingType->probability;
+		+other.hydrogenBondingType->probability;
+		score *= prob;
+		if (hydrogenBondingType->name == other.hydrogenBondingType->name)
+			score *= matchFactor;
+
+		// charge scale up
+		if (charged && other.charged)
+			score *= chargeFactor;
+
+		REPORT(Reporter::DEBUG) << info() << " " << other.info() << " score " << score << " geometric score " <<
+			 geometricScore << " geometry score " << geometryScore << " forward score " << forwardScore <<
+             " solvation correction " << correct << " accScore " << accScore;
+
+		return score;
 	}
+
+	std::unique_ptr<PharmFeatureGeometry> AcceptorAtomFeature::getPharmFeatureGeometry(const SuperpositionCoordinates& superpositionCoordinates) const
+	{
+		
+	}
+
 } // Gape
