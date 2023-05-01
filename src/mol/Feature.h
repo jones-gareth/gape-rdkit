@@ -73,7 +73,7 @@ namespace Gape
 
 		/**
 		 * A feature normally has an point which can be considered it's interaction
-		 * point. E.g. for acceptors the atom, for donors the virtual acceptor on
+
 		 * the donor-hydrogen line and for rings the ring center. We can use this
 		 * point in chromosome encoding for mapping features and place Gaussians on
 		 * this point for scoring feature overlap.
@@ -151,7 +151,7 @@ namespace Gape
 		 * @return
 		 */
 		virtual double score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
-		                     const SuperpositionCoordinates& otherCoordinates);
+		                     const SuperpositionCoordinates& otherCoordinates) = 0;
 
 		/**
 		 * Returns a label for the feature to use in mol2 or sdf pharmacophore
@@ -180,7 +180,7 @@ namespace Gape
 		 *
 		 * @return
 		 */
-		virtual std::string pharmLabel() const;
+		virtual std::string pharmLabel() const = 0;
 
 
 		/**
@@ -188,7 +188,7 @@ namespace Gape
 		 *
 		 * @return
 		 */
-		virtual std::string info() const;
+		virtual std::string info() const = 0;
 
 		/**
 		 * Sets the gaussian radius to r. Adjusts the other gausian parameters so
@@ -268,17 +268,17 @@ namespace Gape
 		 *
 		 * @return
 		 */
-		virtual void calculateCoordinates(SuperpositionCoordinates& superpositionCoordinates) const;
+		virtual void calculateCoordinates(SuperpositionCoordinates& superpositionCoordinates) const = 0; 
 
 		virtual std::unique_ptr<PharmFeatureGeometry> getPharmFeatureGeometry(
-			const SuperpositionCoordinates& superpositionCoordinates) const;
+			const SuperpositionCoordinates& superpositionCoordinates) const = 0;
 
 		/**
 		 * Gets the fitting point for this feature
 		 *
 		 * @return
 		 */
-		virtual const RDGeom::Point3D& getFittingPoint(const SuperpositionCoordinates& superpositionCoordinates) const;
+		virtual const RDGeom::Point3D& getFittingPoint(const SuperpositionCoordinates& superpositionCoordinates) const = 0;
 
 		/**
 		 * Returns the square distance between this feature and the other feature

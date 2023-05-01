@@ -301,9 +301,9 @@ namespace Gape
 	{
 		switch (hydrogenBondingType->geometry)
 		{
-		case Dir:
+		case HydrogenBondGeometry::Dir:
 			return countTrueLonePairs();
-		case Plane:
+		case HydrogenBondGeometry::Plane:
 			{
 				const auto numLP = countTrueLonePairs();
 				if (numLP != 2)
@@ -314,8 +314,8 @@ namespace Gape
 				}
 				return 2;
 			}
-		case Cone:
-		case None:
+		case HydrogenBondGeometry::Cone:
+		case HydrogenBondGeometry::None:
 			// For the cone and none the lone pair is just a
 			// representation of forward geometry and not a real
 			// lone pair.
@@ -573,15 +573,15 @@ namespace Gape
 	{
 		switch (hydrogenBondingType->geometry)
 		{
-		case Dir:
+		case HydrogenBondGeometry::Dir:
 			addAtomLonePairs(conformer, lonePairs);
 			break;
-		case Plane:
+		case HydrogenBondGeometry::Plane:
 			assert(numberLonePairs == 2);
 			addAtomLonePairs(conformer, lonePairs);
 			break;
-		case Cone:
-		case None:
+		case HydrogenBondGeometry::Cone:
+		case HydrogenBondGeometry::None:
 			assert(numberLonePairs == 1);
 			addOnePairToAtom(conformer, lonePairs);
 			break;

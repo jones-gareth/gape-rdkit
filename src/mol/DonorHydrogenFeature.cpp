@@ -11,6 +11,7 @@ namespace Gape
 {
 	thread_local double DonorHydrogenFeature::hBondLen = 2.9;
 	thread_local double DonorHydrogenFeature::chargeFactor = 2.0;
+	thread_local double DonorHydrogenFeature::matchFactor = 1.0;
 
 	thread_local double DonorHydrogenFeature::maxDonorDonorAngle = 120.0 * M_PI / 180.0;
 	thread_local double DonorHydrogenFeature::minDonorDonorAngle = 90 * M_PI / 180.0;
@@ -91,7 +92,7 @@ namespace Gape
 	}
 
 	double DonorHydrogenFeature::score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
-		const SuperpositionCoordinates& otherCoordinates)
+		const SuperpositionCoordinates& otherCoordinates) 
 	{
 		const auto& other = dynamic_cast<const DonorHydrogenFeature&>(otherFeature);
 
@@ -191,7 +192,7 @@ namespace Gape
 		return score;
 	}
 
-	std::unique_ptr<PharmFeatureGeometry> DonorHydrogenFeature::getPharmFeatureGeometry(const SuperpositionCoordinates& superpositionCoordinates) const
+	std::unique_ptr<PharmFeatureGeometry> DonorHydrogenFeature::getPharmFeatureGeometry(const SuperpositionCoordinates& superpositionCoordinates) const 
 	{
 		const auto& conformer = superpositionCoordinates.getConformer();
 		auto& point1 = conformer.getAtomPos(donor->getIdx());
@@ -200,4 +201,9 @@ namespace Gape
 		return pharmFeatureGeometry;
 	}
 
+	const RDGeom::Point3D& DonorHydrogenFeature::getFittingPoint(
+		const SuperpositionCoordinates& superpositionCoordinates) const
+	{
+		return  superpositionCoordinates.getFeatureCoordinates(FeatureType::DonorInteractionPoint, atom)[0];
+	}
 }

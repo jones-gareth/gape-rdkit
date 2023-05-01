@@ -113,25 +113,6 @@ namespace Gape
 		                                  RDGeom::Point3D& lonePair2, double lonePairLength);
 
 		/**
-		 * Adds two lone pairs to the sp2 acceptor atom1 which is bonded to the atom
-		 * at co-ordinates origin. The plane in which the lone pairs are added is
-		 * undefined
-		 * 
-		 * alpha argument is double the angle between the lone pairs, so we can use
-		 * this transform for the cone feature
-		 * 
-		 * @param atom1
-		 * @param origin
-		 * @param lp1
-		 * @param lp2
-		 * @param alpha
-		 * @param lonePairLength
-		 */
-		static void addTwoPairsRandomlyToTrigonal(const RDGeom::Point3D& atom1, const RDGeom::Point3D& origin,
-		                                          RDGeom::Point3D& lonePair1, RDGeom::Point3D& lonePair2, double alpha,
-		                                          double lonePairLength);
-
-		/**
 		 * Returns the true number of lone pairs that an acceptor atom has. Differs
 		 * from countLonePairs in that an acceptor with no geometry or cone geometry
 		 * will return the true number of lone pairs (probably 3).
@@ -220,6 +201,26 @@ namespace Gape
 		 * \return validate lone pair lengths are correct
 		 */
 		bool checkLonePairLengths(const Conformer& conformer, const std::vector<RDGeom::Point3D>& lonePairs) const;
+
+		/**
+		 * Adds two lone pairs to the sp2 acceptor atom1 which is bonded to the atom
+		 * at co-ordinates origin. The plane in which the lone pairs are added is
+		 * undefined
+		 * 
+		 * alpha argument is double the angle between the lone pairs, so we can use
+		 * this transform for the cone feature
+		 * 
+		 * @param atom1
+		 * @param origin
+		 * @param lp1
+		 * @param lp2
+		 * @param alpha
+		 * @param lonePairLength
+		 */
+		static void addTwoPairsRandomlyToTrigonal(const RDGeom::Point3D& atom1, const RDGeom::Point3D& origin,
+		                                          RDGeom::Point3D& lonePair1, RDGeom::Point3D& lonePair2, double alpha,
+		                                          double lonePairLength);
+
 
 	};
 }

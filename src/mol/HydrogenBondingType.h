@@ -20,7 +20,7 @@ namespace Gape {
         Donor, Acceptor
     };
 
-    enum HydrogenBondGeometry {
+    enum class HydrogenBondGeometry {
         None, Dir, Cone, Plane
     };
 

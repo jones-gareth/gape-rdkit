@@ -11,7 +11,6 @@ using namespace RDKit;
 
 namespace Gape
 {
-	class HydrogenBondingType;
 	class AcceptorAtomFeature : public Feature
 	{
 	private:

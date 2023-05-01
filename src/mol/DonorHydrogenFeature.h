@@ -6,7 +6,7 @@ using namespace RDKit;
 
 namespace Gape
 {
-	class HydrogenBondingType;
+	struct HydrogenBondingType;
 
 	class DonorHydrogenFeature : public Feature
 	{
@@ -76,5 +76,7 @@ namespace Gape
 
 
 	  std::unique_ptr<PharmFeatureGeometry> getPharmFeatureGeometry(const SuperpositionCoordinates& superpositionCoordinates) const override;
+
+		const RDGeom::Point3D& getFittingPoint(const SuperpositionCoordinates& superpositionCoordinates) const override;
 	};
 }

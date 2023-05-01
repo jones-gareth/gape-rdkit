@@ -12,6 +12,9 @@ namespace Gape
 {
 	thread_local double Feature::maximumGaussianScore = 2.0;
 	thread_local double Feature::solventVolOk = .0;
+	thread_local double Feature::radius = NAN;
+	thread_local double Feature::gaussianN = NAN;
+	thread_local double Feature::alpha = NAN;
 
 	//const int Feature::N_BUILTIN_FEATURES = 4;
 	//const int Feature::MAX_FEATURES = 14;
@@ -23,7 +26,7 @@ namespace Gape
 
 	std::string Feature::atomLabel() const
 	{
-		auto format = boost::format("%s_%d") % featureSetName % (featureSetNumber+1);
+		auto format = boost::format("%s_%d") % featureSetName % (featureSetNumber + 1);
 		return format.str();
 	}
 
@@ -61,9 +64,9 @@ namespace Gape
 		solvationAlpha = getAlpha(r);
 	}
 
-	double Feature::solvationPenalty(const RDGeom::Point3D& point, 
-		const SuperpositionCoordinates& superpositionCoordinates) const
-		{
+	double Feature::solvationPenalty(const RDGeom::Point3D& point,
+	                                 const SuperpositionCoordinates& superpositionCoordinates) const
+	{
 		double penalty = .0;
 		const auto& conformer = superpositionCoordinates.getConformer();
 		const auto& mol = molecule->getMol();
@@ -81,7 +84,8 @@ namespace Gape
 		return penalty - solventVolOk;
 	}
 
-	double Feature::calculateSqrDist(const Feature& otherFeature, const SuperpositionCoordinates& coordinates, const SuperpositionCoordinates &otherCoordinates) const
+	double Feature::calculateSqrDist(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+	                                 const SuperpositionCoordinates& otherCoordinates) const
 	{
 		const auto& point = getFittingPoint(coordinates);
 		const auto& otherPoint = otherFeature.getFittingPoint(otherCoordinates);
@@ -89,7 +93,8 @@ namespace Gape
 		return squaredDistance;
 	}
 
-	std::string Feature::mappingInfo(const Feature& otherFeature, const SuperpositionCoordinates& coordinates, const SuperpositionCoordinates &otherCoordinates) const
+	std::string Feature::mappingInfo(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+	                                 const SuperpositionCoordinates& otherCoordinates) const
 	{
 		const auto squaredDistance = calculateSqrDist(otherFeature, coordinates, otherCoordinates);
 		std::stringstream ss;
@@ -116,4 +121,8 @@ namespace Gape
 		return exp(val);
 	}
 
+	double Feature::getAlpha(const double r)
+	{
+		return (-2.0 * log(0.5)) / (r * r);
+	}
 } // Gape

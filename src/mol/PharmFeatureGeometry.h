@@ -2,8 +2,7 @@
 // Created by gareth on 1/19/23.
 //
 
-#ifndef GAPE_PHARMFEATUREGEOMETRY_H
-#define GAPE_PHARMFEATUREGEOMETRY_H
+#pragma once
 
 #include <Geometry/point.h>
 #include <string>
@@ -15,7 +14,7 @@ namespace Gape
 		Sphere,
 		Vector,
 		Arc,
-		MultiVector
+		Cone
 	};
 
 	class PharmFeatureGeometry
@@ -62,7 +61,7 @@ namespace Gape
 		 * @param point1
 		 * @param point2
 		 */
-		VectorPharmFeatureGeometry(RDGeom::Point3D point1, RDGeom::Point3D point2);
+		VectorPharmFeatureGeometry(const RDGeom::Point3D& point1, const RDGeom::Point3D& point2);
 
 		std::string summary() const override;
 
@@ -80,6 +79,88 @@ namespace Gape
 		{
 			delete[] points;
 		}
-	}; // Gape
-}
-#endif //GAPE_PHARMFEATUREGEOMETRY_H
+	};
+
+	/**
+	 * Represents a feature that is a arc- typically an sp2 acceptor with two lone
+	 * pairs.
+	 * 
+	 */
+	class  ArcFeatureGeometry : public PharmFeatureGeometry
+	{
+		RDGeom::Point3D* points;
+
+	public:
+
+		/**
+		 * The feature center is at point1 and point2 and point3 define the extent
+		 * of the arc.
+		 * 
+		 * @param point1
+		 * @param point2
+		 * @param point3
+		 */
+		ArcFeatureGeometry(const RDGeom::Point3D& point1, const RDGeom::Point3D& point2, const RDGeom::Point3D& point3);
+
+		std::string summary() const override;
+
+		int getNumPoints() const override
+		{
+			return 3;
+		}
+
+		const RDGeom::Point3D& getPoint(int num) const override
+		{
+			return points[num];
+		}
+
+		~ArcFeatureGeometry()
+		{
+			delete[] points;
+		}
+	};
+
+	/**
+	 * Represents a feature that is a solid cone- typically an sp3 acceptor with
+	 * three lone pairs.
+	 * 
+	 */
+	class  ConeFeatureGeometry : public PharmFeatureGeometry
+	{
+		RDGeom::Point3D* points;
+
+	public:
+
+		/**
+		 * point1 is the center of the cone and point2 and point3 are two points on
+		 * the outside edge of the cone base such that the center of the circular
+		 * base of the cone lies between points 2 and 3.
+		 * 
+		 * @param point1
+		 * @param point2
+		 * @param point3
+		 */
+		ConeFeatureGeometry(const RDGeom::Point3D& point1, const RDGeom::Point3D& point2, const RDGeom::Point3D& point3);
+
+		std::string summary() const override;
+
+		int getNumPoints() const override
+		{
+			return 3;
+		}
+
+		const RDGeom::Point3D& getPoint(int num) const override
+		{
+			return points[num];
+		}
+
+		~ConeFeatureGeometry()
+		{
+			delete[] points;
+		}
+
+
+	};
+
+
+} // namespace Gape

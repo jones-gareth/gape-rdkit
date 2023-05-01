@@ -253,21 +253,22 @@ namespace Gape
 		const auto& otherLonePairs = otherCoordinates.
 			getFeatureCoordinates(FeatureType::AcceptorAtomFeature, other.atom);
 
-		if (geometry == None || otherGeometry == None || geometry == Cone || otherGeometry == Cone)
+		if (geometry == HydrogenBondGeometry::None || otherGeometry == HydrogenBondGeometry::None || geometry ==
+			HydrogenBondGeometry::Cone || otherGeometry == HydrogenBondGeometry::Cone)
 			// For acceptors that accept in a cone or have no directionality
 			// assume that the general forward constraint is sufficient.
 			geometryScore = 1.0;
 
-		else if (geometry == Dir && otherGeometry == Dir)
+		else if (geometry == HydrogenBondGeometry::Dir && otherGeometry == HydrogenBondGeometry::Dir)
 			geometryScore = Detail::lonePairLonePairScore(coordinate, otherCoordinate, lonePairs, otherLonePairs);
 
-		else if (geometry == Plane && otherGeometry == Plane)
+		else if (geometry == HydrogenBondGeometry::Plane && otherGeometry == HydrogenBondGeometry::Plane)
 			geometryScore = Detail::planePlaneScore(coordinate, otherCoordinate, lonePairs, otherLonePairs);
 
-		else if (geometry == Plane && otherGeometry == Dir)
+		else if (geometry == HydrogenBondGeometry::Plane && otherGeometry == HydrogenBondGeometry::Dir)
 			geometryScore = Detail::planeLonePairScore(coordinate, otherCoordinate, lonePairs, otherLonePairs);
 
-		else if (geometry == Dir && otherGeometry == Plane)
+		else if (geometry == HydrogenBondGeometry::Dir && otherGeometry == HydrogenBondGeometry::Plane)
 			// ignore swapped argument warning
 			geometryScore = Detail::planeLonePairScore(otherCoordinate, coordinate, otherLonePairs, lonePairs);
 
@@ -276,8 +277,7 @@ namespace Gape
 		double score = accScore * forwardScore * geometryScore;
 		const auto geometricScore = score;
 		// Type matching scale up
-		double prob = hydrogenBondingType->probability;
-		+other.hydrogenBondingType->probability;
+		double prob = hydrogenBondingType->probability + other.hydrogenBondingType->probability;
 		score *= prob;
 		if (hydrogenBondingType->name == other.hydrogenBondingType->name)
 			score *= matchFactor;
@@ -293,9 +293,43 @@ namespace Gape
 		return score;
 	}
 
-	std::unique_ptr<PharmFeatureGeometry> AcceptorAtomFeature::getPharmFeatureGeometry(const SuperpositionCoordinates& superpositionCoordinates) const
+	std::unique_ptr<PharmFeatureGeometry> AcceptorAtomFeature::getPharmFeatureGeometry(
+		const SuperpositionCoordinates& superpositionCoordinates) const
 	{
-		
-	}
+		const auto& coord = superpositionCoordinates.getConformer().getAtomPos(atom->getIdx());
+		const auto& lonePairs = superpositionCoordinates.getFeatureCoordinates(FeatureType::AcceptorAtomFeature, atom);
 
+		switch (hydrogenBondingType->geometry)
+		{
+		case HydrogenBondGeometry::Dir:
+			assert(lonePairs.size() == 1);
+			return std::make_unique<VectorPharmFeatureGeometry>(coord, lonePairs[0]);
+		case HydrogenBondGeometry::Plane:
+			assert(lonePairs.size() == 2);
+			return std::make_unique<ArcFeatureGeometry>(coord, lonePairs[0], lonePairs[1]);
+		case HydrogenBondGeometry::Cone:
+			{
+				// Cone acceptor is defined by a single lone pair , but for the cone
+				// feature we want two opposite points on the top of the cone. We
+				// set the cone angle to be that for lone pairs in an sp3 setting
+				// and hi-jack the LonePairAddition code to generate two points.
+				assert(lonePairs.size() == 1);
+				const auto diff = coord - lonePairs[0];
+				const auto backward = coord - diff;
+				// in sp3 system angle between lp is 109.47
+				double angle = 109.47 * M_PI / 180.0;
+				// This is the size of the cone edge- so that cone length is the
+				// same // as the lone pair distance.
+				double dist = diff.length();
+				RDGeom::Point3D point2, point3;
+				AcceptorAtom::addTwoPairsRandomlyToTrigonal(coord, backward, point2,
+				                                            point3, angle / 2, dist);
+				return std::make_unique<ConeFeatureGeometry>(coord, point2, point3);
+			}
+		case HydrogenBondGeometry::None:
+
+		default:
+			throw std::domain_error("Unknown acceptor geometry");
+		}
+	}
 } // Gape
