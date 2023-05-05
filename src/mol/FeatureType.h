@@ -2,7 +2,7 @@
 
 namespace Gape
 {
-	enum FeatureType
+	enum class FeatureType
 	{
 		HydrophobicAtom,
 		DonorInteractionPoint,

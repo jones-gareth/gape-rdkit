@@ -16,7 +16,7 @@ namespace Gape {
 
     using namespace RDKit;
 
-    enum HydrogenBondType {
+    enum class HydrogenBondType {
         Donor, Acceptor
     };
 

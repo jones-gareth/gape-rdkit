@@ -16,6 +16,7 @@
 #include "mol/HydrogenBondingType.h"
 #include "../mol/AcceptorAtomFeature.h"
 #include "../mol/DonorHydrogenFeature.h"
+#include "../mol/HydrophobicFeature.h"
 
 using namespace RDKit;
 
@@ -363,8 +364,9 @@ namespace Gape {
 
     void SuperpositionMolecule::findFeatures()
     {
-        features[DonorInteractionPoint] = DonorHydrogenFeature::findDonorHydrogens(this);
-        features[AcceptorAtomFeature] = AcceptorAtomFeature::findAcceptorAtoms(this);
+        features[FeatureType::DonorInteractionPoint] = DonorHydrogenFeature::findDonorHydrogens(this);
+        features[FeatureType::AcceptorAtomFeature] = AcceptorAtomFeature::findAcceptorAtoms(this);
+        features[FeatureType::HydrophobicAtom] = HydrophobicFeature::findHydrophobicFeatures(this);
     }
 
 

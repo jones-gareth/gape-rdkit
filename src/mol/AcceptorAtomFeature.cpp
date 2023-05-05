@@ -8,7 +8,7 @@
 
 #include "HydrogenBondingType.h"
 #include "../util/Reporter.h"
-#include <util/TransformOps.h>
+#include "util/TransformOps.h"
 
 namespace Gape
 {
@@ -327,9 +327,11 @@ namespace Gape
 				return std::make_unique<ConeFeatureGeometry>(coord, point2, point3);
 			}
 		case HydrogenBondGeometry::None:
-
+			assert(lonePairs.empty());
+			return std::make_unique<SphereFeatureGeometry>(coord, hBondLen);
 		default:
 			throw std::domain_error("Unknown acceptor geometry");
 		}
 	}
+
 } // Gape

@@ -290,6 +290,7 @@ namespace Gape
 		std::string mappingInfo(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
 		                        const SuperpositionCoordinates& otherCoordinates) const;
 	};
+
 } // Gape
 
 #endif //GAPE_FEATURE_H

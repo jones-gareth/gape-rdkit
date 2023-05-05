@@ -1,5 +1,5 @@
 //
-// Created by gareth on 1/19/23.
+// Created by Gareth Jones on 1/19/23.
 //
 
 #pragma once
@@ -9,7 +9,7 @@
 
 namespace Gape
 {
-	enum Geometry
+	enum class Geometry
 	{
 		Sphere,
 		Vector,
@@ -86,12 +86,11 @@ namespace Gape
 	 * pairs.
 	 * 
 	 */
-	class  ArcFeatureGeometry : public PharmFeatureGeometry
+	class ArcFeatureGeometry : public PharmFeatureGeometry
 	{
 		RDGeom::Point3D* points;
 
 	public:
-
 		/**
 		 * The feature center is at point1 and point2 and point3 define the extent
 		 * of the arc.
@@ -125,12 +124,11 @@ namespace Gape
 	 * three lone pairs.
 	 * 
 	 */
-	class  ConeFeatureGeometry : public PharmFeatureGeometry
+	class ConeFeatureGeometry : public PharmFeatureGeometry
 	{
 		RDGeom::Point3D* points;
 
 	public:
-
 		/**
 		 * point1 is the center of the cone and point2 and point3 are two points on
 		 * the outside edge of the cone base such that the center of the circular
@@ -140,7 +138,8 @@ namespace Gape
 		 * @param point2
 		 * @param point3
 		 */
-		ConeFeatureGeometry(const RDGeom::Point3D& point1, const RDGeom::Point3D& point2, const RDGeom::Point3D& point3);
+		ConeFeatureGeometry(const RDGeom::Point3D& point1, const RDGeom::Point3D& point2,
+		                    const RDGeom::Point3D& point3);
 
 		std::string summary() const override;
 
@@ -158,9 +157,37 @@ namespace Gape
 		{
 			delete[] points;
 		}
-
-
 	};
 
 
+	/**
+	 * Represents a pharmacophore feature that has no directionality. For example,
+	 * certain acceptors and hydrophobic centers.
+	 * 
+	 */
+	class SphereFeatureGeometry : public PharmFeatureGeometry
+	{
+		RDGeom::Point3D point;
+		double radius;
+
+	public:
+		SphereFeatureGeometry(const RDGeom::Point3D& point, const double radius):
+			PharmFeatureGeometry(Geometry::Sphere), point(point), radius(radius)
+		{
+		}
+
+		std::string summary() const override;
+
+		int getNumPoints() const override
+		{
+			return 1;
+		}
+
+		const RDGeom::Point3D& getPoint(int num) const override
+		{
+			if (num == 0)
+				return point;
+			throw std::range_error("Sphere pharmacophore geometry has only one point");
+		}
+	};
 } // namespace Gape

@@ -51,4 +51,9 @@ namespace Gape
 		return "{CONE " + toString(points[0]) + " " + toString(points[1]) + " " + toString(points[2])
 			+ "}";
 	}
+
+	std::string SphereFeatureGeometry::summary() const
+	{
+		return "{SPHERE " + toString(point) + " RADIUS " + to_string(radius) + "}";
+	}
 } // Gape
