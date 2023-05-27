@@ -72,10 +72,11 @@ namespace Gape
 		 *
 		 */
 		double score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
-			const SuperpositionCoordinates& otherCoordinates) override;
+		             const SuperpositionCoordinates& otherCoordinates) override;
 
 
-	  std::unique_ptr<PharmFeatureGeometry> getPharmFeatureGeometry(const SuperpositionCoordinates& superpositionCoordinates) const override;
+		std::unique_ptr<PharmFeatureGeometry> getPharmFeatureGeometry(
+			const SuperpositionCoordinates& superpositionCoordinates) const override;
 
 		const RDGeom::Point3D& getFittingPoint(const SuperpositionCoordinates& superpositionCoordinates) const override;
 	};

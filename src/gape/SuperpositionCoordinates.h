@@ -45,5 +45,7 @@ namespace Gape
 		{
 			return featureCoordinates;
 		}
+
+		std::vector<const Atom*> getFeatureAtoms(FeatureType featureType) const;
 	};
 }

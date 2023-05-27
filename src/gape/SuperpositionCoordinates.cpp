@@ -13,4 +13,20 @@ namespace Gape
 		auto featureTypeCoordinates = featureCoordinates[featureType];
 		featureTypeCoordinates.emplace(atom, coordinates);
 	}
+
+	std::vector<const Atom*> SuperpositionCoordinates::getFeatureAtoms(const FeatureType featureType) const
+	{
+		std::vector<const Atom*> atoms;
+		if (featureCoordinates.find(featureType) == featureCoordinates.end())
+		{
+			return atoms;
+		}
+
+		const auto& featureTypeCoordinates = featureCoordinates.at(featureType);
+		for (const auto& [fst, snd]: featureTypeCoordinates)
+		{
+			atoms.push_back(fst);
+		}
+		return atoms;
+	}
 }
