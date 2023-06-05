@@ -98,7 +98,7 @@ namespace Gape
 
 		// fitting point Gaussian
 		const auto& coordinate = coordinates.getFeatureCoordinates(FeatureType::DonorInteractionPoint, atom)[0];
-		const auto& otherCoordinate = otherCoordinates.getFeatureCoordinates(FeatureType::DonorInteractionPoint, atom)[0];
+		const auto& otherCoordinate = otherCoordinates.getFeatureCoordinates(FeatureType::DonorInteractionPoint, other.atom)[0];
 		const auto sqrDistance = (coordinate - otherCoordinate).lengthSq();
 		const auto vol = Feature::score(sqrDistance);
 		// TODO - check for maximum Gaussian score?

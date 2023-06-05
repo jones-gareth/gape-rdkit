@@ -26,14 +26,8 @@ namespace Gape
 		}
 
 		AromaticRingFeature(const int featureSetNumber, const SuperpositionMolecule* spMol,
-		                    const std::vector<const Atom*>& ringAtoms, const bool aromatic, const bool planar):
-			AromaticRingFeature(featureSetNumber)
-		{
-			this->ringAtoms = ringAtoms;
-			this->aromatic = aromatic;
-			this->planar = planar;
-			molecule = spMol;
-		}
+							const std::vector<const Atom*>& ringAtoms, const bool aromatic, const bool planar, const std::vector<const Atom *> &atomsInUse);
+
 
 		static std::vector<std::shared_ptr<Feature>> findAromaticRings(
 			const SuperpositionMolecule* superpositionMolecule);
@@ -46,5 +40,8 @@ namespace Gape
 		std::unique_ptr<PharmFeatureGeometry> getPharmFeatureGeometry(
 			const SuperpositionCoordinates& superpositionCoordinates) const override;
 		const RDGeom::Point3D& getFittingPoint(const SuperpositionCoordinates& superpositionCoordinates) const override;
+
+		RDGeom::Point3D ringCenter(const SuperpositionCoordinates& superpositionCoordinates) const;
+		std::vector<RDGeom::Point3D> ringNormals(const SuperpositionCoordinates& superpositionCoordinates) const;
 	};
 } // namespace Gape
