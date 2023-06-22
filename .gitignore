@@ -14,3 +14,4 @@ update_rdkit.sh
 out
 .settings
 eigen_include
+.cache

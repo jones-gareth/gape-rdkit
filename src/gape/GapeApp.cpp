@@ -502,7 +502,191 @@ namespace Gape {
             "probability": 0.24,
             "smarts": "[NX3H1](-*)-*"
         }
-    ]
+    ],
+	"partialChargeGroups": [
+		{
+			"name": "Charged Amine",
+			"formal": 1,
+			"partial": 1.0,
+			"smarts": "[N^3X4]",
+			"multiple": false
+		},
+		{
+			"name": "Guanidinium 1",
+			"formal": 1,
+			"partial": 0.333,
+			"smarts": "[N^2H2X3]=C(-N)-N",
+			"multiple": false
+		},
+		{
+			"name": "Guanidinium 2",
+			"formal": 0,
+			"partial": 0.333,
+			"smarts": "N-C(=[N^2H2X3])-N",
+			"multiple": false
+		},
+		{
+			"name": "Amidine 1",
+			"formal": 0,
+			"partial": 0.5,
+			"smarts": "[NX3]-C=[NX3]",
+			"multiple": false
+		},
+		{
+			"name": "Amidine 2",
+			"formal": 1,
+			"partial": 0.5,
+			"smarts": "[NX3]=C-[NX3]",
+			"multiple": false
+		},
+		{
+			"name": "Ortho Aminopryidine 1",
+			"formal": 1,
+			"partial": 0.5,
+			"smarts": "[nX3H1]1:c(-[NH2]):c:[c,n]:c:c:1",
+			"multiple": false
+		},
+		{
+			"name": "Ortho Aminopryidine 2",
+			"formal": 0,
+			"partial": 0.5,
+			"smarts": "[NH2]-c1:[nX3H1]1:c:c:[c,n]:c::1",
+			"multiple": false
+		},
+		{
+			"name": "Para Aminopryidine 1",
+			"formal": 1,
+			"partial": 0.5,
+			"smarts": "[nX3H1]1:c:[c,n]:c(-[NH2):c:c:1",
+			"multiple": false
+		},
+		{
+			"name": "Para Aminopryidine 2",
+			"formal": 0,
+			"partial": 0.5,
+			"smarts": "[NH2]-c1:c:c:[nX3H1]1:c:[c,n]:1",
+			"multiple": false
+		},
+		{
+			"name": "Carboxylate 1",
+			"formal": -1,
+			"partial": -0.5,
+			"smarts": "[OX1]-C=O",
+			"multiple": false
+		},
+		{
+			"name": "Carboxylate 2",
+			"formal": 0,
+			"partial": -0.5,
+			"smarts": "O=C-[OX1]",
+			"multiple": false
+		},
+		{
+			"name": "Hydroxamate 1",
+			"formal": 1,
+			"partial": -0.5,
+			"smarts": "[OX1]-N=O",
+			"multiple": false
+		},
+		{
+			"name": "Hydroxamate 2",
+			"formal": 0,
+			"partial": -0.5,
+			"smarts": "O=N-[OX1]",
+			"multiple": false
+		},
+		{
+			"name": "Tetrazole 1",
+			"formal": 0,
+			"partial": -0.25,
+			"smarts": "[nX2]1:n:n:c:n:1",
+			"multiple": false
+		},
+		{
+			"name": "Tetrazole 2",
+			"formal": -1,
+			"partial": -0.25,
+			"smarts": "n[X2]1:n:n:n:c:1",
+			"multiple": false
+		},
+		{
+			"name": "Acylsulponamide",
+			"formal": -1,
+			"partial": -1.0,
+			"smarts": "[NX2H](-C=O)-S(=O)=O",
+			"multiple": false
+		},
+		{
+			"name": "Wyeth heterocycle",
+			"formal": -1,
+			"partial": -1.0,
+			"smarts": "[NX2]1-C(=O)-O-N-C(=O)-1",
+			"multiple": false
+		},
+		{
+			"name": "Phosphinyl 1",
+			"formal": -1,
+			"partial": -0.6667,
+			"smarts": "[OX1]-P(=O)-[OX1]",
+			"multiple": true
+		},
+		{
+			"name": "Phosphinyl 2",
+			"formal": 0,
+			"partial": -0.6667,
+			"smarts": "O=P(-[OX1])-[OX1]",
+			"multiple": true
+		},
+		{
+			"name": "Phosphinyl 3",
+			"formal": -1,
+			"partial": -0.5,
+			"smarts": "[OX1]-P=O",
+			"multiple": false
+		},
+		{
+			"name": "Phosphinyl 4",
+			"formal": 0,
+			"partial": -0.5,
+			"smarts": "O=P-[OX1]",
+			"multiple": false
+		},
+		{
+			"name": "Sulphonyl 1",
+			"formal": -1,
+			"partial": -0.5,
+			"smarts": "[OX1]-S(=O)=O",
+			"multiple": false
+		},
+		{
+			"name": "Sulphonyl 2",
+			"formal": 0,
+			"partial": -0.5,
+			"smarts": "O=S(=O)-[OX1]",
+			"multiple": false
+		},
+		{
+			"name": "Imidazole 1",
+			"formal": 1,
+			"partial": 0.5,
+			"smarts": "[nX3H1]:c:[nX3H1]:c:c:@1",
+			"multiple": false
+		},
+		{
+			"name": "Imidazole 2",
+			"formal": 1,
+			"partial": 1.0,
+			"smarts": "[nX3H1]:c:[nX3H0]:c:c:@1",
+			"multiple": false
+		}
+		{
+			"name": "Pyrimidine",
+			"formal": 1,
+			"partial": 1.0,
+			"smarts": "[nX3H1]:c:c:c:c:c:@1",
+			"multiple": false
+		}
+	]
 }
     )JSON";
 
