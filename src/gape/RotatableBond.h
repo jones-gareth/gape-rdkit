@@ -33,9 +33,9 @@ namespace Gape
 	{
 	private:
 		const Atom *atom1, *atom2;
+		RotatableBondType rotatableBondType;
 		SuperpositionMolecule* molecule;
 		std::vector<const Atom*> atom1List, atom2List;
-		RotatableBondType rotatableBondType;
 		std::vector<TorsionInfo> torsions;
 
 		void setTorsionAngles();

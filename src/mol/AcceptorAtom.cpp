@@ -604,7 +604,7 @@ namespace Gape
 			}
 		}
 
-		if (numberLonePairs != lonePairs.size())
+		if (numberLonePairs != static_cast<int>(lonePairs.size()))
 		{
 			REPORT(Reporter::WARN) << "Lone pair count error: expected " << numberLonePairs << " got " << lonePairs.size();
 			return false;

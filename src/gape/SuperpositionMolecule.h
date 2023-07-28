@@ -82,6 +82,8 @@ namespace Gape
 
 		void findDonorsAndAcceptors();
 
+		void findCharges();
+
 		const std::map<const Atom*, std::shared_ptr<const HydrogenBondingType>>& getDonors() const { return donors; }
 
 		const std::map<const Atom*, std::shared_ptr<const HydrogenBondingType>>& getAcceptors() const

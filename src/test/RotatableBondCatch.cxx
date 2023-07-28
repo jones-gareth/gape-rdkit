@@ -113,8 +113,8 @@ TEST_CASE("Rotate bonds", "[RotatableBond]") {
 
     for (int k = 0; k < 2; k++) {
         const auto atomList = k == 0 ? rotatableBond->getAtom1List() : rotatableBond->getAtom2List();
-        for (int i = 0; i < atomList.size(); i++) {
-            for (int j = i + 1; j < atomList.size(); j++) {
+        for (size_t i = 0; i < atomList.size(); i++) {
+            for (size_t j = i + 1; j < atomList.size(); j++) {
                 const auto idx1 = atomList[i]->getIdx();
                 const auto idx2 = atomList[j]->getIdx();
                 const auto d1 = (originalConformer.getAtomPos(idx1) - originalConformer.getAtomPos(idx2)).length();

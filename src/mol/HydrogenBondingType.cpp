@@ -3,13 +3,12 @@
 //
 
 #include "HydrogenBondingType.h"
-#include "../util/Reporter.h"
+#include "util/Reporter.h"
 #include <GraphMol/Substruct/SubstructMatch.h>
 #include <GraphMol/SmilesParse/SmilesParse.h>
 
-namespace Gape
-{
-	using namespace RDKit;
+namespace Gape {
+    using namespace RDKit;
 
     HydrogenBondingType::HydrogenBondingType(const HydrogenBondType hydrogenBondType, std::string name,
                                              const double probability, const HydrogenBondGeometry &geometry,
@@ -34,6 +33,9 @@ namespace Gape
             query = SmartsToMol(smarts);
             weight = query->getNumAtoms();
         } catch (...) {
+            REPORT(Reporter::WARN) << "Failed to parse hydrogen bond smarts pattern " << this->smarts;
+        }
+        if (query == nullptr) {
             REPORT(Reporter::WARN) << "Failed to parse hydrogen bond smarts pattern " << this->smarts;
         }
     }
@@ -80,11 +82,12 @@ namespace Gape
     }
 
     HydrogenBondingType::~HydrogenBondingType() {
-            delete query;
+        delete query;
     }
 
     std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>>
-    findHydrogenBondDonorsOrAcceptors(const HydrogenBondType bondType, const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol) {
+    findHydrogenBondDonorsOrAcceptors(const HydrogenBondType bondType,
+                                      const HydrogenBondingTypesList &hydrogenBondingTypes, ROMol &mol) {
         std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>> features;
         SubstructMatchParameters params;
         params.uniquify = false;
@@ -100,7 +103,7 @@ namespace Gape
                                                                      auto queryAtom = bondingType->query->getAtomWithIdx(
                                                                              pair.first);
                                                                      auto molAtom = mol.getAtomWithIdx(pair.second);
-                                                                     if ( molAtom->getAtomicNum() == 1) {
+                                                                     if (molAtom->getAtomicNum() == 1) {
                                                                          assert(queryAtom->getAtomicNum() == 0);
                                                                          return true;
                                                                      }

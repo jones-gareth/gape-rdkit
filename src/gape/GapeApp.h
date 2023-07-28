@@ -28,10 +28,10 @@ namespace Gape {
 
     struct SolvationRule;
     struct HydrogenBondingType;
+    struct PartialCharge;
 
     class GapeApp {
     public:
-
         explicit GapeApp(const std::string &configFile = "");
 
         GapeApp(const GapeApp &) = delete;
@@ -46,10 +46,14 @@ namespace Gape {
         [[nodiscard]] const std::vector<std::shared_ptr<const HydrogenBondingType>>
         &getHydrogenBondingTypes() const {return hydrogenBondingTypes; }
 
+        [[nodiscard]] const std::vector<std::shared_ptr<const PartialCharge>>
+        &getPartialCharges() const {return partialCharges; }
+        
     private:
         GapeSettings gapeSettings;
         std::vector<std::shared_ptr<const SolvationRule>> solvationRules;
         std::vector<std::shared_ptr<const HydrogenBondingType>> hydrogenBondingTypes;
+        std::vector<std::shared_ptr<const PartialCharge>> partialCharges;
     };
 }
 

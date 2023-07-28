@@ -24,6 +24,8 @@ namespace options = boost::program_options;
  * @return
  */
 int main(int argc, char *argv[]) {
+    RDLog::InitLogs();
+    boost::logging::disable_logs("rdApp.debug");
     Reporter::setMinReportingLevel(Reporter::DEBUG);
 
     std::string inputFile;
@@ -31,7 +33,7 @@ int main(int argc, char *argv[]) {
     options_description desc("Allowed options");
     desc.add_options()
             ("help", "Help message")
-            ("inputFile", options::value<std::string>(&inputFile)->required(), "input structures")
+            ("inputFile", options::value<std::string>(&inputFile)->default_value("../../../resources/5ht3.smi"), "input structures")
             ("configFile", options::value<std::string>(), "Optional JSON configuration file")
             ("reportingLevel", options::value<std::string>(&reportingLevel)->default_value("DEBUG"),
              "Reporting level [TRACE, DEBUG, DETAIL, NORMAL, INFO, WARN, FATAL]");

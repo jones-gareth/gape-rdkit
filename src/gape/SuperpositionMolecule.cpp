@@ -5,8 +5,8 @@
 // #include <GraphMol/ForceFieldHelpers/MMFF/MMFF.h>
 
 #include "SuperpositionMolecule.h"
-#include "../util/Reporter.h"
-#include "../mol/Solvate.h"
+#include "util/Reporter.h"
+#include "mol/Solvate.h"
 #include "RotatableBond.h"
 #include <GraphMol/MolOps.h>
 #include <GraphMol/DistGeomHelpers/Embedder.h>
@@ -14,9 +14,10 @@
 #include <GraphMol/FileParsers/FileParsers.h>
 
 #include "mol/HydrogenBondingType.h"
-#include "../mol/AcceptorAtomFeature.h"
-#include "../mol/DonorHydrogenFeature.h"
-#include "../mol/HydrophobicFeature.h"
+#include "mol/AcceptorAtomFeature.h"
+#include "mol/DonorHydrogenFeature.h"
+#include "mol/HydrophobicFeature.h"
+#include "mol/PartialCharge.h"
 
 using namespace RDKit;
 
@@ -360,6 +361,11 @@ namespace Gape {
     {
         donors = findHydrogenBondDonors(settings.getHydrogenBondingTypes(), mol);
         acceptors = findHydrogenBondAcceptors(settings.getHydrogenBondingTypes(), mol);
+    }
+
+    void SuperpositionMolecule::findCharges()
+    {
+        findPartialCharges(settings.getPartialCharges(), mol);
     }
 
     void SuperpositionMolecule::findFeatures()
