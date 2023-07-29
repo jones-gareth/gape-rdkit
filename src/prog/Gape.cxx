@@ -72,6 +72,7 @@ int main(int argc, char *argv[]) {
         superpositionMolecule->generate3D();
         superpositionMolecule->findFreelyRotatableBonds();
         superpositionMolecule->findPairsToCheck();
+        superpositionMolecule->findCharges();
         superpositionMolecule->findDonorsAndAcceptors();
         molecules.push_back(superpositionMolecule);
     }
