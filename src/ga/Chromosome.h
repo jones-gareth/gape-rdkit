@@ -12,7 +12,7 @@
 #define CHROMOSOME_H_
 
 #include <string>
-#include "../util/export.h"
+#include "util/export.h"
 
 namespace Gape {
 

@@ -14,7 +14,7 @@
 #include "StringChromosomeBase.h"
 #include "BinaryStringChromosomePolicy.h"
 #include "IntegerStringChromosomePolicy.h"
-#include "../util/export.h"
+#include "util/export.h"
 
 namespace Gape {
 

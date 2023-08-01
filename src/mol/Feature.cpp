@@ -5,7 +5,7 @@
 #include <boost/format.hpp>
 #include "Feature.h"
 #include "MolUtil.h"
-#include "../util/Reporter.h"
+#include "util/Reporter.h"
 #include "gape/SuperpositionMolecule.h"
 
 namespace Gape

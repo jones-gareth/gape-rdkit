@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <GraphMol/GraphMol.h>
-#include "../mol/FeatureType.h"
+#include "mol/FeatureType.h"
 
 using namespace RDKit;
 

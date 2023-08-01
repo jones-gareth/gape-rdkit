@@ -1,8 +1,8 @@
 ﻿#include "AcceptorAtom.h"
 
 #include "HydrogenBondingType.h"
-#include "../util/TransformOps.h"
-#include "../util/Reporter.h"
+#include "util/TransformOps.h"
+#include "util/Reporter.h"
 
 #include <boost/format.hpp>
 

@@ -8,7 +8,7 @@
 #include <GraphMol/MolOps.h>
 #include <GraphMol/SmilesParse/SmilesParse.h>
 
-#include "../util/Reporter.h"
+#include "util/Reporter.h"
 
 namespace Gape {
 
@@ -31,6 +31,9 @@ namespace Gape {
 
         const static std::string atomPartialChargeLabel;
         const static std::string atomFormalChargeLabel;
+
+        static double getPartialCharge(const Atom * const atom);
+        static int getFormalCharge(const Atom * const atom);
     };
 
 }

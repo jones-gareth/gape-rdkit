@@ -7,8 +7,9 @@
 #include "AcceptorAtomFeature.h"
 
 #include "HydrogenBondingType.h"
-#include "../util/Reporter.h"
+#include "util/Reporter.h"
 #include "util/TransformOps.h"
+#include "mol/PartialCharge.h"
 
 namespace Gape
 {
@@ -23,6 +24,7 @@ namespace Gape
 	thread_local double AcceptorAtomFeature::hBondLen = 2.9;
 	thread_local double AcceptorAtomFeature::chargeFactor = 2.0;
 	thread_local double AcceptorAtomFeature::matchFactor = 1.0;
+	double AcceptorAtomFeature::maxAcceptorPartialCharge = -0.2;
 
 	namespace Detail
 	{
@@ -170,7 +172,7 @@ namespace Gape
 		const auto acceptorIt = acceptors.find(atom);
 		assert(acceptorIt != acceptors.end());
 		hydrogenBondingType = acceptorIt->second.get();
-		charged = false; //TODO add charge to hydrogen bonding types
+		charged = PartialCharge::getPartialCharge(featureAtom) < maxAcceptorPartialCharge;
 		REPORT(Reporter::DEBUG) << "N Lone Pairs " << nLonePairs;
 		acceptorAtom = std::make_unique<AcceptorAtom>(molecule, atom);
 	}

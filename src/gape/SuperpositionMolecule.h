@@ -8,7 +8,7 @@
 #include <GraphMol/GraphMol.h>
 #include <ForceField/MMFF/Params.h>
 #include "GapeApp.h"
-#include "../mol/Feature.h"
+#include "mol/Feature.h"
 #include "SuperpositionCoordinates.h"
 
 using namespace RDKit;

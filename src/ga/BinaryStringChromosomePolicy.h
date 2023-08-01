@@ -11,8 +11,8 @@
 #ifndef BINARYSTRINGCHROMOSOMEPOLICY_H
 #define	BINARYSTRINGCHROMOSOMEPOLICY_H
 
-#include "../util/export.h"
-#include "../util/RandomUtil.h"
+#include "util/export.h"
+#include "util/RandomUtil.h"
 
 namespace Gape {
 

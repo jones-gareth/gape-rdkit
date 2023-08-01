@@ -17,7 +17,7 @@
 #include "GaBase.h"
 #include "GaOperation.h"
 #include "LinkedPopLinearSel.h"
-#include "../util/Reporter.h"
+#include "util/Reporter.h"
 
 namespace Gape {
 

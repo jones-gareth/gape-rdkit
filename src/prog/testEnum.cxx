@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../util/EnumIter.h"
+#include "util/EnumIter.h"
 
 enum class Color {
 	Red, Green, Blue, First = Red, Last = Blue

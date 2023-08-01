@@ -4,8 +4,9 @@
 #include <boost/algorithm/string.hpp>
 
 #include "HydrogenBondingType.h"
-#include "../util/Reporter.h"
-#include "../gape/SuperpositionMolecule.h"
+#include "util/Reporter.h"
+#include "gape/SuperpositionMolecule.h"
+#include "mol/PartialCharge.h"
 
 namespace Gape
 {
@@ -16,6 +17,8 @@ namespace Gape
 	thread_local double DonorHydrogenFeature::maxDonorDonorAngle = 120.0 * M_PI / 180.0;
 	thread_local double DonorHydrogenFeature::minDonorDonorAngle = 90 * M_PI / 180.0;
 	thread_local bool DonorHydrogenFeature::scoreDonorAtoms = true;
+
+	double DonorHydrogenFeature::minDonorPartialCharge = 0.2;
 
 	std::vector<std::shared_ptr<Feature>> DonorHydrogenFeature::findDonorHydrogens(
 		const SuperpositionMolecule* superpositionMolecule)
@@ -57,7 +60,7 @@ namespace Gape
 		const auto donorIt = donors.find(donor);
 		assert(donorIt != donors.end());
 		hydrogenBondingType = donorIt->second.get();
-		charged = false; //TODO add charge to hydrogen bonding types
+		charged = PartialCharge::getPartialCharge(donor) > minDonorPartialCharge;
 	}
 
 	void DonorHydrogenFeature::calculateCoordinates(SuperpositionCoordinates& superpositionCoordinates) const

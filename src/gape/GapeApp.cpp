@@ -7,9 +7,9 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
-#include "../mol/Solvate.h"
-#include "../mol/HydrogenBondingType.h"
-#include "../mol/PartialCharge.h"
+#include "mol/Solvate.h"
+#include "mol/HydrogenBondingType.h"
+#include "mol/PartialCharge.h"
 
 namespace Gape
 {

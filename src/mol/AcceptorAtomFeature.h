@@ -15,7 +15,6 @@ namespace Gape
 	{
 	private:
 
-
 		const HydrogenBondingType* hydrogenBondingType = nullptr;
 
 		/**
@@ -81,6 +80,9 @@ namespace Gape
 		thread_local static double minPlanePlaneAngle;
 		thread_local static double maxPlaneLonePairAngle;
 		thread_local static double minPlaneLonePairAngle;
+
+		// minimum partial charge for a acceptor to be marked as charged
+		static double maxAcceptorPartialCharge;
 
 		AcceptorAtomFeature(const int featureSetNumber) : Feature(FeatureType::AcceptorAtomFeature, featureSetNumber,
 		                                                          "ACCEPTOR_ATOM", true)

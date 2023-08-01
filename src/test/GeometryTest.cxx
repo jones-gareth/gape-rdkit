@@ -2,8 +2,8 @@
 #define CATCH_CONFIG_MAIN
 #include "catch2/catch.hpp"
 
-#include "../util/CoordOps.h"
-#include "../util/Reporter.h"
+#include "util/CoordOps.h"
+#include "util/Reporter.h"
 
 
 using namespace std;

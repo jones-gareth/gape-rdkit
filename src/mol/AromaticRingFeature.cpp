@@ -1,6 +1,6 @@
 ﻿#include "AromaticRingFeature.h"
-#include "../gape/SuperpositionMolecule.h"
-#include "../util/Reporter.h"
+#include "gape/SuperpositionMolecule.h"
+#include "util/Reporter.h"
 
 
 namespace Gape

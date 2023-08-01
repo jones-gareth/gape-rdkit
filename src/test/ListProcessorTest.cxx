@@ -14,8 +14,8 @@
 
 #include <boost/optional.hpp>
 #include <atomic>
-#include "../util/Reporter.h"
-#include "../util/ListProcessor.h"
+#include "util/Reporter.h"
+#include "util/ListProcessor.h"
 
 
 using namespace std;

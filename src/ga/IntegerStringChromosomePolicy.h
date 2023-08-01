@@ -11,8 +11,8 @@
 #ifndef INTEGERSTRINGCHROMOSOMEPOLICY_H_
 #define INTEGERSTRINGCHROMOSOMEPOLICY_H_
 
-#include "../util/RandomUtil.h"
-#include "../util/export.h"
+#include "util/RandomUtil.h"
+#include "util/export.h"
 #include "StringChromosomeBase.h"
 
 namespace Gape {

@@ -15,12 +15,12 @@
 #include <boost/format.hpp>
 #include <cmath>
 
-#include "../util/Reporter.h"
-#include "../util/RandomUtil.h"
-#include "../ga/BinaryStringChromosomePolicy.h"
-#include "../ga/IntegerStringChromosomePolicy.h"
-#include "../ga/StringChromosome.h"
-#include "../ga/LinkedPopLinearSel.h"
+#include "util/Reporter.h"
+#include "util/RandomUtil.h"
+#include "ga/BinaryStringChromosomePolicy.h"
+#include "ga/IntegerStringChromosomePolicy.h"
+#include "ga/StringChromosome.h"
+#include "ga/LinkedPopLinearSel.h"
 
 using namespace std;
 using namespace Gape;

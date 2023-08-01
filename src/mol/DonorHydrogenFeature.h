@@ -38,6 +38,9 @@ namespace Gape
 		bool charged = false;
 
 	public:
+		// minimum partial charge for a donor to be marked as charged
+		static double minDonorPartialCharge;
+
 		DonorHydrogenFeature(const int featureSetNumber) : Feature(FeatureType::DonorInteractionPoint, featureSetNumber,
 		                                                           "DONOR_HYDROGEN", false)
 		{

@@ -3,7 +3,7 @@
 //
 
 #include "Solvate.h"
-#include "../util/Reporter.h"
+#include "util/Reporter.h"
 #include <GraphMol/Substruct/SubstructMatch.h>
 
 namespace Gape {

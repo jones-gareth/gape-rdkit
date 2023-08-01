@@ -3,7 +3,7 @@
 //
 
 #include "PharmFeatureGeometry.h"
-#include "../util/Util.h"
+#include "util/Util.h"
 
 namespace Gape
 {

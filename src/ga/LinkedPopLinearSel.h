@@ -28,12 +28,12 @@
 #include <limits>
 
 #include "GaOperation.h"
-#include "../util/RandomUtil.h"
+#include "util/RandomUtil.h"
 
 // Don't include Reporter for RDKit build as it does not play well with Windows
 // dynamic DLL
 #ifdef INCLUDE_REPORTER
-#include "../util/Reporter.h"
+#include "util/Reporter.h"
 #endif
 
 namespace Gape {

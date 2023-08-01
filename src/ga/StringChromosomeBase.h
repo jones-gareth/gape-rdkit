@@ -18,7 +18,7 @@
 #ifndef STRINGCHROMOSOME_H_
 #define STRINGCHROMOSOME_H_
 
-#include "../util/RandomUtil.h"
+#include "util/RandomUtil.h"
 #include <cassert>
 #include <string>
 #include <sstream>

@@ -1,6 +1,6 @@
 ﻿#include "HydrophobicFeature.h"
-#include "../util/Reporter.h"
-#include "../gape/SuperpositionMolecule.h"
+#include "util/Reporter.h"
+#include "gape/SuperpositionMolecule.h"
 #include <boost/format.hpp>
 #include <GraphMol/GraphMol.h>
 #include <GraphMol/PeriodicTable.h>

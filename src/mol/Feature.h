@@ -8,7 +8,7 @@
 #include <GraphMol/GraphMol.h>
 
 #include "PharmFeatureGeometry.h"
-#include "../gape/SuperpositionCoordinates.h"
+#include "gape/SuperpositionCoordinates.h"
 
 using namespace RDKit;
 

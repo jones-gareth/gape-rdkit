@@ -12,8 +12,8 @@
 #define GABASE_H_
 
 #include <memory>
-#include "../util/RandomUtil.h"
-#include "../util/export.h"
+#include "util/RandomUtil.h"
+#include "util/export.h"
 
 namespace Gape {
 

@@ -7,8 +7,8 @@
  *      Author: Gareth Jones
  */
 
-#include "../util/Reporter.h"
-#include "../ga/BinaryTestGa.h"
+#include "util/Reporter.h"
+#include "ga/BinaryTestGa.h"
 
 using namespace Gape;
 

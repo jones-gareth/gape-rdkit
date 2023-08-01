@@ -44,5 +44,25 @@ namespace Gape {
                 }
             }
         }
+
+        
+    }
+
+    double PartialCharge::getPartialCharge(const Atom* const atom)
+    {
+        if (double partialCharge = .0; atom->getPropIfPresent(atomPartialChargeLabel, partialCharge))
+        {
+            return partialCharge;
+        }
+        return .0;
+    }
+
+    int PartialCharge::getFormalCharge(const Atom* const atom)
+    {
+        if(int formalCharge = 0; atom->getPropIfPresent(atomFormalChargeLabel, formalCharge))
+        {
+            return formalCharge;
+        }
+        return 0;
     }
 } // namespace Gape

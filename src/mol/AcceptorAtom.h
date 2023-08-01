@@ -3,7 +3,7 @@
 
 #include <GraphMol/GraphMol.h>
 
-#include "../gape/SuperpositionMolecule.h"
+#include "gape/SuperpositionMolecule.h"
 
 using namespace RDKit;
 

@@ -7,10 +7,10 @@
 #define _USE_MATH_DEFINES
 
 #include "catch2/catch.hpp"
-#include "../gape/GapeApp.h"
-#include "../util/Reporter.h"
-#include "../mol/MolUtil.h"
-#include "../gape/RotatableBond.h"
+#include "gape/GapeApp.h"
+#include "util/Reporter.h"
+#include "mol/MolUtil.h"
+#include "gape/RotatableBond.h"
 #include <GraphMol/GraphMol.h>
 #include <GraphMol/MolOps.h>
 #include <GraphMol/SmilesParse/SmilesWrite.h>
