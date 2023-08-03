@@ -494,6 +494,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "sp2 N+H (3)");
+			CHECK(chargedDonor(atom));
 		}
 	}
 
@@ -507,6 +508,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 8);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "Acid OH");
+			CHECK(!chargedDonor(atom));
 		}
 	}
 
@@ -520,6 +522,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "sp2 N+H2 (1)");
+			CHECK(chargedDonor(atom));
 		}
 	}
 
@@ -529,7 +532,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 		auto const mol = "n1c(N)cncc1"_smiles;
 		const auto features = findDonorsOrAcceptors(HydrogenBondType::Donor, *mol, settings);
 		CHECK(features.size() == 2);
-		bool found1, found2;
+		bool found1=false, found2=false;
 		for (const auto& [atom, bondingType] : features)
 		{
 			CHECK(atom->getAtomicNum() == 7);
@@ -542,6 +545,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			{
 				found2 = true;
 			}
+			CHECK(chargedDonor(atom));
 		}
 		CHECK(found1);
 		CHECK(found2);
@@ -552,7 +556,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 		auto const mol = "n1cnc(N)cc1"_smiles;
 		const auto features = findDonorsOrAcceptors(HydrogenBondType::Donor, *mol, settings);
 		CHECK(features.size() == 2);
-		bool found1, found2;
+		bool found1=false, found2=false;
 		for (const auto& [atom, bondingType] : features)
 		{
 			CHECK(atom->getAtomicNum() == 7);
@@ -565,6 +569,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			{
 				found2 = true;
 			}
+			CHECK(chargedDonor(atom));
 		}
 		CHECK(found1);
 		CHECK(found2);
@@ -575,7 +580,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 		auto const mol = "N=C(C)N"_smiles;
 		const auto features = findDonorsOrAcceptors(HydrogenBondType::Donor, *mol, settings);
 		CHECK(features.size() == 2);
-		bool found1, found2;
+		bool found1=false, found2=false;
 		for (const auto& [atom, bondingType] : features)
 		{
 			CHECK(atom->getAtomicNum() == 7);
@@ -588,6 +593,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			{
 				found2 = true;
 			}
+			CHECK(chargedDonor(atom));
 		}
 		CHECK(found1);
 		CHECK(found2);
@@ -603,6 +609,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "sp3 N+H3");
+			CHECK(chargedDonor(atom));
 		}
 	}
 
@@ -616,6 +623,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "sp3 N+H2");
+			CHECK(chargedDonor(atom));
 		}
 	}
 
@@ -629,6 +637,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "sp3 N+H");
+			CHECK(chargedDonor(atom));
 		}
 	}
 
@@ -642,6 +651,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 8);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "OH");
+			CHECK(!chargedDonor(atom));
 		}
 	}
 
@@ -655,6 +665,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "Primary Amide NH2");
+			CHECK(!chargedDonor(atom));
 		}
 	}
 
@@ -668,6 +679,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "Secondary Amide NH");
+			CHECK(!chargedDonor(atom));
 		}
 	}
 
@@ -681,6 +693,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "Phenyl NH");
+			CHECK(!chargedDonor(atom));
 		}
 	}
 
@@ -694,6 +707,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "Phenyl NH2");
+			CHECK(!chargedDonor(atom));
 		}
 	}
 
@@ -707,6 +721,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "Imine NH");
+			CHECK(!chargedDonor(atom));
 		}
 	}
 
@@ -720,6 +735,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 8);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "Phenyl OH");
+			CHECK(!chargedDonor(atom));
 		}
 	}
 
@@ -733,6 +749,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "Primary Amine NH2");
+			CHECK(!chargedDonor(atom));
 		}
 	}
 
@@ -746,6 +763,7 @@ TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingT
 			CHECK(atom->getAtomicNum() == 7);
 			CHECK(bondingType->hydrogenBondType == HydrogenBondType::Donor);
 			CHECK(bondingType->name == "Secondary Amine NH");
+			CHECK(!chargedDonor(atom));
 		}
 	}
 }

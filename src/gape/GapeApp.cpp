@@ -508,13 +508,6 @@ namespace Gape
 		R"JSON(
 	"partialChargeGroups": [
 		{
-			"name": "Charged Amine",
-			"formal": 1,
-			"partial": 1.0,
-			"smarts": "[N^3X4]",
-			"multiple": false
-		},
-		{
 			"name": "Guanidinium 1",
 			"formal": 1,
 			"partial": 0.333,
@@ -687,6 +680,20 @@ namespace Gape
 			"formal": 1,
 			"partial": 1.0,
 			"smarts": "[nX3H1]1:c:c:c:c:c:1",
+			"multiple": false
+		},
+	    {
+			"name": "Charged Amine",
+			"formal": 1,
+			"partial": 1.0,
+			"smarts": "[N^3X4]",
+			"multiple": false
+		},
+	    {
+			"name": "N sp2+",
+			"formal": 1,
+			"partial": 1.0,
+			"smarts": "[N^2X3]=*",
 			"multiple": false
 		}
 	]
