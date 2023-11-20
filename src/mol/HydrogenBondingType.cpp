@@ -17,7 +17,7 @@ namespace Gape {
                                                                      geometry(geometry), smarts(std::move(smartsIn)) {
         try {
             int wildcardNum = 0;
-            for (int i = 0; i < smarts.length(); i++) {
+            for (size_t i = 0; i < smarts.length(); i++) {
                 if (smarts[i] == '*') {
                     wildcardNum++;
                 } else if (smarts[i] == 'Y') {

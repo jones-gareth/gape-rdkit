@@ -271,6 +271,24 @@ namespace Gape
 		return values;
 	}
 
+	template <typename T, typename V>
+	T findMaxBy(const std::vector<T>& values, const function<V(const T&)>& score)
+	{
+		T maxValue = values[0];
+		V maxScore = score(maxValue);
+		for (const auto &value: values)
+		{
+			V testScore = score(value);
+			if (testScore > maxScore)
+			{
+				maxValue = value;
+				maxScore = testScore;
+			}
+		}
+		return maxValue;
+	}
+
+
 	/**
 	 * Creates a new vector of items in the input vector that match the filter
 	 * @param values
@@ -401,6 +419,18 @@ namespace Gape
 			currentValue = accumulator(currentValue, *iter);
 		}
 		return currentValue;
+	}
+
+	/**
+	 * \brief Appends the values in one vector to another
+	 * \tparam T 
+	 * \param values The vector to be appended to 
+	 * \param newValues The values to append
+	 */
+	template <typename T>
+	void append(std::vector<T>& values, const std::vector<T>& newValues)
+	{
+		values.insert(values.end(),newValues.begin(), newValues.end());
 	}
 
 	/**

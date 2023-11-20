@@ -7,7 +7,7 @@
 #define _USE_MATH_DEFINES
 
 #include "catch2/catch.hpp"
-#include "gape/GapeApp.h"
+#include "gape/GapeSettings.h"
 #include "util/Reporter.h"
 #include "mol/MolUtil.h"
 #include "gape/RotatableBond.h"
@@ -20,7 +20,7 @@ using namespace Gape;
 using namespace Gape;
 using namespace RDKit;
 
-SuperpositionMolecule *loadSuperpositionMolecule(const std::string &smilesIn, const GapeApp &settings) {
+SuperpositionMolecule *loadSuperpositionMolecule(const std::string &smilesIn, const GapeSettings &settings) {
     auto mol = SmilesToMol(smilesIn);
     mol->setProp(common_properties::_Name, "Unknown molecule");
     MolOps::addHs(*mol);
@@ -32,7 +32,7 @@ SuperpositionMolecule *loadSuperpositionMolecule(const std::string &smilesIn, co
 }
 
 std::vector<std::shared_ptr<RotatableBond>>
-findRotatableBonds(const std::string &smilesIn, const GapeApp &settings) {
+findRotatableBonds(const std::string &smilesIn, const GapeSettings &settings) {
     auto superpositionMolecule = loadSuperpositionMolecule(smilesIn, settings);
     auto rotatableBonds = superpositionMolecule->getRotatableBonds();
     delete superpositionMolecule;
@@ -41,7 +41,7 @@ findRotatableBonds(const std::string &smilesIn, const GapeApp &settings) {
 
 TEST_CASE("Find rotatable bonds works as expected", "[RotatableBond]") {
     Reporter::setMinReportingLevel(Reporter::DEBUG);
-    const GapeApp settings;
+    const GapeSettings settings;
 
     SECTION("ETHANE") {
         const auto rotatableBonds = findRotatableBonds("CC", settings);
@@ -78,7 +78,7 @@ TEST_CASE("Find rotatable bonds works as expected", "[RotatableBond]") {
 TEST_CASE("Rotate bonds", "[RotatableBond]") {
 
     Reporter::setMinReportingLevel(Reporter::DEBUG);
-    const GapeApp settings;
+    const GapeSettings settings;
 
     auto smiles = "O=C1c2cccc3c2[C@H](CCC3)CN1[C@@H]1C[N@H+]2CC[C@@H]1CC2";
     auto superpositionMolecule = loadSuperpositionMolecule(smiles, settings);

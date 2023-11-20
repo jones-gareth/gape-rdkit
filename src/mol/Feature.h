@@ -289,6 +289,8 @@ namespace Gape
 
 		std::string mappingInfo(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
 		                        const SuperpositionCoordinates& otherCoordinates) const;
+
+		const bool& isMappingFeature() const { return mappingFeature; } 
 	};
 
 } // Gape

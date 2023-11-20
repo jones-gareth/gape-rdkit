@@ -3,7 +3,7 @@
 //
 
 #include "gape/SuperpositionMolecule.h"
-#include "gape/GapeApp.h"
+#include "gape/GapeSettings.h"
 #include "util/Reporter.h"
 
 #include <cassert>
@@ -55,8 +55,37 @@ int main(int argc, char *argv[]) {
 
     }
 
+	if (reportingLevel == "TRACE")
+	{
+        Reporter::setMinReportingLevel(Reporter::TRACE);
+	}
+    else if (reportingLevel == "DEBUG")
+    {
+        Reporter::setMinReportingLevel(Reporter::DEBUG);
+    }
+    else if (reportingLevel == "DETAIL")
+    {
+        Reporter::setMinReportingLevel(Reporter::DETAIL);
+    }
+    else if (reportingLevel == "NORMAL")
+    {
+        Reporter::setMinReportingLevel(Reporter::NORMAL);
+    }
+    else if (reportingLevel == "INFO")
+    {
+        Reporter::setMinReportingLevel(Reporter::INFO);
+    }
+    else if (reportingLevel == "WARN")
+    {
+        Reporter::setMinReportingLevel(Reporter::WARN);
+    }
+    else if (reportingLevel == "FATAL")
+    {
+        Reporter::setMinReportingLevel(Reporter::FATAL);
+    }
+
     RDKit::SmilesMolSupplier smilesMolSupplier(inputFile, " ", 0, 1, false, true);
-    GapeApp gape;
+    GapeSettings settings;
     std::vector<std::shared_ptr<Gape::SuperpositionMolecule>> molecules;
 
     int ligandNum = 0;
@@ -66,7 +95,7 @@ int main(int argc, char *argv[]) {
         if (!mol->hasProp("_Name")) {
             mol->setProp("_Name", (boost::format("Ligand %d") % ligandNum).str());
         }
-        auto superpositionMolecule = std::make_shared<Gape::SuperpositionMolecule>(*mol, gape);
+        auto superpositionMolecule = std::make_shared<Gape::SuperpositionMolecule>(*mol, settings);
         delete mol;
         superpositionMolecule->solvate();
         superpositionMolecule->generate3D();
@@ -82,5 +111,7 @@ int main(int argc, char *argv[]) {
         preparedFile << superpositionMolecule->ToMolBlock() << "$$$$" << std::endl;
     }
     preparedFile.close();
+
+
 
 }

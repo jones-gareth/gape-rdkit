@@ -2,12 +2,11 @@
 // Created by gareth on 10/18/22.
 //
 
-#ifndef GAPE_SUPERPOSITIONMOLECULE_H
-#define GAPE_SUPERPOSITIONMOLECULE_H
+#pragma once
 
 #include <GraphMol/GraphMol.h>
 #include <ForceField/MMFF/Params.h>
-#include "GapeApp.h"
+#include "GapeSettings.h"
 #include "mol/Feature.h"
 #include "SuperpositionCoordinates.h"
 
@@ -50,7 +49,7 @@ namespace Gape
 	class SuperpositionMolecule
 	{
 	public:
-		explicit SuperpositionMolecule(const ROMol& mol, const GapeApp& settings);
+		explicit SuperpositionMolecule(const ROMol& mol, const GapeSettings& settings);
 
 		virtual ~SuperpositionMolecule();
 
@@ -59,6 +58,12 @@ namespace Gape
 		SuperpositionMolecule& operator=(SuperpositionMolecule&) = delete;
 
 		std::string ToMolBlock() const;
+
+		const bool& isRigid() const { return rigid; }
+
+		const bool& isFixed() const { return fixed; }
+
+		const double& activity() const { return act; }
 
 		const RWMol& getMol() const { return mol; }
 
@@ -105,16 +110,26 @@ namespace Gape
 		 */
 		bool isCarboxylateOxygen(const Atom& atom) const;
 
+		std::string getName() const;
+
+		size_t numberFeatures() const;
+		size_t numberMappingFeatures() const;
+		double act = 0.0;
+
 	private:
 		RWMol mol;
 		MMFF::MMFFMolProperties* mmffMolProperties;
-		const GapeApp& settings;
+		const GapeSettings& settings;
 		std::vector<std::shared_ptr<RotatableBond>> rotatableBonds;
 		std::vector<VdwInfo> pairsToCheck;
 		std::map<const Atom*, std::shared_ptr<const HydrogenBondingType>> donors;
 		std::map<const Atom*, std::shared_ptr<const HydrogenBondingType>> acceptors;
 		Conformer referenceConformer;
 		std::map<const FeatureType, std::vector<std::shared_ptr<Feature>>> features;
+		std::vector<std::shared_ptr<Feature>> allFeatures;
+		std::vector<std::shared_ptr<Feature>> allMappingFeatures;
+		bool rigid = false;
+		bool fixed = false;
 
 		bool isO2(const Atom& atom) const;
 
@@ -150,6 +165,7 @@ namespace Gape
 		 */
 		bool isCarboxylateCarbon(const Atom& atom) const;
 	};
+
+	using SuperpositionMolPtr = std::shared_ptr<SuperpositionMolecule>;
 } // namespace GAPE
 
-#endif //GAPE_SUPERPOSITIONMOLECULE_H

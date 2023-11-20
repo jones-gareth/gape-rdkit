@@ -5,7 +5,7 @@
 #define CATCH_CONFIG_MAIN
 
 #include "catch2/catch.hpp"
-#include "gape/GapeApp.h"
+#include "gape/GapeSettings.h"
 #include "util/Reporter.h"
 #include "mol/Solvate.h"
 #include <GraphMol/GraphMol.h>
@@ -37,7 +37,7 @@ solvateSmiles(const std::string &smilesIn, const std::string expectedSmiles, con
 TEST_CASE("Solvation works as expected", "[solvation]") {
 
     Reporter::setMinReportingLevel(Reporter::DEBUG);
-    const GapeApp settings;
+    const GapeSettings settings;
     const SolvationRuleList &solvationRules = settings.getSolvationRules();
 
     SECTION("Primary Aliphatic Amine") {

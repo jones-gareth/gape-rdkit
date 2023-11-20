@@ -5,7 +5,7 @@
 #define CATCH_CONFIG_MAIN
 
 #include "catch2/catch.hpp"
-#include "gape/GapeApp.h"
+#include "gape/GapeSettings.h"
 #include "mol/AcceptorAtomFeature.h"
 #include "mol/DonorHydrogenFeature.h"
 #include "util/Reporter.h"
@@ -17,7 +17,7 @@ using namespace Gape;
 using namespace RDKit;
 
 std::map<const Atom*, std::shared_ptr<const HydrogenBondingType>>
-findDonorsOrAcceptors(HydrogenBondType bondType, RWMol& mol, const GapeApp& settings, bool solvate = true)
+findDonorsOrAcceptors(HydrogenBondType bondType, RWMol& mol, const GapeSettings& settings, bool solvate = true)
 {
 	mol.setProp(common_properties::_Name, "Unknown molecule");
 	MolOps::addHs(mol);
@@ -48,7 +48,7 @@ bool chargedDonor(const Atom* const atom)
 TEST_CASE("Finding hydrogen bonding types works as expected", "[hydrogenBondingType]")
 {
 	Reporter::setMinReportingLevel(Reporter::DEBUG);
-	const GapeApp settings;
+	const GapeSettings settings;
 
 	SECTION("Terminal Phosphate")
 	{
