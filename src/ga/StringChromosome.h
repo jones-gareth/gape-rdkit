@@ -34,7 +34,7 @@ class GA_EXPORT StringChromosome<bool, BinaryStringChromosomePolicy>
 
  public:
   StringChromosome(int length_, Gape::RandomUtil &rng_,
-                   BinaryStringChromosomePolicy &chromosomePolicy_)
+                   const BinaryStringChromosomePolicy &chromosomePolicy_)
       : StringChromosomeBase(length_, rng_, chromosomePolicy_) {
     ;
   }
@@ -55,7 +55,7 @@ class GA_EXPORT StringChromosome<int, IntegerStringChromosomePolicy>
 
  public:
   StringChromosome(int length_, Gape::RandomUtil &rng_,
-                   IntegerStringChromosomePolicy &chromosomePolicy_)
+                   const IntegerStringChromosomePolicy &chromosomePolicy_)
       : StringChromosomeBase(length_, rng_, chromosomePolicy_) {
     ;
   }

@@ -9,7 +9,8 @@
 namespace Gape {
     SuperpositionChromosome::SuperpositionChromosome(const SuperpositionGa& superpositionGa):
         superpositionGa(superpositionGa),
-    integerStringChromosome(superpositionGa.getSuperposition().getIntegerStringLength(), superpositionGa.getRng(), superpositionGa.getIntgerStringChromosomePolicy())
+    integerStringChromosome(superpositionGa.getSuperposition().getIntegerStringLength(), superpositionGa.getRng(), superpositionGa.getIntgerStringChromosomePolicy()),
+    binaryStringChromosome(superpositionGa.getSuperposition().getBinaryStringLength(), superpositionGa.getRng(), superpositionGa.getBinaryStringChromosomePolicy())
     {
 
     }

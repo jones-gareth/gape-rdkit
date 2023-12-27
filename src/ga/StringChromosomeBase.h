@@ -32,7 +32,7 @@ template <typename T, typename ChromosomePolicy>
 class StringChromosomeBase {
  private:
   RandomUtil &rng;
-  ChromosomePolicy &chromosomePolicy;
+  const ChromosomePolicy &chromosomePolicy;
   StringChromosomeBase(const StringChromosomeBase &other);
   StringChromosomeBase &operator=(const StringChromosomeBase &other);
 
@@ -42,7 +42,7 @@ class StringChromosomeBase {
 
  public:
   StringChromosomeBase(int length_, RandomUtil &rng_,
-                       ChromosomePolicy &chromosomePolicy_)
+                       const ChromosomePolicy &chromosomePolicy_)
       : rng(rng_),
         chromosomePolicy(chromosomePolicy_),
         length(length_),
@@ -67,7 +67,7 @@ class StringChromosomeBase {
   T *getString() const;
   int getLength() const { return length; }
   RandomUtil &getRng() const { return rng; }
-  ChromosomePolicy &getChromosomePolicy() const { return chromosomePolicy; }
+  const ChromosomePolicy &getChromosomePolicy() const { return chromosomePolicy; }
 };
 
 /**

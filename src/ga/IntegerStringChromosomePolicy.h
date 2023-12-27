@@ -24,7 +24,7 @@ public:
 
 	int mutate(int pos, int currentValue) const;
 	int initialize(int pos) const;
-	bool isAllowSwitch() {
+	bool isAllowSwitch() const {
 		return false;
 	}
 

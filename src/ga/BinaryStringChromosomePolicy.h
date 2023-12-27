@@ -23,7 +23,7 @@ public:
     
     bool mutate(int pos, bool currentValue) const;
     bool initialize(int pos) const;
-    bool isAllowSwitch() {return false;}
+    bool isAllowSwitch() const {return false;}
 private:
     Gape::RandomUtil & rng;
     BinaryStringChromosomePolicy(const BinaryStringChromosomePolicy& orig);
