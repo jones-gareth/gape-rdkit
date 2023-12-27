@@ -10,6 +10,7 @@
 #include "mol/Feature.h"
 #include "SuperpositionCoordinates.h"
 
+
 using namespace RDKit;
 
 namespace ForceFields
@@ -65,6 +66,8 @@ namespace Gape
 
 		const double& activity() const { return act; }
 
+		const double& getWeight() const { return weight; }
+
 		const RWMol& getMol() const { return mol; }
 
 		MMFF::MMFFMolProperties* getMMFFMolProperties() const { return mmffMolProperties; }
@@ -72,6 +75,8 @@ namespace Gape
 		void findFreelyRotatableBonds();
 
 		const std::vector<std::shared_ptr<RotatableBond>>& getRotatableBonds() const { return rotatableBonds; }
+
+		int conformationalBitLen() const;
 
 		void findPairsToCheck();
 
@@ -116,6 +121,11 @@ namespace Gape
 		size_t numberMappingFeatures() const;
 		double act = 0.0;
 
+		const std::map<const FeatureType, std::vector<std::shared_ptr<Feature>>>& getFeatures() const
+		{
+			return features;
+		}
+
 	private:
 		RWMol mol;
 		MMFF::MMFFMolProperties* mmffMolProperties;
@@ -130,6 +140,7 @@ namespace Gape
 		std::vector<std::shared_ptr<Feature>> allMappingFeatures;
 		bool rigid = false;
 		bool fixed = false;
+		double weight = 1.0;
 
 		bool isO2(const Atom& atom) const;
 
@@ -164,8 +175,9 @@ namespace Gape
 		 * @return
 		 */
 		bool isCarboxylateCarbon(const Atom& atom) const;
+
+		friend class Superposition;
 	};
 
 	using SuperpositionMolPtr = std::shared_ptr<SuperpositionMolecule>;
-} // namespace GAPE
-
+} // namespace Gape

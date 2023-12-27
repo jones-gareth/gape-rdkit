@@ -6,14 +6,12 @@
 #include "GapeSettings.h"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
 #include "mol/Solvate.h"
 #include "mol/HydrogenBondingType.h"
 #include "mol/PartialCharge.h"
 
-namespace Gape
-{
-	std::string defaultConfigStr = R"JSON(
+namespace Gape {
+    std::string defaultConfigStr = R"JSON(
 {
     "gapeParameters": {
         // Flatten bonds when possible
@@ -25,6 +23,26 @@ namespace Gape
 		"baseMoleculeSelection": "minRotatableBonds",
 		"fittingMoleculeSelection": "baseMolecule",
 		"useActivities": false,
+		"scaleFitting": true,
+		"startFittingRadius": 3.5,
+		"finishFittingRadius": 1.5,
+		"numberRebuilds": 24,
+        "ignoreVdwAttractive": true,
+        "ignoreTorsion": false,
+		"numberRuns": 10,
+        "guessGaParameters": true,
+		"numberIslands": 5,
+		"populationSize": 100,
+		"numberIterations": 60000,
+		"selectionPressure": 1.001,
+		"useNiches": true,
+		"useNiches": true,
+        "nicheSize": 5,
+		"nichingOff": 0.6,
+		"crossoverWeight": 95,
+		"mutationWeight": 95,
+		"migrationWeight": 10,
+
     },
     "solvationRules": [
         {
@@ -508,7 +526,7 @@ namespace Gape
             "smarts": "[NX3H1](-*)-*"
         }
     ], )JSON"
-		R"JSON(
+            R"JSON(
 	"partialChargeGroups": [
 		{
 			"name": "Guanidinium 1",
@@ -703,119 +721,113 @@ namespace Gape
 }
     )JSON";
 
-	GapeSettings::GapeSettings(const std::string& configFile)
-	{
-		rapidjson::Document d;
-		d.Parse<rapidjson::kParseCommentsFlag>(defaultConfigStr.c_str());
+    GapeSettings::GapeSettings(const std::string& configFile) {
+        rapidjson::Document d;
+        d.Parse<rapidjson::kParseCommentsFlag>(defaultConfigStr.c_str());
 
-		gapeParameters.flattenBonds = d["gapeParameters"]["flattenBonds"].GetBool();
-		gapeParameters.flipAmideBonds = d["gapeParameters"]["flipAmideBonds"].GetBool();
-		gapeParameters.solvateStructures = d["gapeParameters"]["solvateStructures"].GetBool();
-		std::string baseMolSelection = d["gapeParameters"]["baseMoleculeSelection"].GetString();
-		if (baseMolSelection == "minRotatableBonds")
-		{
-			gapeParameters.baseMoleculeSelection = BaseMoleculeSelection::minRotatableBonds;
-		}
-		else if (baseMolSelection == "maxFeatures")
-		{
-			gapeParameters.baseMoleculeSelection = BaseMoleculeSelection::maxFeatures;
-		}
-		else
-		{
-			REPORT(Reporter::FATAL) << "Unknown base molecule selection " << baseMolSelection;
-			throw std::runtime_error("Unknown base molecule selection");
-		}
-		std::string fittingMolSelection = d["gapeParameters"]["fittingMoleculeSelection"].GetString();
-        if (fittingMolSelection == "minRotatableBonds")
-        {
+        gapeParameters.flattenBonds = d["gapeParameters"]["flattenBonds"].GetBool();
+        gapeParameters.flipAmideBonds = d["gapeParameters"]["flipAmideBonds"].GetBool();
+        gapeParameters.solvateStructures = d["gapeParameters"]["solvateStructures"].GetBool();
+        std::string baseMolSelection = d["gapeParameters"]["baseMoleculeSelection"].GetString();
+        if (baseMolSelection == "minRotatableBonds") {
+            gapeParameters.baseMoleculeSelection = BaseMoleculeSelection::minRotatableBonds;
+        } else if (baseMolSelection == "maxFeatures") {
+            gapeParameters.baseMoleculeSelection = BaseMoleculeSelection::maxFeatures;
+        } else {
+            REPORT(Reporter::FATAL) << "Unknown base molecule selection " << baseMolSelection;
+            throw std::runtime_error("Unknown base molecule selection");
+        }
+        std::string fittingMolSelection = d["gapeParameters"]["fittingMoleculeSelection"].GetString();
+        if (fittingMolSelection == "minRotatableBonds") {
             gapeParameters.fittingMoleculeSelection = FittingMoleculeSelection::minRotatableBonds;
-        } else if (fittingMolSelection == "maxFeatures")
-        {
+        } else if (fittingMolSelection == "maxFeatures") {
             gapeParameters.fittingMoleculeSelection = FittingMoleculeSelection::maxFeatures;
-        } else if (fittingMolSelection == "baseMolecule")
-        {
+        } else if (fittingMolSelection == "baseMolecule") {
             gapeParameters.fittingMoleculeSelection = FittingMoleculeSelection::baseMolecule;
-        } else
-        {
-			REPORT(Reporter::FATAL) << "Unknown fitting molecule selection " << fittingMolSelection;
-			throw std::runtime_error("Unknown fitting molecule selection");
+        } else {
+            REPORT(Reporter::FATAL) << "Unknown fitting molecule selection " << fittingMolSelection;
+            throw std::runtime_error("Unknown fitting molecule selection");
         }
         gapeParameters.useActivities = d["gapeParameters"]["useActivities"].GetBool();
+        gapeParameters.scaleFitting = d["gapeParameters"]["scaleFitting"].GetBool();
+        gapeParameters.startFittingRadius = d["gapeParameters"]["startFittingRadius"].GetDouble();
+        gapeParameters.finishFittingRadius = d["gapeParameters"]["finishFittingRadius"].GetDouble();
+        gapeParameters.numberRebuilds = d["gapeParameters"]["numberRebuilds"].GetInt();
+        gapeParameters.ignoreVdwAttractive = d["gapeParameters"]["ignoreVdwAttractive"].GetBool();
+        gapeParameters.ignoreTorsion = d["gapeParameters"]["ignoreTorsion"].GetBool();
+        gapeParameters.numberRuns = d["gapeParameters"]["numberRuns"].GetInt();
+        gapeParameters.guessGaParameters =d["gapeParameters"]["guessGaParameters"].GetBool();
+        gapeParameters.numberIslands =d["gapeParameters"]["numberIslands"].GetInt();
+        gapeParameters.populationSize = d["gapeParameters"]["populationsSize"].GetInt();
+        gapeParameters.numberIterations = d["gapeParameters"]["numberIterations"].GetInt();
+        gapeParameters.selectionPressure = d["gapeParameters"]["selectionPressure"].GetInt();
+        gapeParameters.useNiches = d["gapeParameters"]["useNiches"].GetBool();
+        gapeParameters.nicheSize = d["gapeParameters"]["nicheSize"].GetInt();
+        gapeParameters.nichingOff = d["gapeParameters"]["nichingOff"].GetDouble();
+        gapeParameters.crossoverWeight = d["gapeParameters"]["crossoverWeight"].GetInt();
+        gapeParameters.mutationWeight = d["gapeParameters"]["mutationWeight"].GetInt();
+        gapeParameters.migrationWeight = d["gapeParameters"]["migrationWeight"].GetInt();
 
-		auto const& jsonSolvationRules = d["solvationRules"];
-		solvationRules.clear();
-		solvationRules.reserve(jsonSolvationRules.Size());
-		for (auto& jsonRule : jsonSolvationRules.GetArray())
-		{
-			std::string name(jsonRule["name"].GetString());
-			std::string typeName(jsonRule["type"].GetString());
-			assert(typeName == "acid" || typeName == "base");
-			std::string smarts(jsonRule["smarts"].GetString());
-			auto pKa = jsonRule["pKa"].GetDouble();
-			SolvationType solvationType = typeName == "acid" ? SolvationType::Acid : SolvationType::Base;
-			auto rule = std::make_shared<const SolvationRule>(solvationType, name, smarts, pKa);
-			solvationRules.push_back(rule);
-		}
+        auto const& jsonSolvationRules = d["solvationRules"];
+        solvationRules.clear();
+        solvationRules.reserve(jsonSolvationRules.Size());
+        for (auto& jsonRule: jsonSolvationRules.GetArray()) {
+            std::string name(jsonRule["name"].GetString());
+            std::string typeName(jsonRule["type"].GetString());
+            assert(typeName == "acid" || typeName == "base");
+            std::string smarts(jsonRule["smarts"].GetString());
+            auto pKa = jsonRule["pKa"].GetDouble();
+            SolvationType solvationType = typeName == "acid" ? SolvationType::Acid : SolvationType::Base;
+            auto rule = std::make_shared<const SolvationRule>(solvationType, name, smarts, pKa);
+            solvationRules.push_back(rule);
+        }
 
-		auto const& jsonHydrogenBondingTypes = d["hydrogenBondingTypes"];
-		hydrogenBondingTypes.clear();
-		hydrogenBondingTypes.reserve(jsonHydrogenBondingTypes.Size());
-		for (auto& jsonType : jsonHydrogenBondingTypes.GetArray())
-		{
-			std::string name(jsonType["name"].GetString());
-			std::string typeName(jsonType["type"].GetString());
-			assert(typeName == "donor" || typeName == "acceptor");
-			auto probability = jsonType["probability"].GetDouble();
-			HydrogenBondType bondType = typeName == "acceptor" ? HydrogenBondType::Acceptor : HydrogenBondType::Donor;
-			HydrogenBondGeometry geometry = HydrogenBondGeometry::None;
-			if (bondType == HydrogenBondType::Acceptor)
-			{
-				std::string geometryName(jsonType["geometry"].GetString());
-				if (geometryName == "none")
-				{
-					geometry = HydrogenBondGeometry::None;
-				}
-				else if (geometryName == "dir")
-				{
-					geometry = HydrogenBondGeometry::Dir;
-				}
-				else if (geometryName == "cone")
-				{
-					geometry = HydrogenBondGeometry::Cone;
-				}
-				else if (geometryName == "plane")
-				{
-					geometry = HydrogenBondGeometry::Plane;
-				}
-				else
-				{
-					REPORT(Reporter::FATAL) << "Unknown hydrogen bond geometry " << geometryName;
-					throw std::runtime_error("Unknown hydrogen bond geometry");
-				}
-			}
-			std::string smarts(jsonType["smarts"].GetString());
-			auto bondingType = std::make_shared<HydrogenBondingType>(bondType, name, probability, geometry, smarts);
-			if (jsonType.HasMember("weight"))
-			{
-				auto weight = jsonType["weight"].GetDouble();
-				bondingType->weight = weight;
-			}
-			hydrogenBondingTypes.push_back(bondingType);
-		}
+        auto const& jsonHydrogenBondingTypes = d["hydrogenBondingTypes"];
+        hydrogenBondingTypes.clear();
+        hydrogenBondingTypes.reserve(jsonHydrogenBondingTypes.Size());
+        for (auto& jsonType: jsonHydrogenBondingTypes.GetArray()) {
+            std::string name(jsonType["name"].GetString());
+            std::string typeName(jsonType["type"].GetString());
+            assert(typeName == "donor" || typeName == "acceptor");
+            auto probability = jsonType["probability"].GetDouble();
+            HydrogenBondType bondType = typeName == "acceptor" ? HydrogenBondType::Acceptor : HydrogenBondType::Donor;
+            HydrogenBondGeometry geometry = HydrogenBondGeometry::None;
+            if (bondType == HydrogenBondType::Acceptor) {
+                std::string geometryName(jsonType["geometry"].GetString());
+                if (geometryName == "none") {
+                    geometry = HydrogenBondGeometry::None;
+                } else if (geometryName == "dir") {
+                    geometry = HydrogenBondGeometry::Dir;
+                } else if (geometryName == "cone") {
+                    geometry = HydrogenBondGeometry::Cone;
+                } else if (geometryName == "plane") {
+                    geometry = HydrogenBondGeometry::Plane;
+                } else {
+                    REPORT(Reporter::FATAL) << "Unknown hydrogen bond geometry " << geometryName;
+                    throw std::runtime_error("Unknown hydrogen bond geometry");
+                }
+            }
+            std::string smarts(jsonType["smarts"].GetString());
+            auto bondingType = std::make_shared<HydrogenBondingType>(bondType, name, probability, geometry, smarts);
+            if (jsonType.HasMember("weight")) {
+                auto weight = jsonType["weight"].GetDouble();
+                bondingType->weight = weight;
+            }
+            hydrogenBondingTypes.push_back(bondingType);
+        }
 
-		auto const& jsonPartialCharges = d["partialChargeGroups"];
-		partialCharges.clear();
-		partialCharges.reserve(jsonPartialCharges.Size());
-		for (auto& jsonRule : jsonPartialCharges.GetArray())
-		{
-			std::string name(jsonRule["name"].GetString());
-			std::string smarts(jsonRule["smarts"].GetString());
-			auto formalCharge = jsonRule["formal"].GetInt();
-			auto partialCharge = jsonRule["partial"].GetDouble();
-			auto multiple = jsonRule["multiple"].GetBool();
-			auto partialChargeGrp = std::make_shared<
-				PartialCharge>(name, formalCharge, partialCharge, smarts, multiple);
-			partialCharges.push_back(partialChargeGrp);
-		}
-	}
+        auto const& jsonPartialCharges = d["partialChargeGroups"];
+        partialCharges.clear();
+        partialCharges.reserve(jsonPartialCharges.Size());
+        for (auto& jsonRule: jsonPartialCharges.GetArray()) {
+            std::string name(jsonRule["name"].GetString());
+            std::string smarts(jsonRule["smarts"].GetString());
+            auto formalCharge = jsonRule["formal"].GetInt();
+            auto partialCharge = jsonRule["partial"].GetDouble();
+            auto multiple = jsonRule["multiple"].GetBool();
+            auto partialChargeGrp = std::make_shared<
+                PartialCharge>(name, formalCharge, partialCharge, smarts, multiple);
+            partialCharges.push_back(partialChargeGrp);
+        }
+    }
 }

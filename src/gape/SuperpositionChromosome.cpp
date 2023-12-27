@@ -4,5 +4,14 @@
 
 #include "SuperpositionChromosome.h"
 
+#include "SuperpositionGa.h"
+
 namespace Gape {
-} // GapeApp
+    SuperpositionChromosome::SuperpositionChromosome(const SuperpositionGa& superpositionGa):
+        superpositionGa(superpositionGa),
+    integerStringChromosome(superpositionGa.getSuperposition().getIntegerStringLength(), superpositionGa.getRng(), superpositionGa.getIntgerStringChromosomePolicy())
+    {
+
+    }
+
+}

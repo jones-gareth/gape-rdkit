@@ -31,6 +31,24 @@ namespace Gape {
         BaseMoleculeSelection baseMoleculeSelection = BaseMoleculeSelection::minRotatableBonds;
         FittingMoleculeSelection fittingMoleculeSelection = FittingMoleculeSelection::baseMolecule;
         bool useActivities = false;
+        bool scaleFitting = true;
+        double startFittingRadius = 3.5;
+        double finishFittingRadius = 1.5;
+        int numberRebuilds = 24;
+		bool ignoreVdwAttractive = true;
+        bool ignoreTorsion = false;
+        int numberRuns = 10;
+        bool guessGaParameters = true;
+		int numberIslands = 5;
+		int populationSize = 100;
+		int numberIterations = 60000;
+        double selectionPressure = 1.0001;
+        bool useNiches = true;
+        int nicheSize = 5;
+		double nichingOff = 0.6;
+		int crossoverWeight = 95;
+		int mutationWeight = 95;
+		int migrationWeight = 10;
 
         GapeParameters() = default;
 
@@ -63,7 +81,7 @@ namespace Gape {
 
         [[nodiscard]] const std::vector<std::shared_ptr<const PartialCharge>>
         &getPartialCharges() const {return partialCharges; }
-        
+
     private:
         GapeParameters gapeParameters;
         std::vector<std::shared_ptr<const SolvationRule>> solvationRules;

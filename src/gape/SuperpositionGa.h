@@ -1,43 +1,62 @@
-//
-// Created by gareth on 10/18/22.
-//
-
 #pragma once
 
-#include <memory>
-#include <vector>
+#include "Superposition.h"
 
-#include "SuperpositionMolecule.h"
+#include <ga/GaBase.h>
+#include <ga/LinkedPopLinearSel.h>
 
-namespace Gape
-{
-	class SuperpositionGa
-	{
-		const static int MAX_MOLS;
-		SuperpositionMolecule *baseMolecule, *fittingMolecule;
+#include "ga/BinaryStringChromosomePolicy.h"
+#include "ga/IntegerStringChromosomePolicy.h"
 
-		std::vector<SuperpositionMolPtr> molecules;
-		const GapeSettings& settings;
+namespace Gape {
+    class SuperpositionChromosome;
+    class SuperpositionGa;
 
-		SuperpositionGa(const std::vector<std::shared_ptr<SuperpositionMolecule>>& m,
-		                const GapeSettings& s);
+    typedef LinkedPopLinearSel<SuperpositionChromosome, SuperpositionGa>
+    SuperpositionGaPopulation;
 
-		void setupMolecules();
-		void findBaseMolecule();
+    typedef enum {
+        RgroupMutate = 0x01,
+        Crossover = 0x02,
+        Create = 0x04,
+        Migrate = 0x08,
+    } OperationName;
 
-	private:
-		SuperpositionMolecule* leastFlexibleMolecule() const;
-		SuperpositionMolecule* mostFlexibleMolecule() const;
-		SuperpositionMolecule* mostFeaturedMolecule() const;
-		SuperpositionMolecule* mostFeaturedRigidMolecule() const;
-		SuperpositionMolecule* mostActiveRigidMolecule() const;
-		SuperpositionMolecule* mostActiveMolecule() const;
+    class SuperpositionGa : public GaBase {
+        const Superposition& superposition;
+        IntegerStringChromosomePolicy integerStringChromosomePolicy;
+        BinaryStringChromosomePolicy binaryStringChromosomePolicy;
 
-		size_t numberMoleculesMapped;
-		std::vector<int> integerEntryPoints;
-		int integerStringLength;
-		int baseMoleculeNumber = -1;
-		int fittingMoleculeNumber = -1;
+    public:
+        explicit SuperpositionGa(const Superposition& superposition);
 
-	};
-} // GapeApp
+        SuperpositionGa(const SuperpositionGa&) = delete;
+
+        SuperpositionGa& operator=(const SuperpositionGa&) = delete;
+
+        std::shared_ptr<SuperpositionChromosome> run(int runNumber);
+
+        [[nodiscard]] const std::vector<std::shared_ptr<GaOperation<SuperpositionChromosome>>>
+        getOperations() const;
+
+        static void superpositionMutateOperation(
+            const std::vector<std::shared_ptr<SuperpositionChromosome>>&
+            parents,
+            std::vector<std::shared_ptr<SuperpositionChromosome>>& children);
+
+        static void superpositionCrossoverOperation(
+            const std::vector<std::shared_ptr<SuperpositionChromosome>>&
+            parents,
+            std::vector<std::shared_ptr<SuperpositionChromosome>>& children);
+
+        [[nodiscard]] const Superposition& getSuperposition() const { return superposition; }
+
+        [[nodiscard]] const IntegerStringChromosomePolicy& getIntgerStringChromosomePolicy() const {
+            return integerStringChromosomePolicy;
+        }
+
+        [[nodiscard]] const BinaryStringChromosomePolicy& getBinaryStringChromosomePolicy() const {
+            return binaryStringChromosomePolicy;
+        }
+    };
+}

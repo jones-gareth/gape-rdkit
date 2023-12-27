@@ -14,8 +14,8 @@ namespace Gape
 	thread_local double DonorHydrogenFeature::chargeFactor = 2.0;
 	thread_local double DonorHydrogenFeature::matchFactor = 1.0;
 
-	thread_local double DonorHydrogenFeature::maxDonorDonorAngle = 120.0 * M_PI / 180.0;
-	thread_local double DonorHydrogenFeature::minDonorDonorAngle = 90 * M_PI / 180.0;
+	thread_local double DonorHydrogenFeature::maxDonorDonorAngle = 100.0 * M_PI / 180.0;
+	thread_local double DonorHydrogenFeature::minDonorDonorAngle = 60 * M_PI / 180.0;
 	thread_local bool DonorHydrogenFeature::scoreDonorAtoms = true;
 
 	double DonorHydrogenFeature::minDonorPartialCharge = 0.2;

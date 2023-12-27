@@ -29,10 +29,19 @@ with custom molecular handling replaced by RDKit.
 Edit CMakeLists.txt to select Boost, GTest and Eigen paths (or you can invoke cmake
 with the appropriate defines). If you download GTest (googletest) make sure you build it after downloading (`cmake .; make` in the toplevel directory). Then:
 
+Linking to RDKit cmake may select `${RDBASE}cmake-build-release/lib` as the library directory, even when
+`${RDBASE}/lib` is specified in CMakeLists.txt.  Workaround is to remove cmake build directories from
+RDKit source.
+
 ```sh
 mkdir build
 cd build
 cmake ..
-
 ```
 
+## TODO
+
+* Island model
+* Corner flipping
+* User defined features
+* 

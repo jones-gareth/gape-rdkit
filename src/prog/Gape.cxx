@@ -4,6 +4,7 @@
 
 #include "gape/SuperpositionMolecule.h"
 #include "gape/GapeSettings.h"
+#include "gape/SuperpositionGa.h"
 #include "util/Reporter.h"
 
 #include <cassert>
@@ -112,6 +113,11 @@ int main(int argc, char *argv[]) {
     }
     preparedFile.close();
 
-
+    Superposition superposition(molecules, settings);
+    SuperpositionGa ga(superposition);
+    const auto numberRuns = settings.getGapeParameters().numberRuns;
+    for (int runNumber=0; runNumber<numberRuns; runNumber++) {
+        auto bestChromosome = ga.run(runNumber);
+    }
 
 }

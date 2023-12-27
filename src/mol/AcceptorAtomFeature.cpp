@@ -13,14 +13,14 @@
 
 namespace Gape
 {
-	thread_local double AcceptorAtomFeature::maxLonePairLonePairAngle = 60.0 * M_PI / 180.0;
-	thread_local double AcceptorAtomFeature::minLonePairLonePairAngle = 30.0 * M_PI / 180.0;
-	thread_local double AcceptorAtomFeature::maxForwardAcceptorAngle = 90.0 * M_PI / 180.0;
-	thread_local double AcceptorAtomFeature::minForwardAcceptorAngle = 60.0 * M_PI / 180.0;
-	thread_local double AcceptorAtomFeature::maxPlanePlaneAngle = 60.0 * M_PI / 180.0;
-	thread_local double AcceptorAtomFeature::minPlanePlaneAngle = 30.0 * M_PI / 180.0;
-	thread_local double AcceptorAtomFeature::maxPlaneLonePairAngle = 60.0 * M_PI / 180.0;
-	thread_local double AcceptorAtomFeature::minPlaneLonePairAngle = 30.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::maxLonePairLonePairAngle = 50.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::minLonePairLonePairAngle = 20.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::maxForwardAcceptorAngle = 80.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::minForwardAcceptorAngle = 50.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::maxPlanePlaneAngle = 50.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::minPlanePlaneAngle = 20.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::maxPlaneLonePairAngle = 50.0 * M_PI / 180.0;
+	thread_local double AcceptorAtomFeature::minPlaneLonePairAngle = 20.0 * M_PI / 180.0;
 	thread_local double AcceptorAtomFeature::hBondLen = 2.9;
 	thread_local double AcceptorAtomFeature::chargeFactor = 2.0;
 	thread_local double AcceptorAtomFeature::matchFactor = 1.0;

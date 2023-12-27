@@ -26,21 +26,21 @@ namespace Gape {
 class GA_EXPORT GaBase {
  private:
   std::string fileName;
-  Gape::RandomUtil& rng = RandomUtil::getInstance();
+  RandomUtil& rng = RandomUtil::getInstance();
   size_t popsize = 100;
   double selectionPressure = 1.1;
   GaBase(const GaBase& other) = delete;
   GaBase& operator=(const GaBase& other) = delete;
 
  public:
-  GaBase(){};
-  virtual ~GaBase(){};
+  GaBase() = default;
+  virtual ~GaBase() = default;
 
-  double getSelectionPressure() const { return selectionPressure; }
+  [[nodiscard]] double getSelectionPressure() const { return selectionPressure; }
 
-  size_t getPopsize() const { return popsize; }
+  [[nodiscard]] size_t getPopsize() const { return popsize; }
 
-  Gape::RandomUtil& getRng() { return rng; }
+  [[nodiscard]] RandomUtil& getRng() const { return rng; }
 
  protected:
   void setSelectionPressure(double selectionPressure) {

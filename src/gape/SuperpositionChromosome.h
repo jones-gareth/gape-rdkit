@@ -2,15 +2,27 @@
 // Created by gareth on 10/18/22.
 //
 
-#ifndef GAPE_RDKIT_SUPERPOSITIONCHROMOSOME_H
-#define GAPE_RDKIT_SUPERPOSITIONCHROMOSOME_H
+#pragma once
+
+#include "ga/Chromosome.h"
+#include "ga/StringChromosome.h"
 
 namespace Gape {
+    class SuperpositionGa;
 
-    class SuperpositionChromosome {
+    class SuperpositionChromosome : public Chromosome {
+    public:
+        const SuperpositionGa& superpositionGa;
+        BinaryStringChromosome binaryStringChromosome;
+        IntegerStringChromosome integerStringChromosome;
 
+
+        SuperpositionChromosome() = delete;
+
+        SuperpositionChromosome(const SuperpositionChromosome&) = delete;
+
+        SuperpositionChromosome& operator=(const SuperpositionChromosome&) = delete;
+
+        explicit SuperpositionChromosome(const SuperpositionGa &superpositionGa);
     };
-
 } // GapeApp
-
-#endif //GAPE_RDKIT_SUPERPOSITIONCHROMOSOME_H

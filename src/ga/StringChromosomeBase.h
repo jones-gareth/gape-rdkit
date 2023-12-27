@@ -15,8 +15,7 @@
  * mutate and allowSwitch methods.
  */
 
-#ifndef STRINGCHROMOSOME_H_
-#define STRINGCHROMOSOME_H_
+#pragma once
 
 #include "util/RandomUtil.h"
 #include <cassert>
@@ -255,4 +254,3 @@ T *StringChromosomeBase<T, ChromosomePolicy>::getString() const {
 }
 
 }  // Gape
-#endif /* STRINGCHROMOSOME_H_ */
