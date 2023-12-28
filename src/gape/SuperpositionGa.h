@@ -15,12 +15,12 @@ namespace Gape {
     typedef LinkedPopLinearSel<SuperpositionChromosome, SuperpositionGa>
     SuperpositionGaPopulation;
 
-    typedef enum {
-        RgroupMutate = 0x01,
-        Crossover = 0x02,
-        Create = 0x04,
-        Migrate = 0x08,
-    } OperationName;
+    enum class OperationName {
+        Mutate,
+        Crossover,
+        Create,
+        Migrate
+    };
 
     class SuperpositionGa : public GaBase {
         const Superposition& superposition;
@@ -36,7 +36,7 @@ namespace Gape {
 
         std::shared_ptr<SuperpositionChromosome> run(int runNumber);
 
-        [[nodiscard]] const std::vector<std::shared_ptr<GaOperation<SuperpositionChromosome>>>
+        [[nodiscard]] std::vector<std::shared_ptr<GaOperation<SuperpositionChromosome>>>
         getOperations() const;
 
         static void superpositionMutateOperation(

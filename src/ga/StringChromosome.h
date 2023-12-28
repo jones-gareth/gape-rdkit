@@ -54,7 +54,7 @@ class GA_EXPORT StringChromosome<int, IntegerStringChromosomePolicy>
   StringChromosome &operator=(const StringChromosome &other) = delete;
 
  public:
-  StringChromosome(int length_, Gape::RandomUtil &rng_,
+  StringChromosome(int length_, RandomUtil &rng_,
                    const IntegerStringChromosomePolicy &chromosomePolicy_)
       : StringChromosomeBase(length_, rng_, chromosomePolicy_) {
     ;

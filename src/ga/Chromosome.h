@@ -65,7 +65,7 @@ public:
 	/*
 	 * The genetic information in Chromosome c is copied to this chromosome.
 	 */
-	virtual void copyGene(Chromosome &c) const=0;
+	virtual void copyGene(const Chromosome &c) = 0;
 
 	/*
 	 * Return a summary of the fitness.

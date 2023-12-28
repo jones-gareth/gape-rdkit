@@ -15,23 +15,29 @@
 #include "util/RandomUtil.h"
 
 namespace Gape {
+    class GA_EXPORT BinaryStringChromosomePolicy {
+    public:
+        explicit BinaryStringChromosomePolicy(RandomUtil& rng_);
 
-class GA_EXPORT BinaryStringChromosomePolicy {
-public:
-    BinaryStringChromosomePolicy(Gape::RandomUtil & rng_);
-    virtual ~BinaryStringChromosomePolicy();
-    
-    bool mutate(int pos, bool currentValue) const;
-    bool initialize(int pos) const;
-    bool isAllowSwitch() const {return false;}
-private:
-    Gape::RandomUtil & rng;
-    BinaryStringChromosomePolicy(const BinaryStringChromosomePolicy& orig);
-    BinaryStringChromosomePolicy & operator=(const BinaryStringChromosomePolicy & other);
-};
+        BinaryStringChromosomePolicy(const BinaryStringChromosomePolicy& orig) = delete;
 
+        BinaryStringChromosomePolicy& operator=(const BinaryStringChromosomePolicy& other) = delete;
+
+        virtual ~BinaryStringChromosomePolicy();
+
+        bool mutate(int pos, bool currentValue) const;
+
+        bool initialize(int pos) const;
+
+        bool isAllowSwitch() const { return allowSwitch; }
+
+        void setAllowSwitch(const bool allow) { allowSwitch = allow; }
+
+    private:
+        bool allowSwitch = false;
+        RandomUtil& rng;
+    };
 }
 
 
 #endif	/* BINARYSTRINGCHROMOSOMEPOLICY_H */
-

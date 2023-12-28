@@ -15,4 +15,10 @@ namespace Gape {
 
     }
 
+    void SuperpositionChromosome::copyGene(const Chromosome& c) {
+        const auto& parent = dynamic_cast<const SuperpositionChromosome&>(c);
+        integerStringChromosome.copyGene(parent.integerStringChromosome);
+        binaryStringChromosome.copyGene(parent.binaryStringChromosome);
+    }
+
 }
