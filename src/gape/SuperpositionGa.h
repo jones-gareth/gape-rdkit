@@ -16,16 +16,22 @@ namespace Gape {
     SuperpositionGaPopulation;
 
     enum class OperationName {
-        Mutate,
-        Crossover,
+        BinaryStringMutate,
+        BinaryStringCrossover,
+        IntegerStringMutate,
+        IntegerStringCrossover,
         Create,
-        Migrate
+        Migrate,
+        None
     };
 
     class SuperpositionGa : public GaBase {
         const Superposition& superposition;
         IntegerStringChromosomePolicy integerStringChromosomePolicy;
         BinaryStringChromosomePolicy binaryStringChromosomePolicy;
+        int numberOperations = 0;
+
+        std::shared_ptr<SuperpositionChromosome> run(int runNumber);
 
     public:
         explicit SuperpositionGa(const Superposition& superposition);
@@ -34,7 +40,6 @@ namespace Gape {
 
         SuperpositionGa& operator=(const SuperpositionGa&) = delete;
 
-        std::shared_ptr<SuperpositionChromosome> run(int runNumber);
 
         [[nodiscard]] std::vector<std::shared_ptr<GaOperation<SuperpositionChromosome>>>
         getOperations() const;
@@ -58,5 +63,9 @@ namespace Gape {
         [[nodiscard]] const BinaryStringChromosomePolicy& getBinaryStringChromosomePolicy() const {
             return binaryStringChromosomePolicy;
         }
+
+        void run();
+
+        std::shared_ptr<SuperpositionChromosome> createChromosome();
     };
 }

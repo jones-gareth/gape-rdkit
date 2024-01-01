@@ -161,7 +161,7 @@ namespace Gape {
         assert(fittingMoleculeNumber > -1);
 
         integerStringRanges.resize(integerStringLength);
-        const auto& fittingFeatures = fittingMolecule->getFeatures();
+        const auto& fittingFeatures = fittingMolecule->getAllMappingFeatures();
         integerStringRanges.resize(integerStringLength);
         int pos = 0;
         for (const auto& molecule: molecules) {
@@ -171,10 +171,10 @@ namespace Gape {
             if (molecule->isFixed()) {
                 continue;
             }
-            for (const auto& [featureType, featureMapping]: fittingFeatures) {
+            for (const auto& featureMapping: fittingFeatures) {
                 // currently all features support mapping, but this may need to change if we support user defined features
                 const auto& otherMoleculeFeatures = molecule->getFeatures();
-                if (const auto& otherFeatures = otherMoleculeFeatures.find(featureType);
+                if (const auto& otherFeatures = otherMoleculeFeatures.find(featureMapping->getFeatureType());
                     otherFeatures != otherMoleculeFeatures.end()) {
                     integerStringRanges[pos] = static_cast<int>(otherFeatures->second.size());
                     ++pos;

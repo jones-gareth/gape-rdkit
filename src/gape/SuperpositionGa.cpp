@@ -19,16 +19,16 @@ namespace Gape {
         const auto& gapeParameters = superposition.settings.getGapeParameters();
         int popsize = gapeParameters.populationSize;
         int numberIslands = gapeParameters.numberIslands;
-        int numberIterations = gapeParameters.numberIterations;
+        numberOperations = gapeParameters.numberOperations;
 
         if (gapeParameters.guessGaParameters) {
             REPORT(Reporter::INFO) << "Guessing GA Paramteters";
             const auto numberMolecules = static_cast<int>(superposition.getMolecules().size());
             numberIslands = numberMolecules + 1;
-            numberIterations = numberMolecules * 15000;
+            numberOperations = numberMolecules * 15000;
             popsize = 100;
             REPORT(Reporter::INFO) << "Number islands " << numberIslands << " popsize " << popsize +
- " number iterations" << numberIterations;
+ " number iterations" << numberOperations;
         }
 
         setPopsize(popsize);
@@ -37,6 +37,18 @@ namespace Gape {
 
     std::shared_ptr<SuperpositionChromosome> SuperpositionGa::run(int runNumber) {
         SuperpositionGaPopulation population(*this);
+        auto format =
+                boost::format(
+                    "Running GA run %2d number operations %5d population size %5d ") %
+                runNumber % numberOperations % getPopsize();
+        REPORT(Reporter::INFO) << format.str();
+        population.create();
+        double bestScore = population.getBestScore();
+
+        REPORT(Reporter::INFO) << population.info() << endl;
+
+        for (int i = 0; i < numberOperations; i++) {
+        }
         return nullptr;
     }
 
@@ -57,13 +69,14 @@ namespace Gape {
         assert(children.size() == 1);
         auto& parent = parents[0];
         auto& child = children[0];
-        child->setOperationName(OperationName::Mutate);
         child->copyGene(*parent);
 
         if (auto& childBinaryString = child->binaryStringChromosome;
             childBinaryString.getLength() > 0 && childBinaryString.getRng().randomBoolean()) {
+            child->setOperationName(OperationName::BinaryStringMutate);
             childBinaryString.mutate();
         } else {
+            child->setOperationName(OperationName::IntegerStringMutate);
             child->integerStringChromosome.mutate();
         }
     }
@@ -73,17 +86,30 @@ namespace Gape {
         std::vector<std::shared_ptr<SuperpositionChromosome>>& children) {
         assert(parents.size() == 2);
         assert(children.size() == 2);
-        children[0]->setOperationName(OperationName::Crossover);
-        children[1]->setOperationName(OperationName::Crossover);
         if (const auto& parent1BinaryString = parents[0]->binaryStringChromosome;
             parent1BinaryString.getLength() > 0 && parent1BinaryString.getRng().randomBoolean()) {
+            children[0]->setOperationName(OperationName::BinaryStringCrossover);
+            children[1]->setOperationName(OperationName::BinaryStringCrossover);
             parent1BinaryString.onePointCrossover(parents[1]->binaryStringChromosome,
                                                   children[0]->binaryStringChromosome,
                                                   children[1]->binaryStringChromosome);
         } else {
+            children[0]->setOperationName(OperationName::IntegerStringCrossover);
+            children[1]->setOperationName(OperationName::IntegerStringCrossover);
             parents[0]->integerStringChromosome.fullMixing(parents[1]->integerStringChromosome,
                                                            children[0]->integerStringChromosome,
                                                            children[1]->integerStringChromosome);
         }
+    }
+
+    void SuperpositionGa::run() {
+        const auto numberRuns = superposition.settings.getGapeParameters().numberRuns;
+        for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
+            run(runNumber);
+        }
+    }
+
+    std::shared_ptr<SuperpositionChromosome> SuperpositionGa::createChromosome() {
+        return std::make_shared<SuperpositionChromosome>(*this);
     }
 }

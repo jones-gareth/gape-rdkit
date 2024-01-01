@@ -365,6 +365,8 @@ getNumBonds();
 
         const std::function filter = [](const shared_ptr<Feature>& f) { return f->isMappingFeature(); };
         allMappingFeatures = filterListToNewList(allFeatures, filter);
+
+        buildSuperpositionCoordinates();
     }
 
     std::string SuperpositionMolecule::getName() const {
@@ -395,4 +397,12 @@ getNumBonds();
         }
         return nBits;
     }
+
+    void SuperpositionMolecule::buildSuperpositionCoordinates() {
+        referenceCoordinates = std::make_unique<SuperpositionCoordinates>(referenceConformer);
+        for (const auto& feature: allFeatures) {
+            feature->calculateCoordinates(*referenceCoordinates);
+        }
+    }
+
 } // namespace GAPE

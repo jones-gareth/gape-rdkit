@@ -14,7 +14,7 @@ namespace Gape
 		std::map<FeatureType, std::map<const Atom*, std::vector<RDGeom::Point3D>>> featureCoordinates;
 
 	public:
-		SuperpositionCoordinates(Conformer c) : conformer(std::move(c))
+		explicit SuperpositionCoordinates(Conformer c) : conformer(std::move(c))
 		{
 		}
 

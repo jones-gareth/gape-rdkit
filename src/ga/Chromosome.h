@@ -17,10 +17,12 @@
 namespace Gape {
 
 /*
- * Base class for all GA chromosomes
+ * Base class for all GA chromosomes.
+ *
+ * This class is not used as GA chromosomes use templates.  However, I've kept it for reference.
  *
  */
-class GA_EXPORT Chromosome {
+class GA_EXPORT [[deprecated]] Chromosome {
 private:
 	static int idCounter;
 	int chromosomeId;

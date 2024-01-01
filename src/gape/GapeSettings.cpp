@@ -33,7 +33,7 @@ namespace Gape {
         "guessGaParameters": true,
 		"numberIslands": 5,
 		"populationSize": 100,
-		"numberIterations": 60000,
+		"numberOperations": 60000,
 		"selectionPressure": 1.001,
 		"useNiches": true,
 		"useNiches": true,
@@ -759,7 +759,7 @@ namespace Gape {
         gapeParameters.guessGaParameters =d["gapeParameters"]["guessGaParameters"].GetBool();
         gapeParameters.numberIslands =d["gapeParameters"]["numberIslands"].GetInt();
         gapeParameters.populationSize = d["gapeParameters"]["populationsSize"].GetInt();
-        gapeParameters.numberIterations = d["gapeParameters"]["numberIterations"].GetInt();
+        gapeParameters.numberOperations = d["gapeParameters"]["numberOperations"].GetInt();
         gapeParameters.selectionPressure = d["gapeParameters"]["selectionPressure"].GetInt();
         gapeParameters.useNiches = d["gapeParameters"]["useNiches"].GetBool();
         gapeParameters.nicheSize = d["gapeParameters"]["nicheSize"].GetInt();

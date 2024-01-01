@@ -5,15 +5,16 @@
 #pragma once
 
 #include "SuperpositionGa.h"
-#include "ga/Chromosome.h"
 #include "ga/StringChromosome.h"
 
 namespace Gape {
     class SuperpositionGa;
-    enum class OperationName;
 
-    class SuperpositionChromosome : public Chromosome {
-        OperationName operationName;
+    class SuperpositionChromosome {
+        OperationName operationName = OperationName::None;
+        bool fitted = false;
+        std::vector<std::shared_ptr<SuperpositionCoordinates>> conformerCoordinates;
+        std::vector<std::shared_ptr<SuperpositionCoordinates>> fittedCoordinates;
 
     public:
         const SuperpositionGa& superpositionGa;
@@ -27,30 +28,23 @@ namespace Gape {
 
         SuperpositionChromosome& operator=(const SuperpositionChromosome&) = delete;
 
-        explicit SuperpositionChromosome(const SuperpositionGa &superpositionGa);
+        explicit SuperpositionChromosome(const SuperpositionGa& superpositionGa);
 
-        void setOperationName(const OperationName operationName_) {operationName = operationName_;}
+        void setOperationName(const OperationName operationName_) { operationName = operationName_; }
 
-        const OperationName& getOperationName() const {return operationName; }
+        const OperationName& getOperationName() const { return operationName; }
 
-        Chromosome& create() override;
+        void copyGene(const SuperpositionChromosome& from);
 
-        double rebuild(Chromosome& c) override;
+        void initialize();
 
-        bool equals(const Chromosome& c) const override;
+        double score();
 
-        double distance(const Chromosome& c) const override;
+        void fitMolecules(bool remap);
 
-        bool sameNiche(const Chromosome& c) const override;
-
-        bool ok() const override;
-
-        void copyGene(const Chromosome& c) override;
-
-        std::string fitnessInfo() const override;
-
-        std::string geneInfo() const override;
-
-        void calculateFitness() override;
+        bool fitMolecule(int start, const SuperpositionMolecule& fittingMolecule,
+                         const SuperpositionMolecule& otherMolecule,
+                         const SuperpositionCoordinates& fittingCoordinates, SuperpositionCoordinates otherCoordinatesi,
+                         bool remap = true);
     };
 } // GapeApp

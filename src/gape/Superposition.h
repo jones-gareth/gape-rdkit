@@ -36,21 +36,22 @@ namespace Gape {
         [[nodiscard]] int getIntegerStringLength() const { return integerStringLength; }
         [[nodiscard]] int getBinaryStringLength() const { return binaryStringLength; }
         [[nodiscard]] std::vector<int> getIntegerStringRanges() const { return integerStringRanges; }
-        [[nodiscard]] const std::vector<std::shared_ptr<SuperpositionMolecule>>& getMolecules() const {return molecules; }
+        [[nodiscard]] const std::vector<std::shared_ptr<SuperpositionMolecule>>& getMolecules() const {
+            return molecules;
+        }
+        [[nodiscard]] const std::vector<int>& getBinaryEntryPoints() const { return binaryEntryPoints; }
+        [[nodiscard]] const std::vector<int>& getIntegerEntryPoints() const { return integerEntryPoints; }
+        [[nodiscard]] const SuperpositionMolecule* getFittingMolecule() const { return fittingMolecule; }
+        [[nodiscard]] const SuperpositionMolecule* getBaseMolecule() const { return baseMolecule; }
 
         const GapeSettings& settings;
 
     private:
         [[nodiscard]] SuperpositionMolecule* leastFlexibleMolecule() const;
-
         [[nodiscard]] SuperpositionMolecule* mostFlexibleMolecule() const;
-
         [[nodiscard]] SuperpositionMolecule* mostFeaturedMolecule() const;
-
         [[nodiscard]] SuperpositionMolecule* mostFeaturedRigidMolecule() const;
-
         [[nodiscard]] SuperpositionMolecule* mostActiveRigidMolecule() const;
-
         [[nodiscard]] SuperpositionMolecule* mostActiveMolecule() const;
 
         void setWeights() const;

@@ -104,6 +104,8 @@ int main(int argc, char *argv[]) {
         superpositionMolecule->findPairsToCheck();
         superpositionMolecule->findCharges();
         superpositionMolecule->findDonorsAndAcceptors();
+        superpositionMolecule->findFeatures();
+
         molecules.push_back(superpositionMolecule);
     }
 

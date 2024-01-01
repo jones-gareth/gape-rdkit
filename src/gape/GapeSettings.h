@@ -41,7 +41,7 @@ namespace Gape {
         bool guessGaParameters = true;
 		int numberIslands = 5;
 		int populationSize = 100;
-		int numberIterations = 60000;
+		int numberOperations = 60000;
         double selectionPressure = 1.0001;
         bool useNiches = true;
         int nicheSize = 5;
