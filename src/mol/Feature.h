@@ -31,12 +31,7 @@ namespace Gape
 		const std::string featureSetName;
 
 		/**
-		 * Set this if the feature is atom-centered, e.g. an acceptor
-		 */
-		const bool atomFeature;
-
-		/**
-		 * Atom if feature is atom centered
+		 * Atom associated with feature
 		 */
 		const Atom* atom = nullptr;
 
@@ -141,7 +136,12 @@ namespace Gape
 	public:
 		static const int N_BUILTIN_FEATURES = 4, MAX_FEATURES = 14;
 
-		static void initialize();
+        /**
+         * Set this if the feature is atom-centered, e.g. an acceptor
+         */
+        const bool atomFeature;
+
+        static void initialize();
 
 		/**
 		 * Each subclass must implement the score method which returns the
@@ -293,6 +293,8 @@ namespace Gape
 		const bool& isMappingFeature() const { return mappingFeature; }
 
 		const FeatureType& getFeatureType() const {return featureType; }
+
+        const Atom* getAtom() const { return atom; }
 	};
 
 } // Gape

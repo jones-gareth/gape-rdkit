@@ -6,6 +6,8 @@
 
 #include <GraphMol/GraphMol.h>
 #include <ForceField/MMFF/Params.h>
+#include <util/ConnectedGraphFinder.h>
+
 #include "GapeSettings.h"
 #include "mol/Feature.h"
 #include "SuperpositionCoordinates.h"
@@ -83,7 +85,7 @@ namespace Gape {
 
         [[nodiscard]] const Conformer& getReferenceConformer() const { return referenceConformer; }
 
-        [[nodiscard]] const SuperpositionCoordinates& getReferenceCoordinates() const { return *referenceCoordinates; }
+        [[nodiscard]] const SuperpositionCoordinates& getReferenceCoordinates() const { return *superpositionCoordinates; }
 
         void findDonorsAndAcceptors();
 
@@ -119,6 +121,8 @@ namespace Gape {
         const std::vector<std::shared_ptr<Feature>>& getAllFeatures() const { return allFeatures; }
         const std::vector<std::shared_ptr<Feature>>& getAllMappingFeatures() const { return allMappingFeatures; }
 
+        void copySuperpositionCoordinates(const SuperpositionCoordinates& otherCoordinates) const;
+
     private:
         RWMol mol;
         MMFF::MMFFMolProperties* mmffMolProperties;
@@ -128,7 +132,7 @@ namespace Gape {
         std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>> donors;
         std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>> acceptors;
         Conformer referenceConformer;
-        std::unique_ptr<SuperpositionCoordinates> referenceCoordinates;
+        std::unique_ptr<SuperpositionCoordinates> superpositionCoordinates;
         std::map<const FeatureType, std::vector<std::shared_ptr<Feature>>> features;
         std::vector<std::shared_ptr<Feature>> allFeatures;
         std::vector<std::shared_ptr<Feature>> allMappingFeatures;

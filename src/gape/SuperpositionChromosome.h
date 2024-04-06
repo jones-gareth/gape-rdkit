@@ -11,6 +11,10 @@ namespace Gape {
     class SuperpositionGa;
 
     class SuperpositionChromosome {
+
+        static const double passOneDistance;
+        static const double maxPassDistance;
+
         OperationName operationName = OperationName::None;
         bool fitted = false;
         std::vector<std::shared_ptr<SuperpositionCoordinates>> conformerCoordinates;
@@ -44,7 +48,7 @@ namespace Gape {
 
         bool fitMolecule(int start, const SuperpositionMolecule& fittingMolecule,
                          const SuperpositionMolecule& otherMolecule,
-                         const SuperpositionCoordinates& fittingCoordinates, SuperpositionCoordinates otherCoordinatesi,
+                         const SuperpositionCoordinates& fittingCoordinates, SuperpositionCoordinates &otherCoordinates,
                          bool remap = true);
     };
 } // GapeApp

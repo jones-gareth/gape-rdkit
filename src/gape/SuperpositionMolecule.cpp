@@ -399,9 +399,9 @@ getNumBonds();
     }
 
     void SuperpositionMolecule::buildSuperpositionCoordinates() {
-        referenceCoordinates = std::make_unique<SuperpositionCoordinates>(referenceConformer);
+        superpositionCoordinates = std::make_unique<SuperpositionCoordinates>(referenceConformer);
         for (const auto& feature: allFeatures) {
-            feature->calculateCoordinates(*referenceCoordinates);
+            feature->calculateCoordinates(*superpositionCoordinates);
         }
     }
 

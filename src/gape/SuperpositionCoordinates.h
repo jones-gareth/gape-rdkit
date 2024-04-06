@@ -2,6 +2,7 @@
 
 #include <GraphMol/GraphMol.h>
 #include "mol/FeatureType.h"
+#include <Eigen/Dense>
 
 using namespace RDKit;
 
@@ -47,5 +48,7 @@ namespace Gape
 		}
 
 		std::vector<const Atom*> getFeatureAtoms(FeatureType featureType) const;
+
+        void transformCoordinates(const Eigen::Transform<double, 3, Eigen::Affine> &transform);
 	};
 }

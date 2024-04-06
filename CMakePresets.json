@@ -52,10 +52,10 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS": "-g -Wall -O0",
-        "CMAKE_INCLUDE_PATH": "/home/packages/anaconda3/envs/rdkit_build/include",
-        "CMAKE_LIBRARY_PATH": "/home/packages/anaconda3/envs/rdkit_build/lib",
-        "CMAKE_C_COMPILER": "gcc-10",
-        "CMAKE_CXX_COMPILER": "g++-10"
+        "CMAKE_INCLUDE_PATH": "/home/gareth/packages/miniconda/envs/rdkit_build/include",
+        "CMAKE_LIBRARY_PATH": "/home/gareth/packages/miniconda/envs/rdkit_build/lib",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
       },
       "environment": {
         "RDBASE": "/home/gareth/.vs/rdkit",
