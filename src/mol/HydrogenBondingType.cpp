@@ -1,5 +1,5 @@
 //
-// Created by jones on 12/27/2022.
+// Created by Gareth Jones on 12/27/2022.
 //
 
 #include "HydrogenBondingType.h"

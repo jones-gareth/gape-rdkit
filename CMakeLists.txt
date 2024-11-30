@@ -114,7 +114,9 @@ endforeach ()
 MESSAGE(STATUS "allSources is ${allSources} ")
 
 # find all C sources
-set(allCSources "")
+set(allCSources ""
+        src/gape/FeatureOverlay.cpp
+        src/gape/FeatureOverlay.h)
 foreach (_dir ${cSrcDirs})
     set(_pattern "src/${_dir}/*.c")
     file(GLOB _srcs ${_pattern})

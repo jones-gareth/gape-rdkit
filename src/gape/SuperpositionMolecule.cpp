@@ -23,6 +23,21 @@
 using namespace RDKit;
 
 namespace Gape {
+
+    double VdwInfo::vdwEnergy(const RDKit::Conformer &conformer, double cutoffSqr) const {
+        const auto& point1 = conformer.getAtomPos(index0);
+        const auto& point2 = conformer.getAtomPos(index1);
+        const auto diff = point1-point2;
+        double sqrDist = diff.lengthSq();
+        if (sqrDist >= cutoffSqr) {
+            return .0;
+        }
+
+        const auto dist = sqrt(sqrDist);
+        const auto energy = ForceFields::MMFF::Utils::calcVdWEnergy(dist, mmffVdw.R_ij_star, mmffVdw.epsilon);
+        return energy;
+    }
+
     SuperpositionMolecule::SuperpositionMolecule(const ROMol& inputMol, const GapeSettings& settings) : settings(
         settings) {
         mol = inputMol;
@@ -366,6 +381,11 @@ getNumBonds();
         const std::function filter = [](const shared_ptr<Feature>& f) { return f->isMappingFeature(); };
         allMappingFeatures = filterListToNewList(allFeatures, filter);
 
+        donorHydrogens.clear();
+        for (const auto& donorHydrogenFeature: features[FeatureType::DonorInteractionPoint]) {
+            donorHydrogens.insert(donorHydrogenFeature->getAtom());
+        }
+
         buildSuperpositionCoordinates();
     }
 
@@ -403,6 +423,36 @@ getNumBonds();
         for (const auto& feature: allFeatures) {
             feature->calculateCoordinates(*superpositionCoordinates);
         }
+    }
+
+    double SuperpositionMolecule::calculateConformationalEnergy(const RDKit::Conformer &conformer) const {
+        double torsionalEnergy = .0;
+        for (const auto rotatableBond: rotatableBonds) {
+            torsionalEnergy += rotatableBond->rotatableBondEnergy(conformer);
+        }
+        double vdwEnergy = .0;
+        const double cutoff = settings.getGapeParameters().vdwCutoff;
+        const double cutoffSqr = cutoff*cutoff;
+        for (const auto &vdwInfo: pairsToCheck) {
+            // skip contacts between donor hydrogens and acceptors
+            const auto& atom1 = mol.getAtomWithIdx(vdwInfo.index0);
+            const auto& atom2 = mol.getAtomWithIdx(vdwInfo.index1);
+            if (atom1->getAtomicNum() == 1 && atom2->getAtomicNum() > 1) {
+                if (donorHydrogens.find(atom1) != donorHydrogens.end() &&
+                    acceptors.find(atom2) != acceptors.end()) {
+                    continue;
+                }
+            }
+            else if (atom2->getAtomicNum() == 1 && atom1->getAtomicNum() > 1) {
+                if (donorHydrogens.find(atom2) != donorHydrogens.end() &&
+                    acceptors.find(atom1) != acceptors.end()) {
+                    continue;
+                }
+            }
+            vdwEnergy += vdwInfo.vdwEnergy(conformer, cutoffSqr);
+        }
+
+        return torsionalEnergy + vdwEnergy;
     }
 
 } // namespace GAPE

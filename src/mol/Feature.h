@@ -295,6 +295,8 @@ namespace Gape
 		const FeatureType& getFeatureType() const {return featureType; }
 
         const Atom* getAtom() const { return atom; }
+
+		const SuperpositionMolecule* getMolecule() const { return molecule; }
 	};
 
 } // Gape

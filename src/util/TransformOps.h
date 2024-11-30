@@ -1,5 +1,5 @@
 //
-// Created by jones on 12/23/2022.
+// Created by Gareth Jones on 12/23/2022.
 //
 
 #ifndef GAPE_TRANSFORMOPS_H

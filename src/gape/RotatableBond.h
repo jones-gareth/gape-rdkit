@@ -1,5 +1,5 @@
 //
-// Created by jones on 11/25/2022.
+// Created by Gareth Jones on 11/25/2022.
 //
 
 #ifndef GAPE_ROTATABLEBOND_H
@@ -27,6 +27,8 @@ namespace Gape
 		                                                  mmffTorsion(mmffTor)
 		{
 		}
+
+        double torsionEnergy(const Conformer& conformer) const;
 	};
 
 	class RotatableBond
@@ -54,12 +56,13 @@ namespace Gape
 
 		void rotateBond(double angle, SuperpositionCoordinates& superpositionCoordinates) const;
 
+        double rotatableBondEnergy(const Conformer &conformer) const;
+
 		const std::vector<TorsionInfo>& getTorsions() const { return torsions; }
 
 		const std::vector<const Atom*>& getAtom1List() const { return atom1List; }
 
 		const std::vector<const Atom*>& getAtom2List() const { return atom2List; }
-
 
 		~RotatableBond();
 	};

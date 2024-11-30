@@ -99,14 +99,7 @@ namespace Gape
 		const auto squaredDistance = calculateSqrDist(otherFeature, coordinates, otherCoordinates);
 		std::stringstream ss;
 		ss << info();
-		if (mapped)
-		{
-			ss << " --> " << otherFeature.info() << " sqrDist " << squaredDistance;
-		}
-		else
-		{
-			ss << ":Not Mapped";
-		}
+        ss << " --> " << otherFeature.info() << " sqrDist " << squaredDistance;
 		return ss.str();
 	}
 

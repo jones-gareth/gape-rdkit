@@ -1,5 +1,5 @@
 //
-// Created by jones on 11/25/2022.
+// Created by Gareth Jones on 11/25/2022.
 //
 
 #pragma once
@@ -49,6 +49,13 @@ namespace Gape {
 		int crossoverWeight = 95;
 		int mutationWeight = 95;
 		int migrationWeight = 10;
+        double donorHydrogenWeight = 1750;
+        double acceptorAtomWeight = 1750;
+        double aromaticRingWeight = 2000;
+        double volumeWeight = 100;
+        double conformationalWeight = 10;
+        double constraintWeight = 100;
+        double vdwCutoff = 100;
 
         GapeParameters() = default;
 

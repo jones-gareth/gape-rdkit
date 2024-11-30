@@ -41,6 +41,8 @@ namespace Gape {
         VdwInfo(unsigned int index0, unsigned int index1,
                 ForceFields::MMFF::MMFFVdWRijstarEps mmffVdw) : index0(index0), index1(index1), mmffVdw(mmffVdw) {
         }
+
+        double vdwEnergy(const RDKit::Conformer& conformer, double cutoffSqr) const;
     };
 
     class SuperpositionMolecule {
@@ -123,6 +125,8 @@ namespace Gape {
 
         void copySuperpositionCoordinates(const SuperpositionCoordinates& otherCoordinates) const;
 
+        double calculateConformationalEnergy(const Conformer& conformer) const;
+
     private:
         RWMol mol;
         MMFF::MMFFMolProperties* mmffMolProperties;
@@ -131,6 +135,7 @@ namespace Gape {
         std::vector<VdwInfo> pairsToCheck;
         std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>> donors;
         std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>> acceptors;
+        std::set<const Atom *> donorHydrogens;
         Conformer referenceConformer;
         std::unique_ptr<SuperpositionCoordinates> superpositionCoordinates;
         std::map<const FeatureType, std::vector<std::shared_ptr<Feature>>> features;

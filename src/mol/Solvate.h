@@ -1,5 +1,5 @@
 //
-// Created by jones on 11/27/2022.
+// Created by Gareth Jones on 11/27/2022.
 //
 
 #ifndef GAPE_SOLVATE_H

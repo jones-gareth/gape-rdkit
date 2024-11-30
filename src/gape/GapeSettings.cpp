@@ -1,5 +1,5 @@
 //
-// Created by jones on 11/25/2022.
+// Created by Gareth Jones on 11/25/2022.
 //
 
 #include <string>
@@ -42,7 +42,13 @@ namespace Gape {
 		"crossoverWeight": 95,
 		"mutationWeight": 95,
 		"migrationWeight": 10,
-
+        "donorHydrogenWeight": 1750,
+        "acceptorAtomWeight": 1750,
+        "aromaticRingWeight": 2000,
+        "volumeWeight": 100,
+        "conformationalWeight": 10,
+        "constraintWeight": 100,
+        "vdwCutoff": 100
     },
     "solvationRules": [
         {
@@ -767,6 +773,14 @@ namespace Gape {
         gapeParameters.crossoverWeight = d["gapeParameters"]["crossoverWeight"].GetInt();
         gapeParameters.mutationWeight = d["gapeParameters"]["mutationWeight"].GetInt();
         gapeParameters.migrationWeight = d["gapeParameters"]["migrationWeight"].GetInt();
+
+        gapeParameters.donorHydrogenWeight = d["gapeParameters"]["donorHydrogenWeight"].GetDouble();
+        gapeParameters.acceptorAtomWeight = d["gapeParameters"]["acceptorAtomWeight"].GetDouble();
+        gapeParameters.aromaticRingWeight = d["gapeParameters"]["aromaticRingWeight"].GetDouble();
+        gapeParameters.volumeWeight = d["gapeParameters"]["volumeWeight"].GetDouble();
+        gapeParameters.conformationalWeight = d["gapeParameters"]["conformationalWeight"].GetDouble();
+        gapeParameters.constraintWeight = d["gapeParameters"]["constraintWeight"].GetDouble();
+        gapeParameters.vdwCutoff = d["gapeParameters"]["vdwCutoff"].GetDouble();
 
         auto const& jsonSolvationRules = d["solvationRules"];
         solvationRules.clear();

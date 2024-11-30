@@ -112,4 +112,6 @@ namespace Gape {
     std::shared_ptr<SuperpositionChromosome> SuperpositionGa::createChromosome() {
         return std::make_shared<SuperpositionChromosome>(*this);
     }
+
+
 }

@@ -1,6 +1,6 @@
 # GAPE C++ Codebase with RDKit Molecular Handling
 
-WIP.  Intended to be a C++ version of GAPE (https://github.com/jones-gareth/gape)
+WIP.  Intended to be a C++ version of GAPE (https://github.com/Gareth Jones-gareth/gape)
 with custom molecular handling replaced by RDKit.
 
 ## Future work

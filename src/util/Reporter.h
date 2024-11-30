@@ -17,6 +17,18 @@
 #include "Util.h"
 #include "export.h"
 
+// turn off logging for TRACE and DEBUG completely for optimized code,
+// and TRACE for debug code
+// (or whatever MIN_REPORTING_LEVEL is set to)
+
+#ifndef MIN_REPORTING_LEVEL
+#ifdef NDEBUG
+#define MIN_REPORTING_LEVEL Gape::Reporter::ReportingLevel::DETAIL
+#else
+#define MIN_REPORTING_LEVEL Gape::Reporter::ReportingLevel::DEBUG
+#endif
+#endif
+
 namespace Gape {
 
     using namespace std;
@@ -70,21 +82,18 @@ namespace Gape {
                                                  "NORMAL", "INFO", "WARNING", "FATAL"};
             return labels[level];
         }
+
+        static bool isReportingAt(ReportingLevel level) {
+            if (level < MIN_REPORTING_LEVEL) {
+                return false;
+            } else if (level < getMinReportingLevel()) {
+                return false;
+            }
+            return true;
+        }
+
     };
-
 }
-
-// turn off logging for TRACE and DEBUG completely for optimized code,
-// and TRACE for debug code
-// (or whatever MIN_REPORTING_LEVEL is set to)
-
-#ifndef MIN_REPORTING_LEVEL
-#ifdef NDEBUG
-#define MIN_REPORTING_LEVEL Gape::Reporter::ReportingLevel::DETAIL
-#else
-#define MIN_REPORTING_LEVEL Gape::Reporter::ReportingLevel::DEBUG
-#endif
-#endif
 
 #define REPORT(level) \
 if (level < MIN_REPORTING_LEVEL) ;\

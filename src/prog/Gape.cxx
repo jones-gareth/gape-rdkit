@@ -117,9 +117,5 @@ int main(int argc, char *argv[]) {
 
     Superposition superposition(molecules, settings);
     SuperpositionGa ga(superposition);
-    const auto numberRuns = settings.getGapeParameters().numberRuns;
-    for (int runNumber=0; runNumber<numberRuns; runNumber++) {
-        auto bestChromosome = ga.run(runNumber);
-    }
-
+    ga.run();
 }
