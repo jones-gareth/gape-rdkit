@@ -16,6 +16,12 @@ namespace Gape
 {
 	class SuperpositionMolecule;
 
+	struct FeatureScore {
+		const double score;
+		const double geometricScore;
+		FeatureScore(const double score, const double geometricScore) : score(score), geometricScore(geometricScore) {}
+	};
+
 	class Feature
 	{
 	protected:
@@ -60,11 +66,6 @@ namespace Gape
 		// resolving one-to-one mappings.
 		// double bestScore, bestGeometricScore;
 
-		/**
-		 * If this feature (in another molecule) is mappped to a feature in the base
-		 * molecule, we can store the base molecule feature here.
-		 */
-		// Feature* baseFeature;
 
 		/**
 		 * A feature normally has an point which can be considered it's interaction
@@ -76,9 +77,7 @@ namespace Gape
 		// store coordinates in SuperpositionCoordinates
 		// RDGeom::Point3D coordinate;
 
-		/**
-		 * Set this true if we consider this feature to be part of a pharmacophore.
-		 */
+
 		// bool pharmacophorePoint;
 
 		/**
@@ -134,7 +133,7 @@ namespace Gape
 		thread_local static double alpha, gaussianN, radius;
 
 	public:
-		static const int N_BUILTIN_FEATURES = 4, MAX_FEATURES = 14;
+		static constexpr int N_BUILTIN_FEATURES = 4, MAX_FEATURES = 14;
 
         /**
          * Set this if the feature is atom-centered, e.g. an acceptor
@@ -150,8 +149,8 @@ namespace Gape
 		 * @param f
 		 * @return
 		 */
-		virtual double score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
-		                     const SuperpositionCoordinates& otherCoordinates) = 0;
+		virtual FeatureScore score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+		                     const SuperpositionCoordinates& otherCoordinates) const = 0;
 
 		/**
 		 * Returns a label for the feature to use in mol2 or sdf pharmacophore
@@ -199,6 +198,8 @@ namespace Gape
 		 * @param r
 		 */
 		static void setRadius(double r);
+
+		static double getRadius() { return radius; }
 
 		/**
 		 * Determines the integral between two gaussians. The square distance

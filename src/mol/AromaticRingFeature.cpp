@@ -139,8 +139,8 @@ namespace Gape
 		superpositionCoordinates.addFeatureCoordinates(FeatureType::AromaticRing, atom, centerAndNormals);
 	}
 
-	double AromaticRingFeature::score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
-	                                  const SuperpositionCoordinates& otherCoordinates)
+	FeatureScore AromaticRingFeature::score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+	                                  const SuperpositionCoordinates& otherCoordinates) const
 	{
 		const auto& other = dynamic_cast<const AromaticRingFeature&>(otherFeature);
 		const auto& centerAndNormals = coordinates.getFeatureCoordinates(FeatureType::AromaticRing, atom);
@@ -182,7 +182,8 @@ namespace Gape
 		}
 
 		REPORT(Reporter::DEBUG) << info() << " " << other.info() << " score " << score;
-		return score;
+		const FeatureScore result(score, score);
+		return result;
 	}
 
 	std::string AromaticRingFeature::pharmLabel() const

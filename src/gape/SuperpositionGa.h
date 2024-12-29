@@ -64,6 +64,10 @@ namespace Gape {
             return binaryStringChromosomePolicy;
         }
 
+        int numberMolecules() const {
+            return static_cast<int>(superposition.getMolecules().size());
+        }
+
         void run();
 
         std::shared_ptr<SuperpositionChromosome> createChromosome();

@@ -56,6 +56,9 @@ namespace Gape {
         double conformationalWeight = 10;
         double constraintWeight = 100;
         double vdwCutoff = 100;
+    	bool scalePharmacophore = true;
+    	double geometricWeightCriterion = 0.5;
+    	double pharmacophoreFactor = 0.5;
 
         GapeParameters() = default;
 

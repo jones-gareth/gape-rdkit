@@ -48,7 +48,10 @@ namespace Gape {
         "volumeWeight": 100,
         "conformationalWeight": 10,
         "constraintWeight": 100,
-        "vdwCutoff": 100
+        "vdwCutoff": 100,
+		"scalePharmacophore": true,
+        "geometricWeightCriterion": 0.5,
+		"pharmacophoreFactor": 0.5
     },
     "solvationRules": [
         {
@@ -781,6 +784,9 @@ namespace Gape {
         gapeParameters.conformationalWeight = d["gapeParameters"]["conformationalWeight"].GetDouble();
         gapeParameters.constraintWeight = d["gapeParameters"]["constraintWeight"].GetDouble();
         gapeParameters.vdwCutoff = d["gapeParameters"]["vdwCutoff"].GetDouble();
+        gapeParameters.scalePharmacophore = d["gapeParameters"]["scalePharmacophore"].GetBool();
+        gapeParameters.geometricWeightCriterion = d["gapeParameters"]["geometricWeightCriterion"].GetDouble();
+    	gapeParameters.pharmacophoreFactor = d["gapeParameters"]["pharmacophoreFactor"].GetDouble();
 
         auto const& jsonSolvationRules = d["solvationRules"];
         solvationRules.clear();

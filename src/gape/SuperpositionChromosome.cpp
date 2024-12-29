@@ -296,7 +296,7 @@ namespace Gape {
             for (const auto feature : molecule->getAllFeatures()) {
                 const auto ptr = feature.get();
                 const auto point = feature->getFittingPoint(*superpositionCoordinates);
-                auto featureInformation = std::make_shared<FeatureInformation>(ptr, point);
+                auto featureInformation = std::make_shared<FeatureInformation>(ptr, *superpositionCoordinates);
                 featureMapping[feature.get()] = featureInformation;
             }
         }

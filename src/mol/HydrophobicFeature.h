@@ -27,8 +27,8 @@ namespace Gape
 		static std::vector<std::shared_ptr<Feature>> findHydrophobicFeatures(
 			const SuperpositionMolecule* superpositionMolecule);
 
-		double score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
-		             const SuperpositionCoordinates& otherCoordinates) override;
+		FeatureScore score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+		             const SuperpositionCoordinates& otherCoordinates)  const override;
 
 		std::string pharmLabel() const override;
 

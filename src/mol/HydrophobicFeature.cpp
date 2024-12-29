@@ -37,10 +37,11 @@ namespace Gape
 		return features;
 	}
 
-	double HydrophobicFeature::score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
-	                                 const SuperpositionCoordinates& otherCoordinates)
+	FeatureScore HydrophobicFeature::score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+	                                 const SuperpositionCoordinates& otherCoordinates) const
 	{
-		return .0;
+		const FeatureScore result(.0, .0);
+		return result;
 	}
 
 	std::string HydrophobicFeature::pharmLabel() const

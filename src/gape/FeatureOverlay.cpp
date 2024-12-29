@@ -9,10 +9,10 @@
 #include "mol/MolUtil.h"
 
 namespace Gape {
-    void FeaturePoint::addFeaturePoint(const FeatureInformation& f, const bool updateCenter) {
-        assert( features.find(&f) != features.end());
+    void FeaturePoint::addFeaturePoint(FeatureInformation &f, const bool updateCenter) {
+        assert(features.find(&f) != features.end());
         features.insert(&f);
-        const auto & point = f.point;
+        const auto &point = f.point;
         sum.x += point.x;
         sum.y += point.y;
         sum.z += point.z;
@@ -23,7 +23,7 @@ namespace Gape {
     }
 
     bool FeaturePoint::checkSingleMolecules() const {
-        for (const auto & feature : features) {
+        for (const auto &feature: features) {
             for (const auto &otherFeature: features) {
                 if (feature == otherFeature) {
                     continue;
@@ -37,14 +37,14 @@ namespace Gape {
     }
 
     void FeaturePoint::recalculateCenter() {
-        const double numberPoints = features.size();
-        center = sum/numberPoints;
+        const double numberPoints = static_cast<int>(features.size());
+        center = sum / numberPoints;
     }
 
-    void FeaturePoint::removeFeaturePoint(FeatureInformation& f, bool updateCenter) {
-        assert( features.find(&f) != features.end());
+    void FeaturePoint::removeFeaturePoint(FeatureInformation &f, bool updateCenter) {
+        assert(features.find(&f) != features.end());
         features.erase(&f);
-        const auto & point = f.point;
+        const auto &point = f.point;
         sum.x -= point.x;
         sum.y -= point.y;
         sum.z -= point.z;
@@ -53,14 +53,14 @@ namespace Gape {
         }
     }
 
-    double FeaturePoint::squareDistance(const FeatureInformation &otherFeatures) const {
-        const auto & otherPoint = otherFeatures.point;
-        double sqrDistance = squareDistance(point, otherPoint);
+    double FeaturePoint::squareDistance(const FeatureInformation &otherFeature) const {
+        const auto &otherPoint = otherFeature.point;
+        double sqrDistance = Gape::squareDistance(center, otherPoint);
         return sqrDistance;
     }
 
-    bool FeaturePoint::constainsMoleculeFeature(const SuperpositionMolecule &molecule) const {
-        for (const auto & feature : features) {
+    bool FeaturePoint::containsMoleculeFeature(const SuperpositionMolecule &molecule) const {
+        for (const auto &feature: features) {
             if (feature->feature->getMolecule() == &molecule) {
                 return true;
             }
@@ -69,26 +69,279 @@ namespace Gape {
     }
 
     double FeaturePoint::scorePoint() {
+        auto numMolecules = featureOverlay.numberMolecules();
         double maxScore = -std::numeric_limits<double>::max();
         baseFeature = nullptr;
         pharmacoporePoint = false;
-        numberMatches = 0;
+        numberMatched = 0;
         score = .0;
 
         REPORT(Reporter::DEBUG) << "Entering FeaturePoint::score()";
-        for (const auto & otherFeature : features) {
-            double test = scoreFeature(*otherFeature);
+        for (auto otherFeature: features) {
+            int testMatched = 0;
+            double test = scoreFeature(*otherFeature, testMatched);
             REPORT(Reporter::DEBUG) << "Test score: " << test;
             if (test > maxScore) {
+                REPORT(Reporter::DEBUG) << "Setting base feature to " << otherFeature->feature->info();
                 maxScore = test;
-             REPORT(Reporter::DEBUG) << "Setting base feature to " << otherFeature->feature->;
+                baseFeature = otherFeature;
+                numberMatched = testMatched;
+            }
+
+            // if we have two features the scores will be identical. Should
+            // probably pick the feature with the highest group
+            // probability.
+            if (features.size() == 2)
+                break;
+        }
+
+        assert(baseFeature != nullptr);
+
+        // check for pharmacophore point
+        if (numberMatched > 1 || (numMolecules == 2 && numberMatched == 1)) {
+            assert(!baseFeature->isPharmacophoreFeature);
+            baseFeature->isPharmacophoreFeature = true;
+            baseFeature->numberMatches = numberMatched;
+            pharmacoporePoint = true;
+        }
+
+        // Normalize to number of pairs
+        maxScore = maxScore / (static_cast<double>(numMolecules) - 1.0);
+        score = maxScore;
+        return score;
+    }
+
+    /**
+         * Test a feature as the base feature.
+         *
+         * @param testFeature
+         * @return score that we get from using this feature as the base feature.
+         */
+    double FeaturePoint::scoreFeature(const FeatureInformation &testFeature, int &testMatched) const {
+        double testScore = .0;
+        testMatched = 0;
+
+        auto testMolecule = testFeature.feature->getMolecule();
+        const auto &settings = featureOverlay.getSuperpositionGa().getSuperposition().settings.getGapeParameters();
+
+        // sum pair-wise score with all other features
+        for (auto otherFeature: features) {
+            if (otherFeature == &testFeature)
+                continue;
+            auto otherMolecule = otherFeature->feature->getMolecule();
+
+            // only one feature per molecule can contribute to a
+            // pharmacophore point.
+            if (otherMolecule == testMolecule)
+                continue;
+
+            // get molecule weighting
+            double weight = (testMolecule->getWeight() + otherMolecule->getWeight()) / 2.0;
+            // determine feature pair score.
+            const auto featureScore = testFeature.feature->score(*otherFeature->feature, testFeature.coordinates,
+                                                                 otherFeature->coordinates);
+            testScore += weight * featureScore.score;
+
+            // count any "pharmacophore" matches
+            if (settings.scalePharmacophore
+                && featureScore.geometricScore > settings.geometricWeightCriterion)
+                testMatched++;
+        }
+
+        // detmine any pharmacophore scale up.
+        if (testMatched > 2) {
+            REPORT(Reporter::DEBUG) << "testMatched (2) " << testMatched;
+            testScore *= pow(testMatched, settings.pharmacophoreFactor);
+        }
+
+        return testScore;
+    }
+
+    /**
+     * Removes previous feature and scoring information from this point.
+     * Seeds point with single feature. This should be the entry point for
+     * creating new points.
+     *
+     * @param feature
+     */
+    void FeaturePoint::seed(FeatureInformation &feature) {
+        features.clear();
+        sum.x = sum.y = sum.z = 0;
+        center.x = center.y = center.z = 0;
+        numberMatched = 0;
+        score = 0;
+        pharmacoporePoint = false;
+        addFeaturePoint(feature, true);
+    }
+
+    /**
+  * @param feature
+  * @return ture if this point contains the feature.
+  */
+    bool FeaturePoint::hasFeature(const FeatureInformation &feature) const {
+        return features.find(const_cast<FeatureInformation *>(&feature)) != features.end();
+    }
+
+    double FeaturePointSet::calculateScore() {
+        assert(featurePoints.size() > 0);
+        assert(numberPharmacophorePoints == 0);
+
+
+        // remove pharm point information here so that we always know
+        // molecule pharm counts and feature counts are the same. This is
+        // also done in groupPoints
+        numberPharmacophorePoints = 0;
+        for (const auto feature: features) {
+            feature->isPharmacophoreFeature = false;
+            feature->numberMatches = 0;
+        }
+
+        score = 0;
+        for (auto featurePoint: featurePoints) {
+            score += featurePoint->scorePoint();
+            if (featurePoint->isPharmacophorePoint())
+                numberPharmacophorePoints++;
+        }
+        return score;
+    }
+
+    int FeaturePointSet::getPharmacoporeCount() const {
+        int count = 0;
+        for (const auto feature: features) {
+            if (feature->isPharmacophoreFeature) count++;
+        }
+        return count;
+    }
+
+    const int FeaturePointSet::maxRelocations = 100;
+
+    /**
+     * Groups all the points. First performs initial assignment of feature
+     * points then does relocation until convergence.
+     *
+     * @see #relocate()
+     * @see #addFeature(Feature)
+     */
+    void FeaturePointSet::groupPoints() {
+        // clear out any previous grouping and scoring
+        for (auto featurePoint: featurePoints) {
+            freeFeaturePoints.insert(featurePoint);
+        }
+        featurePoints.clear();
+        assert(featurePoints.size() + freeFeaturePoints.size() == features.size());
+
+        // feature coordinates need to be this close (maxDistance) to form a
+        // cluster
+        auto maxDistance = Feature::getRadius() * 2;
+
+        // features this close (minDistance) from the same molecule will be
+        // allowed in the same cluster, otherwise features from the same
+        // molecule will always occupy their own cluster
+        double minDistance = 0;
+        double maxSqrDistance = maxDistance * maxDistance;
+
+        // / initial assignment
+        for (auto feature: features)
+            addFeature(*feature, maxSqrDistance);
+
+        // relocations
+        int nRelocations = 0;
+        while (relocate()) {
+            nRelocations++;
+            if (nRelocations == maxRelocations) {
+                REPORT(Reporter::INFO) << "groupPoints no convergence after " << maxRelocations << " relocations";
+                break;
             }
         }
 
+        for (auto featurePoint: featurePoints)
+            assert(featurePoint->checkSingleMolecules());
     }
 
+    bool FeaturePointSet::relocate() {
+        bool relocate = false;
 
+        assert(featurePoints.size() + freeFeaturePoints.size() == features.size());
 
+        for (auto feature: features) {
+            // foreach feature find the closest featurePoint and the point
+            // containing that feature.
+            std::shared_ptr<FeaturePoint> closestPoint = nullptr;
+            std::shared_ptr<FeaturePoint> currentPoint = nullptr;
+            double minDistance = std::numeric_limits<double>::max();
+            for (auto featurePoint: featurePoints) {
+                double distance = featurePoint->squareDistance(*feature);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestPoint = featurePoint;
+                }
+                if (featurePoint->hasFeature(*feature))
+                    currentPoint = featurePoint;
+            }
 
+            assert(closestPoint != nullptr);
+            assert(currentPoint != nullptr);
 
+            // check if feature is already the closest point.
+            if (closestPoint == currentPoint)
+                continue;
+
+            // check constraint that each point only contains one feature
+            // from a molecule
+            if (closestPoint->containsMoleculeFeature(*feature->feature->getMolecule()))
+                continue;
+
+            // otherwise move it to the closest point.
+            relocate = true;
+            currentPoint->removeFeaturePoint(*feature, false);
+            closestPoint->addFeaturePoint(*feature, false);
+
+            // if the relocation leaves an empty point remove it.
+            if (currentPoint->numberFeatures() == 0) {
+                featurePoints.erase(currentPoint);
+                freeFeaturePoints.insert(currentPoint);
+                assert(featurePoints.size() + freeFeaturePoints.size() == features .size());
+            }
+        }
+
+        // update centers
+        for (auto featurePoint: featurePoints)
+            featurePoint->recalculateCenter();
+
+        return relocate;
+    }
+
+    /**
+     * Adds a feature to the initial grouping.
+     *
+     * @param feature
+     */
+    void FeaturePointSet::addFeature(FeatureInformation &feature, const double maxSqrDistance) {
+        const auto molecule = feature.feature->getMolecule();
+        bool added = false;
+
+        // loop though any existing points
+        for (auto featurePoint: featurePoints) {
+            double sqrDistance = featurePoint->squareDistance(feature);
+            if (featurePoint->containsMoleculeFeature(*molecule))
+                continue;
+            // criteria if the current point does not contain any
+            // feature from this molecule.
+            if (sqrDistance < maxSqrDistance) {
+                // add updating center
+                featurePoint->addFeaturePoint(feature, true);
+                added = true;
+                break;
+            }
+        }
+
+        if (!added) {
+            // no close points so create a new feature point with this
+            // feature.
+            auto newFeaturePoint = *std::next(freeFeaturePoints.begin());
+            freeFeaturePoints.erase(newFeaturePoint);
+            newFeaturePoint->seed(feature);
+            featurePoints.insert(newFeaturePoint);
+        }
+    }
 }

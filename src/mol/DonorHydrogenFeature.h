@@ -74,8 +74,8 @@ namespace Gape
 		 * Returns similarity between two donor hydrogens. 
 		 *
 		 */
-		double score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
-		             const SuperpositionCoordinates& otherCoordinates) override;
+		FeatureScore score(const Feature& otherFeature, const SuperpositionCoordinates& coordinates,
+		             const SuperpositionCoordinates& otherCoordinates)  const override;
 
 
 		std::unique_ptr<PharmFeatureGeometry> getPharmFeatureGeometry(

@@ -22,7 +22,7 @@ namespace Gape {
         numberOperations = gapeParameters.numberOperations;
 
         if (gapeParameters.guessGaParameters) {
-            REPORT(Reporter::INFO) << "Guessing GA Paramteters";
+            REPORT(Reporter::INFO) << "Guessing GA Parameters";
             const auto numberMolecules = static_cast<int>(superposition.getMolecules().size());
             numberIslands = numberMolecules + 1;
             numberOperations = numberMolecules * 15000;
