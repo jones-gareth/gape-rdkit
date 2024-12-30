@@ -78,5 +78,7 @@ namespace Gape {
         double rebuild();
 
         bool equals(const SuperpositionChromosome &other) const;
+
+        const std::vector<std::shared_ptr<SuperpositionCoordinates>>& getFittedCoordinates() const {return fittedCoordinates;}
     };
 } // GapeApp

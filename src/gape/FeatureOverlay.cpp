@@ -148,7 +148,7 @@ namespace Gape {
                 testMatched++;
         }
 
-        // detmine any pharmacophore scale up.
+        // determine any pharmacophore scale up.
         if (testMatched > 2) {
             REPORT(Reporter::DEBUG) << "testMatched (2) " << testMatched;
             testScore *= pow(testMatched, settings.pharmacophoreFactor);
@@ -234,10 +234,8 @@ namespace Gape {
         // cluster
         auto maxDistance = Feature::getRadius() * 2;
 
-        // features this close (minDistance) from the same molecule will be
-        // allowed in the same cluster, otherwise features from the same
+        // features from the same
         // molecule will always occupy their own cluster
-        double minDistance = 0;
         double maxSqrDistance = maxDistance * maxDistance;
 
         // / initial assignment
@@ -344,4 +342,89 @@ namespace Gape {
             featurePoints.insert(newFeaturePoint);
         }
     }
+
+    /**
+     * Creates an object for doing the feature overlay. Initializes
+     * FeaturePointSets for built-in and user features. Sets the pharmacophore
+     * counts for molecules to zero. If you're re-scoring (such as in a GA run)
+     * you need to set the molecule pharmacophore counts to zero before calling
+     * scoring functions.
+     *
+     * @param problem
+     */
+    FeatureOverlay::FeatureOverlay(const SuperpositionChromosome &superpositionChromosome): superpositionChromosome(superpositionChromosome) {
+        assert(numberMolecules() > 2);
+        const auto& settings = superpositionChromosome.superpositionGa.getSuperposition().settings.getGapeParameters();
+
+        if (settings.donorHydrogenWeight > 0) {
+            setup(FeatureType::DonorInteractionPoint);
+        }
+        if (settings.acceptorAtomWeight > 0) {
+            setup(FeatureType::AcceptorAtomFeature);
+        }
+        if (settings.aromaticRingWeight > 0) {
+            setup(FeatureType::AromaticRing);
+        }
+    }
+
+	/**
+	 * Initializes a feature set. Creates a FeaturePointSet.
+	 *
+	 * @param featureType
+	 */
+    void FeatureOverlay::setup(const FeatureType featureType) {
+        std::set<std::shared_ptr<FeatureInformation>> setFeatures;
+        auto moleculeNumber = 0;
+        const auto& superpositionCoordinates = superpositionChromosome.getFittedCoordinates();
+        for (const auto& molecule: superpositionChromosome.superpositionGa.getSuperposition().getMolecules()) {
+            const auto& coordinates = superpositionCoordinates[moleculeNumber];
+            const auto& features = molecule->getFeatures().at(featureType);
+            for (const auto& feature: features) {
+                auto featureInformation= std::make_shared<FeatureInformation>(feature.get(), *coordinates);
+                setFeatures.insert(featureInformation);
+            }
+            moleculeNumber++;
+        }
+        auto featurePointSet = std::make_shared<FeaturePointSet>(*this, featureType, setFeatures);
+        featurePointSets.emplace(featureType, featurePointSet);
+    }
+
+	/**
+	 * Takes the current saved feature coordinates and determines GAPE score.
+	 * More typically we'll call scoreFeature for each feature.
+	 *
+	 * @return feature score.
+	 */
+    double FeatureOverlay::scoreOverlay() {
+        score = .0;
+        const auto& settings = superpositionChromosome.superpositionGa.getSuperposition().settings.getGapeParameters();
+
+        if (settings.donorHydrogenWeight > 0) {
+            score += settings.donorHydrogenWeight * groupFeatures(FeatureType::DonorInteractionPoint);
+        }
+        if (settings.acceptorAtomWeight > 0) {
+            score += settings.acceptorAtomWeight * groupFeatures(FeatureType::AcceptorAtomFeature);
+        }
+        if (settings.aromaticRingWeight > 0) {
+            score += settings.aromaticRingWeight * groupFeatures(FeatureType::AromaticRing);
+        }
+
+        return score;
+    }
+
+	/**
+	 * Determines GAPE score for a feature. First clusters in 3D space then
+	 * scores clusters.
+	 *
+	 * @param featureSetNo
+	 * @return
+	 */
+    double FeatureOverlay::groupFeatures(const FeatureType featureType) {
+        auto featurePointSet = featurePointSets[featureType];
+        assert(featurePointSet->featureType == featureType);
+        featurePointSet->groupPoints();
+        const auto setScore = featurePointSet->calculateScore();
+        return setScore;
+    }
+
 }

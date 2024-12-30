@@ -12,6 +12,41 @@
 
 namespace Gape {
 
+    class FeaturePointSet;
+
+    /**
+     * A class to encode pharmacophore point scoring without reference to the base
+     * molecule. Uses 3D relocation clustering of feature fitting points. When
+     * scoring a cluster of fitting points each feature is tried in turn and the
+     * best scoring feature is selected as a "base" feature.
+     *
+     * @author Gareth Jones
+     *
+     */
+    class FeatureOverlay {
+        const SuperpositionChromosome &superpositionChromosome;
+        double groupFeatures(const FeatureType featureType);
+        void setupFeaturePointSet(const FeatureType featureType);
+        std::map<FeatureType, std::shared_ptr<FeaturePointSet>> featurePointSets;
+        void setup(const FeatureType featureType);
+        double score;
+
+    public:
+        explicit FeatureOverlay(const SuperpositionChromosome &superpositionChromosome);
+
+        int numberMolecules() const {
+            return superpositionChromosome.superpositionGa.numberMolecules();
+        }
+
+        const SuperpositionGa &getSuperpositionGa() const { return superpositionChromosome.superpositionGa; }
+
+        double scoreOverlay();
+    };
+
+	/**
+	 * This class represents a cluster of pharmacophore features.
+	 *
+	 */
     class FeaturePoint {
         RDGeom::Point3D center;
         RDGeom::Point3D sum;
@@ -65,45 +100,38 @@ namespace Gape {
         }
     };
 
+	/**
+	 * This class is used to store a set of feature points for a given feature
+	 * type
+	 *
+	 */
     class FeaturePointSet {
         const FeatureOverlay &featureOverlay;
-        const FeatureType featureType;
-        std::set<FeatureInformation *> features;
+        std::set<std::shared_ptr<FeatureInformation>> features;
         std::set<std::shared_ptr<FeaturePoint> > featurePoints;
         std::set<std::shared_ptr<FeaturePoint> > freeFeaturePoints;
         int numberPharmacophorePoints = 0;
         double score = .0;
         const static int maxRelocations;
 
-        FeaturePointSet(const FeatureOverlay &featureOverlay, const FeatureType featureType,
-                        const std::set<FeatureInformation *> &features): featureOverlay(featureOverlay),
+
+        int getPharmacoporeCount() const;
+        void addFeature(FeatureInformation &feature, const double maxSqrDistance);
+        bool relocate();
+
+    public:
+        const FeatureType featureType;
+
+         FeaturePointSet(const FeatureOverlay &featureOverlay, const FeatureType featureType,
+                        const std::set<std::shared_ptr<FeatureInformation>> &features): featureOverlay(featureOverlay),
                                                                          featureType(featureType), features(features) {
             for ([[maybe_unused]] auto feature: features) {
                 freeFeaturePoints.insert(std::make_shared<FeaturePoint>(featureOverlay));
             }
         }
 
-        double calculateScore();
-        int getPharmacoporeCount() const;
         void groupPoints();
-        void addFeature(FeatureInformation &feature, const double maxSqrDistance);
-        bool relocate();
+        double calculateScore();
     };
 
-
-    class FeatureOverlay {
-        const SuperpositionGa &superpositionGa;
-
-        
-
-    public:
-        explicit FeatureOverlay(const SuperpositionGa &superpositionGa): superpositionGa(superpositionGa) {
-        }
-
-        int numberMolecules() const {
-            return superpositionGa.numberMolecules();
-        }
-
-        const SuperpositionGa &getSuperpositionGa() const { return superpositionGa; }
-    };
 }
