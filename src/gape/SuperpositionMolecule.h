@@ -127,6 +127,8 @@ namespace Gape {
 
         double calculateConformationalEnergy(const Conformer& conformer) const;
 
+        double gaussianIntegral(const SuperpositionMolecule& otherMolecule, const Conformer& conformer, const Conformer &otherConformer) const;
+
     private:
         RWMol mol;
         MMFF::MMFFMolProperties* mmffMolProperties;

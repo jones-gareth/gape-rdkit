@@ -12,6 +12,7 @@
 #include <GraphMol/DistGeomHelpers/Embedder.h>
 #include <GraphMol/ForceFieldHelpers/MMFF/MMFF.h>
 #include <GraphMol/FileParsers/FileParsers.h>
+#include <util/GaussianList.h>
 
 #include "mol/HydrogenBondingType.h"
 #include "mol/AcceptorAtomFeature.h"
@@ -23,11 +24,10 @@
 using namespace RDKit;
 
 namespace Gape {
-
     double VdwInfo::vdwEnergy(const RDKit::Conformer &conformer, double cutoffSqr) const {
-        const auto& point1 = conformer.getAtomPos(index0);
-        const auto& point2 = conformer.getAtomPos(index1);
-        const auto diff = point1-point2;
+        const auto &point1 = conformer.getAtomPos(index0);
+        const auto &point2 = conformer.getAtomPos(index1);
+        const auto diff = point1 - point2;
         double sqrDist = diff.lengthSq();
         if (sqrDist >= cutoffSqr) {
             return .0;
@@ -38,7 +38,7 @@ namespace Gape {
         return energy;
     }
 
-    SuperpositionMolecule::SuperpositionMolecule(const ROMol& inputMol, const GapeSettings& settings) : settings(
+    SuperpositionMolecule::SuperpositionMolecule(const ROMol &inputMol, const GapeSettings &settings) : settings(
         settings) {
         mol = inputMol;
         MolOps::addHs(mol, false, true);
@@ -67,7 +67,7 @@ getNumBonds();
         delete forceField;
         assert(mol.getNumConformers() == 1);
         referenceConformer = mol.getConformer();
-        for (const auto& rotatableBond: rotatableBonds) {
+        for (const auto &rotatableBond: rotatableBonds) {
             rotatableBond->setTorsionAngles();
         }
     }
@@ -106,7 +106,7 @@ getNumBonds();
                     auto atom0 = mol.getAtomWithIdx(i);
                     auto atom1 = mol.getAtomWithIdx(j);
                     bool separatedByRotor = std::find_if(rotatableBonds.begin(), rotatableBonds.end(),
-                                                         [atom0, atom1](const auto& rb) {
+                                                         [atom0, atom1](const auto &rb) {
                                                              return rb->isSeparatedByBond(atom0, atom1);
                                                          }) != rotatableBonds.end();
                     if (separatedByRotor) {
@@ -128,7 +128,7 @@ getNumBonds();
         return MolToMolBlock(mol);
     }
 
-    bool SuperpositionMolecule::isO2(const Atom& atom) const {
+    bool SuperpositionMolecule::isO2(const Atom &atom) const {
         if (atom.getAtomicNum() != 8 || atom.getDegree() != 1 || atom.getHybridization() != Atom::SP2) {
             return false;
         }
@@ -140,7 +140,7 @@ getNumBonds();
         return false;
     }
 
-    bool SuperpositionMolecule::isO3(const RDKit::Atom& atom) const {
+    bool SuperpositionMolecule::isO3(const RDKit::Atom &atom) const {
         // RDKit will set the hybridization of the OH atom in COOH to SP2- so don't check hybridization here
         if (atom.getAtomicNum() != 8 || atom.getTotalDegree() != 2) {
             return false;
@@ -154,7 +154,7 @@ getNumBonds();
         return true;
     }
 
-    bool SuperpositionMolecule::isAmideBond(const RDKit::Bond& bond) const {
+    bool SuperpositionMolecule::isAmideBond(const RDKit::Bond &bond) const {
         if (bond.getBondType() != Bond::BondType::SINGLE) {
             return false;
         }
@@ -182,11 +182,11 @@ getNumBonds();
         return false;
     }
 
-    bool SuperpositionMolecule::isTerminalBond(const RDKit::Bond& bond) {
+    bool SuperpositionMolecule::isTerminalBond(const RDKit::Bond &bond) {
         return (bond.getEndAtom()->getTotalDegree() == 1 || bond.getEndAtom()->getTotalDegree() == 1);
     }
 
-    bool SuperpositionMolecule::isNpl3Atom(const RDKit::Atom& atom) const {
+    bool SuperpositionMolecule::isNpl3Atom(const RDKit::Atom &atom) const {
         if (atom.getAtomicNum() != 7 || atom.getTotalDegree() != 3) {
             return false;
         }
@@ -198,7 +198,7 @@ getNumBonds();
         return false;
     }
 
-    bool SuperpositionMolecule::isArginineCarbon(const RDKit::Atom& atom) const {
+    bool SuperpositionMolecule::isArginineCarbon(const RDKit::Atom &atom) const {
         if (atom.getAtomicNum() != 6 || atom.getHybridization() != Atom::SP2 || atom.getTotalDegree() != 3) {
             return false;
         }
@@ -210,15 +210,15 @@ getNumBonds();
         return true;
     }
 
-    bool SuperpositionMolecule::isSp2Carbon(const Atom& atom) {
+    bool SuperpositionMolecule::isSp2Carbon(const Atom &atom) {
         return atom.getAtomicNum() == 6 && atom.getHybridization() == Atom::SP2;
     }
 
-    bool SuperpositionMolecule::atomIsInRing(const RDKit::Atom& atom) const {
+    bool SuperpositionMolecule::atomIsInRing(const RDKit::Atom &atom) const {
         return mol.getRingInfo()->numAtomRings(atom.getIdx());
     }
 
-    bool SuperpositionMolecule::isCOOHCarbon(const RDKit::Atom& atom, Atom*& o2Atom, Atom*& o3Atom) const {
+    bool SuperpositionMolecule::isCOOHCarbon(const RDKit::Atom &atom, Atom *&o2Atom, Atom *&o3Atom) const {
         if (atom.getAtomicNum() != 6 || atom.getHybridization() != Atom::SP2 || atomIsInRing(atom) ||
             atom.getDegree() != 3) {
             return false;
@@ -238,14 +238,14 @@ getNumBonds();
     }
 
     RotatableBondType
-    SuperpositionMolecule::isRotatableBond(const RDKit::Bond& bond, bool& canFlatten) const {
+    SuperpositionMolecule::isRotatableBond(const RDKit::Bond &bond, bool &canFlatten) const {
         bool flipAmideBonds = settings.getGapeParameters().flipAmideBonds;
         canFlatten = false;
         if (bond.getBondType() != Bond::BondType::SINGLE) {
             return RotatableBondType::None;
         }
-        auto* atom1 = bond.getBeginAtom();
-        auto* atom2 = bond.getEndAtom();
+        auto *atom1 = bond.getBeginAtom();
+        auto *atom2 = bond.getEndAtom();
         auto hyb = atom1->getHybridization();
         if (hyb != Atom::HybridizationType::SP3 && hyb != Atom::HybridizationType::SP2) {
             return RotatableBondType::None;
@@ -302,7 +302,7 @@ getNumBonds();
         return RotatableBondType::Full;
     }
 
-    void SuperpositionMolecule::setConformer(const Conformer& conformer) {
+    void SuperpositionMolecule::setConformer(const Conformer &conformer) {
         assert(mol.getNumConformers() == 1);
         const auto id = mol.getConformer().getId();
         mol.removeConformer(id);
@@ -311,7 +311,7 @@ getNumBonds();
         assert(mol.getNumConformers() == 1);
     }
 
-    bool SuperpositionMolecule::isNitroOxygen(const Atom& atom) const {
+    bool SuperpositionMolecule::isNitroOxygen(const Atom &atom) const {
         if (atom.getAtomicNum() != 8 || atom.getDegree() != 1) {
             return false;
         }
@@ -320,13 +320,13 @@ getNumBonds();
         return isNitroNitrogen(*neighbor);
     }
 
-    bool SuperpositionMolecule::isNitroNitrogen(const Atom& atom) const {
+    bool SuperpositionMolecule::isNitroNitrogen(const Atom &atom) const {
         if (atom.getAtomicNum() != 7 || atom.getDegree() != 3) {
             return false;
         }
 
         int numOxy = 0;
-        for (const auto& neighbor: mol.atomNeighbors(&atom)) {
+        for (const auto &neighbor: mol.atomNeighbors(&atom)) {
             if (neighbor->getAtomicNum() == 8 && neighbor->getDegree() == 1) {
                 numOxy++;
             }
@@ -335,7 +335,7 @@ getNumBonds();
         return numOxy == 2;
     }
 
-    bool SuperpositionMolecule::isCarboxylateOxygen(const Atom& atom) const {
+    bool SuperpositionMolecule::isCarboxylateOxygen(const Atom &atom) const {
         if (atom.getAtomicNum() != 8 || atom.getDegree() != 1) {
             return false;
         }
@@ -343,13 +343,13 @@ getNumBonds();
         return isCarboxylateCarbon(*neighbor);
     }
 
-    bool SuperpositionMolecule::isCarboxylateCarbon(const Atom& atom) const {
+    bool SuperpositionMolecule::isCarboxylateCarbon(const Atom &atom) const {
         if (atom.getAtomicNum() != 6 || atom.getDegree() != 3) {
             return false;
         }
 
         int numOxy = 0;
-        for (const auto& neighbor: mol.atomNeighbors(&atom)) {
+        for (const auto &neighbor: mol.atomNeighbors(&atom)) {
             if (neighbor->getAtomicNum() == 8 && neighbor->getDegree() == 1) {
                 numOxy++;
             }
@@ -374,15 +374,15 @@ getNumBonds();
         features[FeatureType::HydrophobicAtom] = HydrophobicFeature::findHydrophobicFeatures(this);
         features[FeatureType::AromaticRing] = AromaticRingFeature::findAromaticRings(this);
 
-        for (const auto& [featureType, featuresForType]: features) {
+        for (const auto &[featureType, featuresForType]: features) {
             append(allFeatures, featuresForType);
         }
 
-        const std::function filter = [](const shared_ptr<Feature>& f) { return f->isMappingFeature(); };
+        const std::function filter = [](const shared_ptr<Feature> &f) { return f->isMappingFeature(); };
         allMappingFeatures = filterListToNewList(allFeatures, filter);
 
         donorHydrogens.clear();
-        for (const auto& donorHydrogenFeature: features[FeatureType::DonorInteractionPoint]) {
+        for (const auto &donorHydrogenFeature: features[FeatureType::DonorInteractionPoint]) {
             donorHydrogens.insert(donorHydrogenFeature->getAtom());
         }
 
@@ -403,7 +403,7 @@ getNumBonds();
 
     int SuperpositionMolecule::conformationalBitLen() const {
         int nBits = 0;
-        for (const auto& rotatableBond: rotatableBonds) {
+        for (const auto &rotatableBond: rotatableBonds) {
             switch (rotatableBond->getRotatableBondType()) {
                 case RotatableBondType::Flip:
                     nBits += 1;
@@ -420,30 +420,29 @@ getNumBonds();
 
     void SuperpositionMolecule::buildSuperpositionCoordinates() {
         superpositionCoordinates = std::make_unique<SuperpositionCoordinates>(referenceConformer);
-        for (const auto& feature: allFeatures) {
+        for (const auto &feature: allFeatures) {
             feature->calculateCoordinates(*superpositionCoordinates);
         }
     }
 
     double SuperpositionMolecule::calculateConformationalEnergy(const RDKit::Conformer &conformer) const {
         double torsionalEnergy = .0;
-        for (const auto rotatableBond: rotatableBonds) {
+        for (const auto &rotatableBond: rotatableBonds) {
             torsionalEnergy += rotatableBond->rotatableBondEnergy(conformer);
         }
         double vdwEnergy = .0;
         const double cutoff = settings.getGapeParameters().vdwCutoff;
-        const double cutoffSqr = cutoff*cutoff;
+        const double cutoffSqr = cutoff * cutoff;
         for (const auto &vdwInfo: pairsToCheck) {
             // skip contacts between donor hydrogens and acceptors
-            const auto& atom1 = mol.getAtomWithIdx(vdwInfo.index0);
-            const auto& atom2 = mol.getAtomWithIdx(vdwInfo.index1);
+            const auto &atom1 = mol.getAtomWithIdx(vdwInfo.index0);
+            const auto &atom2 = mol.getAtomWithIdx(vdwInfo.index1);
             if (atom1->getAtomicNum() == 1 && atom2->getAtomicNum() > 1) {
                 if (donorHydrogens.find(atom1) != donorHydrogens.end() &&
                     acceptors.find(atom2) != acceptors.end()) {
                     continue;
                 }
-            }
-            else if (atom2->getAtomicNum() == 1 && atom1->getAtomicNum() > 1) {
+            } else if (atom2->getAtomicNum() == 1 && atom1->getAtomicNum() > 1) {
                 if (donorHydrogens.find(atom2) != donorHydrogens.end() &&
                     acceptors.find(atom1) != acceptors.end()) {
                     continue;
@@ -455,4 +454,38 @@ getNumBonds();
         return torsionalEnergy + vdwEnergy;
     }
 
+    /**
+     * Returns common molecular volume using atomic Gaussians of hydrophobic features.
+     *
+     * @param mol
+     * @return
+     */
+    double SuperpositionMolecule::gaussianIntegral(const SuperpositionMolecule &otherMolecule, const Conformer &conformer,
+                                                   const Conformer &otherConformer) const {
+        const GaussianList gaussians(*this, conformer);
+        const GaussianList otherGaussians(otherMolecule, otherConformer);
+
+        auto volume = gaussians.overlapVolume(otherGaussians);
+        REPORT(Reporter::DEBUG) << "1st order Gaussian integral: " << volume;
+
+        // Java returned here, higher order contributions were not working
+        if (false) return volume;
+
+        GaussianList overlay = gaussians.intersection(otherGaussians);
+        volume = overlay.volume();
+        REPORT(Reporter::DEBUG) << "1st order Gaussian integral (2): " << volume;
+        // Subtract 2 order intersections
+        overlay = overlay.intersection();
+        double diff = overlay.volume();
+        volume -= diff;
+        REPORT(Reporter::DEBUG) << "2nd order Gaussian Integral " << diff << " new vol " << volume;
+
+        // Add 3 order intersections
+        overlay = overlay.intersection();
+        diff = overlay.volume();
+        volume += diff;
+        REPORT(Reporter::DEBUG) << "3nd order Gaussian Integral " << diff << " new vol " << volume;
+
+        return volume;
+    }
 } // namespace GAPE

@@ -173,10 +173,9 @@ namespace Gape {
             auto transformedOtherCoords = matrix * otherCoords;
             REPORT(Reporter::TRACE) << "First pass transformed coordinates " << std::endl << transformedOtherCoords;
             // 2nd pass fitting
-            int nMapped = 0;
             BestThree bestThree;
             for (int i = 0; i < pointNumber; i++) {
-                auto c1 = transformedOtherCoords.col(i);
+                // auto c1 = transformedOtherCoords.col(i);
                 auto sqrDist = sqrDistance(transformedOtherCoords.col(i), fittingCoords.col(i));
                 if (sqrDist < passOneDistance * passOneDistance) {
                     closeMappings.insert(i);
@@ -224,9 +223,9 @@ namespace Gape {
         otherCoordinates.transformCoordinates(matrix);
         // TODO Remap chromosome
         if (remap) {
-            for (int i = 0; i < fittingFeatures.size(); i++) {
+            for (size_t i = 0; i < fittingFeatures.size(); i++) {
                 if (closeMappings.find(i) == closeMappings.end()) {
-                    auto pos = start + 1;
+                    auto pos = start + i;
                     integerStringChromosome.setValue(pos, -1);
                 }
                 REPORT(Reporter::DEBUG) << "V " << integerStringChromosome.getValue(pos);
@@ -234,14 +233,16 @@ namespace Gape {
         }
 
         if (Gape::Reporter::isReportingAt(Reporter::DEBUG)) {
+            int i = 0;
             for (const auto &mappingFeature: fittingFeatures) {
+                auto pos = start + i;
                 REPORT(Reporter::DEBUG) << "V " << integerStringChromosome.getValue(pos);
-                auto pos = start + 1;
                 if (auto otherFeature = featureMap.find(mappingFeature); otherFeature != featureMap.end()) {
                     REPORT(Reporter::DEBUG)
                         << mappingFeature->mappingInfo(*otherFeature->second, fittingCoordinates, otherCoordinates);
                 }
             }
+            i++;
         }
 
         return true;
@@ -290,10 +291,10 @@ namespace Gape {
         // Initialize pharmacophore information
         featureMapping.clear();
         const auto &molecules = superpositionGa.getSuperposition().getMolecules();
-        for (int moleculeNumber = 0; moleculeNumber < molecules.size(); moleculeNumber++) {
+        for (size_t moleculeNumber = 0; moleculeNumber < molecules.size(); moleculeNumber++) {
             const auto & molecule = molecules[moleculeNumber];
             const auto superpositionCoordinates = conformerCoordinates[moleculeNumber];
-            for (const auto feature : molecule->getAllFeatures()) {
+            for (const auto& feature : molecule->getAllFeatures()) {
                 const auto ptr = feature.get();
                 const auto point = feature->getFittingPoint(*superpositionCoordinates);
                 auto featureInformation = std::make_shared<FeatureInformation>(ptr, *superpositionCoordinates);
@@ -355,11 +356,11 @@ namespace Gape {
     }
 
     double SuperpositionChromosome::calculateConformationalEnergy() {
-        double conformationalEnergy = .0;
+        conformationalEnergy = .0;
         const auto &molecules = superpositionGa.getSuperposition().getMolecules();
         conformationalEnergies.clear();
         conformationalEnergies.reserve(molecules.size());
-        for (int i = 0; i < molecules.size(); i++) {
+        for (size_t i = 0; i < molecules.size(); i++) {
             const auto &molecule = molecules[i];
             const auto &conformer = conformerCoordinates[i]->getConformer();
             const auto moleculeConformerEnergy = molecule->calculateConformationalEnergy(conformer);
@@ -372,5 +373,30 @@ namespace Gape {
     }
 
     double SuperpositionChromosome::calculateVolumeIntegral() {
+        const auto &molecules = superpositionGa.getSuperposition().getMolecules();
+        auto numberMolecules = molecules.size();
+        volumeIntegrals = std::make_unique<Array2D<double>>(numberMolecules, numberMolecules);
+        volumeIntegral = 0.0;
+        double count = 0.0;
+
+        for (size_t i = 0; i < numberMolecules; i++) {
+            const auto& moleculeA = molecules[i];
+            const auto& conformerA = conformerCoordinates[i]->getConformer();
+            for (int j = i + 1; j < numberMolecules; j++) {
+                const auto& moleculeB = molecules[j];
+                const auto& conformerB = conformerCoordinates[j]->getConformer();
+                // we get a cleaner overlay if we compare against everything- at
+                // a CPU cost.
+                double vol = moleculeA->gaussianIntegral(*moleculeB, conformerA, conformerB);
+                vol = (moleculeA->getWeight() + moleculeB->getWeight()) * vol / 2.0;
+                volumeIntegrals->set(i, j, vol);
+                volumeIntegral += vol;
+                REPORT(Reporter::DEBUG) << "Volume Integral for molecules " << i << " and " << j << " " << vol;
+                count++;
+            }
+        }
+
+        volumeIntegral = volumeIntegral / count;
+        return volumeIntegral * 2;
     }
 }

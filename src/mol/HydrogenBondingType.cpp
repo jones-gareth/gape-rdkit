@@ -47,7 +47,7 @@ namespace Gape {
         int wildCardNum = 0;
         int yAtomicWt = -1;
         int zAtomicWt = -1;
-        for (const auto [queryIdx, molIdx]: match) {
+        for (const auto& [queryIdx, molIdx]: match) {
             if (query->getAtomWithIdx(queryIdx)->getAtomicNum() == 0) {
                 const auto molAtomicWt = mol.getAtomWithIdx(molIdx)->getAtomicNum();
                 if (const auto yPresent = std::find(yWildcards.begin(), yWildcards.end(),

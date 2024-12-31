@@ -30,7 +30,7 @@ namespace Gape {
         std::vector<Gaussian> gaussians;
 
     public:
-        GaussianList(const SuperpositionMolecule molecule, const Conformer &conformer);
+        GaussianList(const SuperpositionMolecule& molecule, const Conformer &conformer);
 
         GaussianList(const std::vector<Gaussian> &g) : gaussians(g) {}
 
@@ -41,6 +41,11 @@ namespace Gape {
         GaussianList intersection(const GaussianList &other) const;
 
         GaussianList intersection() const;
+
+        double volume() const;
+
+        // 2.7 is the the default atom volume
+        static constexpr double atomicVolume = 2.7;
 
     };
 

@@ -29,7 +29,7 @@ namespace Gape
 		std::vector<std::shared_ptr<Feature>> features;
 
 		std::vector<const Atom*> atomsInUse;
-		for (const auto ringAtomsIdxs : ringInfo->atomRings())
+		for (const auto& ringAtomsIdxs : ringInfo->atomRings())
 		{
 			const bool aromatic = std::all_of(ringAtomsIdxs.begin(), ringAtomsIdxs.end(), [&mol](const int atomIdx)
 			{

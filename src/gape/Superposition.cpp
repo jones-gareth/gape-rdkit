@@ -22,7 +22,7 @@ namespace Gape {
         int nBits = 0;
         binaryEntryPoints.clear();
         binaryEntryPoints.reserve(molecules.size());
-        for (int i = 0; i < molecules.size(); i++) {
+        for (size_t i = 0; i < molecules.size(); i++) {
             binaryEntryPoints[i] = nBits;
             const auto molecule= molecules[i];
             nBits += molecule->conformationalBitLen();

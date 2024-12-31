@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <util/Array2D.h>
+
 #include "SuperpositionGa.h"
 #include "ga/StringChromosome.h"
 
@@ -33,7 +35,9 @@ namespace Gape {
         std::vector<std::shared_ptr<SuperpositionCoordinates> > conformerCoordinates;
         std::vector<std::shared_ptr<SuperpositionCoordinates> > fittedCoordinates;
         std::vector<double> conformationalEnergies;
-
+        std::unique_ptr<Array2D<double>> volumeIntegrals = nullptr;
+        double conformationalEnergy = 0.0;
+        double volumeIntegral = 0.0;
         std::map<Feature *, std::shared_ptr<FeatureInformation> > featureMapping;
         double fitness;
 

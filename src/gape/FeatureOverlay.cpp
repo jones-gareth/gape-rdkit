@@ -191,7 +191,7 @@ namespace Gape {
         // molecule pharm counts and feature counts are the same. This is
         // also done in groupPoints
         numberPharmacophorePoints = 0;
-        for (const auto feature: features) {
+        for (const auto& feature: features) {
             feature->isPharmacophoreFeature = false;
             feature->numberMatches = 0;
         }
@@ -207,7 +207,7 @@ namespace Gape {
 
     int FeaturePointSet::getPharmacoporeCount() const {
         int count = 0;
-        for (const auto feature: features) {
+        for (const auto& feature: features) {
             if (feature->isPharmacophoreFeature) count++;
         }
         return count;
@@ -357,13 +357,13 @@ namespace Gape {
         const auto& settings = superpositionChromosome.superpositionGa.getSuperposition().settings.getGapeParameters();
 
         if (settings.donorHydrogenWeight > 0) {
-            setup(FeatureType::DonorInteractionPoint);
+            setupFeaturePointSet(FeatureType::DonorInteractionPoint);
         }
         if (settings.acceptorAtomWeight > 0) {
-            setup(FeatureType::AcceptorAtomFeature);
+            setupFeaturePointSet(FeatureType::AcceptorAtomFeature);
         }
         if (settings.aromaticRingWeight > 0) {
-            setup(FeatureType::AromaticRing);
+            setupFeaturePointSet(FeatureType::AromaticRing);
         }
     }
 
@@ -372,7 +372,7 @@ namespace Gape {
 	 *
 	 * @param featureType
 	 */
-    void FeatureOverlay::setup(const FeatureType featureType) {
+    void FeatureOverlay::setupFeaturePointSet(const FeatureType featureType) {
         std::set<std::shared_ptr<FeatureInformation>> setFeatures;
         auto moleculeNumber = 0;
         const auto& superpositionCoordinates = superpositionChromosome.getFittedCoordinates();
@@ -385,7 +385,7 @@ namespace Gape {
             }
             moleculeNumber++;
         }
-        auto featurePointSet = std::make_shared<FeaturePointSet>(*this, featureType, setFeatures);
+        auto featurePointSet = std::make_shared<FeaturePointSet>(*this, setFeatures, featureType);
         featurePointSets.emplace(featureType, featurePointSet);
     }
 

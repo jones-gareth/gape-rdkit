@@ -52,11 +52,6 @@ namespace Gape
                                  << " radius " << r;
 	}
 
-	static double getAlpha(const double r)
-	{
-		return (-2.0 * log(0.5)) / (r * r);
-	}
-
 	double Feature::solvationAlpha = Feature::getAlpha(1.0);
 
 	void Feature::setSolvationAlpha(const double r)

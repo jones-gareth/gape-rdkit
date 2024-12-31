@@ -10,19 +10,6 @@ namespace Gape {
 
     const double VDW_CUTOFF = 1.0e-2;
 
-    GaussianList::GaussianList(const Gape::SuperpositionMolecule molecule, const RDKit::Conformer &conformer) {
-        gaussians.clear();
-        const auto &hydrophobicFeatures = molecule.getFeatures().at(FeatureType::HydrophobicAtom);
-        gaussians.reserve(hydrophobicFeatures.size());
-        for (const auto &feature: hydrophobicFeatures) {
-            const auto atom = feature->getAtom();
-            const auto atomIdx = atom->getIdx();
-            const auto &point = conformer.getAtomPos(atomIdx);
-
-
-        }
-    }
-
     /**
      * Determines the alpha parameter (or Gaussian width paramterer) for an
      * atomic Gaussian.
@@ -33,9 +20,22 @@ namespace Gape {
         const auto *ptable = RDKit::PeriodicTable::getTable();
         auto r = ptable->getRvdw(atomicNumber);
         // 2.7 is the the default atom volume
-        auto alpha = pow((3.0 * 2.7) / (4 * M_PI * r * r * r),
+        auto alpha = pow((3.0 * GaussianList::atomicVolume) / (4 * M_PI * r * r * r),
                          2.0 / 3.0) * M_PI;
         return alpha;
+    }
+
+    GaussianList::GaussianList(const Gape::SuperpositionMolecule& molecule, const RDKit::Conformer &conformer) {
+        gaussians.clear();
+        const auto &hydrophobicFeatures = molecule.getFeatures().at(FeatureType::HydrophobicAtom);
+        gaussians.reserve(hydrophobicFeatures.size());
+        for (const auto &feature: hydrophobicFeatures) {
+            const auto atom = feature->getAtom();
+            const auto atomIdx = atom->getIdx();
+            const auto &point = conformer.getAtomPos(atomIdx);
+            Gaussian atomicGaussian(GaussianList::atomicVolume, gaussianWidth(atom->getAtomicNum()), point);
+            gaussians.push_back(std::move(atomicGaussian));
+        }
     }
 
     double gaussianVolume(const double n, const double alpha) {
@@ -121,9 +121,9 @@ namespace Gape {
         const auto size = gaussians.size();
         std::vector<Gaussian> intersection;
         REPORT(Reporter::DEBUG) << "Max number of self intersections gaussians " << size * (size - 1) / 2;
-        for (int i = 0; i < size; i++) {
+        for (size_t i = 0; i < size; i++) {
             const auto g1 = gaussians[i];
-            for (int j = i + 1; j < size; j++) {
+            for (size_t j = i + 1; j < size; j++) {
                 const auto g2 = gaussians[j];
                 const auto g3 = g1.intersection(g2);
                 if (g3.has_value()) {
@@ -153,5 +153,15 @@ namespace Gape {
         << other.gaussians.size() << " volume " << vol;
         return vol;
     }
+
+    double GaussianList::volume() const {
+        auto vol = 0.0;
+        for (const auto &g1: gaussians) {
+            vol += g1.volume();
+        }
+        REPORT(Reporter::DEBUG) << "Volume " << vol;
+        return vol;
+    }
+
 
 }

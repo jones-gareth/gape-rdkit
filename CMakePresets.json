@@ -10,8 +10,8 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl.exe",
         "CMAKE_CXX_COMPILER": "cl.exe",
-        "CMAKE_INCLUDE_PATH": "C:/tools/Anaconda3/envs/rdkit_build/Library/include",
-        "CMAKE_LIBRARY_PATH": "C:/tools/Anaconda3/envs/rdkit_build/Library/bin"
+        "CMAKE_INCLUDE_PATH": "C:/Users/jones/.conda/envs/rdkit_build/Library/include",
+        "CMAKE_LIBRARY_PATH": "C:/Users/jones/.conda/envs/rdkit_build/Library/bin"
       },
       "condition": {
         "type": "equals",
@@ -32,7 +32,7 @@
       "displayName": "x64 Debug",
       "inherits": "windows",
       "environment": {
-        "RDLIB": "c:/gareth/src/rdkit/out/build/x64-python-debug/lib/Debug"
+        "RDLIB": "c:/gareth/src/rdkit/out/build/x64-csharp-debug/lib/Debug"
       }
     },
     {
@@ -40,7 +40,7 @@
       "displayName": "x64 Release",
       "inherits": "windows",
       "environment": {
-        "RDLIB": "c:/gareth/src/rdkit/out/build/x64-python-release/lib/Release"
+        "RDLIB": "c:/gareth/src/rdkit/out/build/x64-csharp-release/lib/Release"
       }
     },
     {
