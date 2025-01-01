@@ -77,14 +77,14 @@ namespace Gape {
         score = .0;
 
         REPORT(Reporter::DEBUG) << "Entering FeaturePoint::score()";
-        for (auto otherFeature: features) {
+        for (auto testFeature: features) {
             int testMatched = 0;
-            double test = scoreFeature(*otherFeature, testMatched);
+            double test = scoreFeature(*testFeature, testMatched);
             REPORT(Reporter::DEBUG) << "Test score: " << test;
             if (test > maxScore) {
-                REPORT(Reporter::DEBUG) << "Setting base feature to " << otherFeature->feature->info();
+                REPORT(Reporter::DEBUG) << "Setting base feature to " << testFeature->feature->info();
                 maxScore = test;
-                baseFeature = otherFeature;
+                baseFeature = testFeature;
                 numberMatched = testMatched;
             }
 
@@ -112,11 +112,11 @@ namespace Gape {
     }
 
     /**
-         * Test a feature as the base feature.
-         *
-         * @param testFeature
-         * @return score that we get from using this feature as the base feature.
-         */
+     * Test a feature as the base feature.
+     *
+     * @param testFeature
+     * @return score that we get from using this feature as the base feature.
+     */
     double FeaturePoint::scoreFeature(const FeatureInformation &testFeature, int &testMatched) const {
         double testScore = .0;
         testMatched = 0;
@@ -238,17 +238,22 @@ namespace Gape {
         // molecule will always occupy their own cluster
         double maxSqrDistance = maxDistance * maxDistance;
 
-        // / initial assignment
+        // initial assignment
         for (auto feature: features)
             addFeature(*feature, maxSqrDistance);
 
-        // relocations
-        int nRelocations = 0;
-        while (relocate()) {
-            nRelocations++;
-            if (nRelocations == maxRelocations) {
-                REPORT(Reporter::INFO) << "groupPoints no convergence after " << maxRelocations << " relocations";
-                break;
+        // because features are ordered by molecule at this point there is no need to do relocations
+        // if we only have two molecules
+
+        if (featureOverlay.numberMolecules() > 2) {
+            // relocations
+            int nRelocations = 0;
+            while (relocate()) {
+                nRelocations++;
+                if (nRelocations == maxRelocations) {
+                    REPORT(Reporter::INFO) << "groupPoints no convergence after " << maxRelocations << " relocations";
+                    break;
+                }
             }
         }
 
@@ -318,22 +323,25 @@ namespace Gape {
         const auto molecule = feature.feature->getMolecule();
         bool added = false;
 
-        // loop though any existing points
+        // loop though any existing points, and add to closest
+        shared_ptr<FeaturePoint> closestPoint = nullptr;
+        double closestSqrDistance = std::numeric_limits<double>::max();
         for (auto featurePoint: featurePoints) {
             double sqrDistance = featurePoint->squareDistance(feature);
             if (featurePoint->containsMoleculeFeature(*molecule))
                 continue;
             // criteria if the current point does not contain any
             // feature from this molecule.
-            if (sqrDistance < maxSqrDistance) {
-                // add updating center
-                featurePoint->addFeaturePoint(feature, true);
-                added = true;
-                break;
+            if (sqrDistance < maxSqrDistance && sqrDistance < closestSqrDistance) {
+                closestPoint = featurePoint;
+                closestSqrDistance = sqrDistance;
             }
         }
 
-        if (!added) {
+        if (closestPoint == nullptr) {
+                // add updating center
+            closestPoint->addFeaturePoint(feature, true);
+        } else {
             // no close points so create a new feature point with this
             // feature.
             auto newFeaturePoint = *std::next(freeFeaturePoints.begin());
@@ -373,7 +381,7 @@ namespace Gape {
 	 * @param featureType
 	 */
     void FeatureOverlay::setupFeaturePointSet(const FeatureType featureType) {
-        std::set<std::shared_ptr<FeatureInformation>> setFeatures;
+        std::vector<std::shared_ptr<FeatureInformation>> setFeatures;
         auto moleculeNumber = 0;
         const auto& superpositionCoordinates = superpositionChromosome.getFittedCoordinates();
         for (const auto& molecule: superpositionChromosome.superpositionGa.getSuperposition().getMolecules()) {
@@ -381,7 +389,7 @@ namespace Gape {
             const auto& features = molecule->getFeatures().at(featureType);
             for (const auto& feature: features) {
                 auto featureInformation= std::make_shared<FeatureInformation>(feature.get(), *coordinates);
-                setFeatures.insert(featureInformation);
+                setFeatures.push_back(featureInformation);
             }
             moleculeNumber++;
         }
@@ -400,13 +408,16 @@ namespace Gape {
         const auto& settings = superpositionChromosome.superpositionGa.getSuperposition().settings.getGapeParameters();
 
         if (settings.donorHydrogenWeight > 0) {
-            score += settings.donorHydrogenWeight * groupFeatures(FeatureType::DonorInteractionPoint);
+            donorHydrogenScore = groupFeatures(FeatureType::DonorInteractionPoint);
+            score += settings.donorHydrogenWeight * donorHydrogenScore;
         }
         if (settings.acceptorAtomWeight > 0) {
-            score += settings.acceptorAtomWeight * groupFeatures(FeatureType::AcceptorAtomFeature);
+            acceptorAtomScore = groupFeatures(FeatureType::AcceptorAtomFeature);
+            score += settings.acceptorAtomWeight * acceptorAtomScore;
         }
         if (settings.aromaticRingWeight > 0) {
-            score += settings.aromaticRingWeight * groupFeatures(FeatureType::AromaticRing);
+            aromaticRingScore = groupFeatures(FeatureType::AromaticRing);
+            score += settings.aromaticRingWeight * aromaticRingScore;
         }
 
         return score;

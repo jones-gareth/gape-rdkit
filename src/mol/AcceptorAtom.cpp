@@ -262,7 +262,7 @@ namespace Gape
 		lonePair1[3] = lonePair2[3] = 1.0;
 
 		// Angle could be random- but we just make it 0
-		double angle = 0;
+		const double angle = 0;
 		rotation.SetRotation(angle, RDGeom::Z_Axis);
 		rotation.TransformPoint(lonePair1);
 		rotation.TransformPoint(lonePair2);

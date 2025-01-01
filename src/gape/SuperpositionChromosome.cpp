@@ -11,6 +11,8 @@
 #include "util/Reporter.h"
 #include <set>
 
+#include "FeatureOverlay.h"
+
 namespace Gape {
     struct BestThree {
         double firstSqrDist = 1e100, secondSqrDist = 1e100, thirdSqrDist = 1e100;
@@ -274,77 +276,31 @@ namespace Gape {
         assert(ok && fitted);
 
         fitness = .0;
-        const auto &settings = superpositionGa.getSuperposition().settings;
+        const auto &settings = superpositionGa.getSuperposition().settings.getGapeParameters();
         // Conformational Energies
-        if (settings.getGapeParameters().conformationalWeight > .0) {
+        if (settings.conformationalWeight > .0) {
             calculateConformationalEnergy();
         }
 
         // Volume Overlay
-        if (settings.getGapeParameters().volumeWeight > 0) {
+        if (settings.volumeWeight > 0) {
             calculateVolumeIntegral();
         }
 
+        // TODO: UserFeatures
+        // TODO: Constraints
 
-        // All the features now:
+        // features
+        featureOverlay = std::make_unique<FeatureOverlay>(*this);
+        const auto featureScore = featureOverlay->scoreOverlay();
 
-        // Initialize pharmacophore information
-        featureMapping.clear();
-        const auto &molecules = superpositionGa.getSuperposition().getMolecules();
-        for (size_t moleculeNumber = 0; moleculeNumber < molecules.size(); moleculeNumber++) {
-            const auto & molecule = molecules[moleculeNumber];
-            const auto superpositionCoordinates = conformerCoordinates[moleculeNumber];
-            for (const auto& feature : molecule->getAllFeatures()) {
-                const auto ptr = feature.get();
-                const auto point = feature->getFittingPoint(*superpositionCoordinates);
-                auto featureInformation = std::make_shared<FeatureInformation>(ptr, *superpositionCoordinates);
-                featureMapping[feature.get()] = featureInformation;
-            }
-        }
+        fitness = featureScore
+                  + settings.volumeWeight * volumeIntegral
+                  - settings.conformationalWeight * conformationalEnergy;
 
-        // For donors, acceptors and aromatic rings given the standard
-        // configuration of compareAll not set and singleMatchOnly set we'll end
-        // up calling singleMatchFeatureOverlay for each of these.
-
-        // Donor Hydrogens
-
-        if (settings.getGapeParameters().donorHydrogenWeight > .0) {
-
-        }
-        /*
-        if (superposition.getDonorHydrogenWt() > 0)
-            donorHydrogenScore();
-
-        // Acceptor Atom
-        if (superposition.getAcceptorAtomWt() > 0)
-            acceptorAtomScore();
-
-        // Aromatic Ring
-        if (superposition.getAromaticRingWt() > 0)
-            aromaticRingScore();
-
-        // Constraints (including breaking large cycles)
-        if (superposition.getConstraintWt() > 0)
-            constraintScore();
-
-        fitness = superposition.getDonorHydrogenWt() * donorHydrogenScore
-                  + superposition.getAcceptorAtomWt() * acceptorAtomScore
-                  + superposition.getAromaticRingWt() * aromaticRingScore
-                  + superposition.getVolumeWt() * volumeIntegral
-                  - superposition.getConfWt() * conformationalEnergy
-                  - superposition.getConstraintWt() * constraintScore;
-
-        // UserFeatures
-        for (int i = 0; i < superposition.getnUserFeatureTypes(); i++) {
-            FeatureType featureType = Feature.userFeatureType(i);
-            userFeatureScore(featureType);
-            UserFeatureSet featureSet = superposition.getUserFeatureSet(featureType);
-            fitness += featureSet.getFeatureWeight() * userFeatureScores[i];
-        }
-
+        
         logger.debug("Fitness " + fitness);
 
-         */
         hasFitness = true;
         return fitness;
     }

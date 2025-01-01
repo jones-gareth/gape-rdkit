@@ -22,11 +22,9 @@ namespace Gape
 	string currentTime()
 	{
 		time_t rawtime;
-		struct tm* timeinfo;
-		char buffer[80];
-
 		time(&rawtime);
-		timeinfo = localtime(&rawtime);
+		const tm* timeinfo = localtime(&rawtime);
+		char buffer[80];
 
 		strftime(buffer, 80, "%m-%d-%Y %H:%M:%S", timeinfo);
 

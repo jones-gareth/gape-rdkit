@@ -11,6 +11,7 @@
 
 namespace Gape {
     class SuperpositionGa;
+    class FeatureOverlay;
 
     struct FeatureInformation {
         bool isPharmacophoreFeature = false;
@@ -38,8 +39,8 @@ namespace Gape {
         std::unique_ptr<Array2D<double>> volumeIntegrals = nullptr;
         double conformationalEnergy = 0.0;
         double volumeIntegral = 0.0;
-        std::map<Feature *, std::shared_ptr<FeatureInformation> > featureMapping;
         double fitness;
+        std::unique_ptr<FeatureOverlay> featureOverlay;
 
         double calculateConformationalEnergy();
 

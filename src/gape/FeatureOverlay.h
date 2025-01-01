@@ -29,6 +29,9 @@ namespace Gape
 		double groupFeatures(const FeatureType featureType);
 		void setupFeaturePointSet(const FeatureType featureType);
 		std::map<FeatureType, std::shared_ptr<FeaturePointSet>> featurePointSets;
+		double donorHydrogenScore = 0.0;
+		double acceptorAtomScore = 0.0;
+		double aromaticRingScore = 0.0;
 		double score;
 
 	public:
@@ -42,6 +45,14 @@ namespace Gape
 		const SuperpositionGa& getSuperpositionGa() const { return superpositionChromosome.superpositionGa; }
 
 		double scoreOverlay();
+
+		double getScore() const { return score; }
+
+		double getDonorHydrogenScore() const { return donorHydrogenScore; }
+
+		double getAcceptorAtomScore() const { return acceptorAtomScore; }
+
+		double getAromaticRingScore() const { return aromaticRingScore; }
 	};
 
 	/**
@@ -112,7 +123,7 @@ namespace Gape
 	class FeaturePointSet
 	{
 		const FeatureOverlay& featureOverlay;
-		std::set<std::shared_ptr<FeatureInformation>> features;
+		std::vector<std::shared_ptr<FeatureInformation>> features;
 		std::set<std::shared_ptr<FeaturePoint>> featurePoints;
 		std::set<std::shared_ptr<FeaturePoint>> freeFeaturePoints;
 		int numberPharmacophorePoints = 0;
@@ -128,7 +139,7 @@ namespace Gape
 		const FeatureType featureType;
 
 		FeaturePointSet(const FeatureOverlay& featureOverlay,
-		                const std::set<std::shared_ptr<FeatureInformation>>& features,
+		                const std::vector<std::shared_ptr<FeatureInformation>>& features,
 		                const FeatureType featureType): featureOverlay(featureOverlay),
 		                                                features(features), featureType(featureType)
 		{

@@ -183,7 +183,7 @@ getNumBonds();
     }
 
     bool SuperpositionMolecule::isTerminalBond(const RDKit::Bond &bond) {
-        return (bond.getEndAtom()->getTotalDegree() == 1 || bond.getEndAtom()->getTotalDegree() == 1);
+        return (bond.getBeginAtom()->getTotalDegree() == 1 || bond.getEndAtom()->getTotalDegree() == 1);
     }
 
     bool SuperpositionMolecule::isNpl3Atom(const RDKit::Atom &atom) const {
