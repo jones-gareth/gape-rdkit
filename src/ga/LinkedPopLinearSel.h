@@ -432,9 +432,9 @@ namespace Gape {
         auto iter = population.end();
         --iter;
         ties.push_back(iter->second);
-        auto bestScore = iter->first;
+        auto _bestScore = iter->first;
         --iter;
-        while (std::fabs(iter->first - bestScore) < tolerance) {
+        while (std::fabs(iter->first - _bestScore) < tolerance) {
             ties.push_back(iter->second);
             if (iter == population.begin()) {
                 break;

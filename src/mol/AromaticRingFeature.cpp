@@ -99,7 +99,7 @@ namespace Gape
 		{
 			center += conformer.getAtomPos(atom->getIdx());
 		}
-		center /= ringAtoms.size();
+		center /= static_cast<int>(ringAtoms.size());
 		return center;
 	}
 

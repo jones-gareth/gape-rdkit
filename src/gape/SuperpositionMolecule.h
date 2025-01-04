@@ -6,7 +6,6 @@
 
 #include <GraphMol/GraphMol.h>
 #include <ForceField/MMFF/Params.h>
-#include <util/ConnectedGraphFinder.h>
 
 #include "GapeSettings.h"
 #include "mol/Feature.h"
@@ -123,7 +122,7 @@ namespace Gape {
         const std::vector<std::shared_ptr<Feature>>& getAllFeatures() const { return allFeatures; }
         const std::vector<std::shared_ptr<Feature>>& getAllMappingFeatures() const { return allMappingFeatures; }
 
-        void copySuperpositionCoordinates(const SuperpositionCoordinates& otherCoordinates) const;
+        // void copySuperpositionCoordinates(const SuperpositionCoordinates& otherCoordinates) const;
 
         double calculateConformationalEnergy(const Conformer& conformer) const;
 

@@ -469,7 +469,7 @@ getNumBonds();
         REPORT(Reporter::DEBUG) << "1st order Gaussian integral: " << volume;
 
         // Java returned here, higher order contributions were not working
-        if (false) return volume;
+        if (true) return volume;
 
         GaussianList overlay = gaussians.intersection(otherGaussians);
         volume = overlay.volume();

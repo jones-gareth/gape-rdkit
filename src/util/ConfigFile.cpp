@@ -34,7 +34,7 @@ static bool existsAndIsDirectory(const string & str) {
 	return exists(path) && is_directory(path);
 }
 
-const string ConfigFile::configDirectory() {
+string ConfigFile::configDirectory() {
 	boost::optional<string> configDirEnv = getEnv("CONFIG_DIR");
 	string configDir;
 	if (configDirEnv) {
@@ -78,7 +78,8 @@ string ConfigFile::configFilePath(const string &configFile) {
 		REPORT(Reporter::FATAL) << message;
 		throw runtime_error(message);
 	}
-	return file.string();
+    string fileName(file.string());
+    return fileName;
 }
 
 ConfigFile::ConfigFile(const string & fileName_) :

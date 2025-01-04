@@ -41,8 +41,8 @@ void BinaryTestGa::mutate(
 		const std::vector<shared_ptr<BinaryTestGaChromosome> > & parents,
 		std::vector<shared_ptr<BinaryTestGaChromosome> > & children) {
 
-	shared_ptr<BinaryTestGaChromosome> parent = parents[0];
-	shared_ptr<BinaryTestGaChromosome> child = children[0];
+	const shared_ptr<BinaryTestGaChromosome>& parent = parents[0];
+	shared_ptr<BinaryTestGaChromosome>& child = children[0];
 
 	child->copyGene(*parent);
 	child->mutate();
@@ -58,10 +58,10 @@ void BinaryTestGa::crossover(
 		const vector<shared_ptr<BinaryTestGaChromosome> > & parents,
 		vector<shared_ptr<BinaryTestGaChromosome> > & children) {
 
-	shared_ptr<BinaryTestGaChromosome> parent1 = parents[0];
-	shared_ptr<BinaryTestGaChromosome> child1 = children[0];
-	shared_ptr<BinaryTestGaChromosome> parent2 = parents[1];
-	shared_ptr<BinaryTestGaChromosome> child2 = children[1];
+	const shared_ptr<BinaryTestGaChromosome>& parent1 = parents[0];
+	shared_ptr<BinaryTestGaChromosome>& child1 = children[0];
+	const shared_ptr<BinaryTestGaChromosome>& parent2 = parents[1];
+	shared_ptr<BinaryTestGaChromosome>& child2 = children[1];
 
 	parent1->onePointCrossover(*parent2, *child1, *child2);
 

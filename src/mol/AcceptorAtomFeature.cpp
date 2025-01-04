@@ -139,7 +139,7 @@ namespace Gape {
         std::vector<std::shared_ptr<Feature> > features;
 
         int featureSetNumber = 0;
-        for (auto [atom, t]: acceptors) {
+        for (const auto& [atom, t]: acceptors) {
             auto acceptorAtom = mol.getAtomWithIdx(atom->getIdx());
             auto feature = std::make_shared<AcceptorAtomFeature>(featureSetNumber++, superpositionMolecule,
                                                                  acceptorAtom);

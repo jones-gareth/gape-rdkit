@@ -177,7 +177,7 @@ public:
 				}
 				auto graphPath = make_unique<GraphPath>(node1, node2, isEdge,
 						nNodes);
-				graphPaths(node1, node2) = move(graphPath);
+				graphPaths(node1, node2) = std::move(graphPath);
 			}
 		}
 		nEdges = nEdges / 2;

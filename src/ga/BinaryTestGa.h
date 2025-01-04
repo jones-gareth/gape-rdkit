@@ -29,8 +29,6 @@ typedef LinkedPopLinearSel<BinaryTestGaChromosome, BinaryTestGa> BinaryTestGaPop
 
 class BinaryTestGa: public GaBase {
 private:
-	BinaryTestGa(const BinaryTestGa & other) = delete;
-	BinaryTestGa & operator =(const BinaryTestGa & other) = delete;
 
 	static void mutate(const vector<shared_ptr<BinaryTestGaChromosome> > & parents,
 			vector<shared_ptr<BinaryTestGaChromosome> > & children);
@@ -44,16 +42,16 @@ private:
 	// need to have population as a pointer as we want to change popsize etc before creating population
 	unique_ptr<BinaryTestGaPopulation> population;
 public:
+    BinaryTestGa(const BinaryTestGa & other) = delete;
+    BinaryTestGa & operator =(const BinaryTestGa & other) = delete;
+
 	BinaryTestGa() : binaryStringChromosomePolicy(getRng()) {
 		setPopsize(20);
 		createOperations();
-		population = unique_ptr<BinaryTestGaPopulation>(new BinaryTestGaPopulation(*this));
+		population = std::make_unique<BinaryTestGaPopulation>(*this);
 	}
 
-	virtual ~BinaryTestGa() {
-	}
-
-	const vector<shared_ptr<GaOperation<BinaryTestGaChromosome> > >  getOperations() const {
+	const vector<shared_ptr<GaOperation<BinaryTestGaChromosome> > >&  getOperations() const {
 		return operations;
 	}
 

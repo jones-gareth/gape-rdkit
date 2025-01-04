@@ -84,13 +84,13 @@ namespace Gape
 		// minimum partial charge for a acceptor to be marked as charged
 		static double maxAcceptorPartialCharge;
 
-		AcceptorAtomFeature(const int featureSetNumber) : Feature(FeatureType::AcceptorAtomFeature, featureSetNumber,
+		explicit AcceptorAtomFeature(const int featureSetNumber) : Feature(FeatureType::AcceptorAtomFeature, featureSetNumber,
 		                                                          "ACCEPTOR_ATOM", true)
 		{
 		}
 
 
-		AcceptorAtomFeature(const int featureSetNum, const SuperpositionMolecule* spMol,
+		AcceptorAtomFeature(int featureSetNum, const SuperpositionMolecule* spMol,
 		                    const Atom* featureAtom);
 
 		static std::vector<std::shared_ptr<Feature>> findAcceptorAtoms(

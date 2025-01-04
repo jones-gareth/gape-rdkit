@@ -43,11 +43,11 @@ class GA_EXPORT GaBase {
   [[nodiscard]] RandomUtil& getRng() const { return rng; }
 
  protected:
-  void setSelectionPressure(double selectionPressure) {
-    this->selectionPressure = selectionPressure;
+  void setSelectionPressure(double _selectionPressure) {
+    this->selectionPressure = _selectionPressure;
   }
 
-  void setPopsize(size_t popsize) { this->popsize = popsize; }
+  void setPopsize(size_t _popsize) { this->popsize = _popsize; }
 };
 
 }  // Gape

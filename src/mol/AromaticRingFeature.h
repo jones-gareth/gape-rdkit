@@ -11,11 +11,10 @@ namespace Gape
 		std::vector<const Atom*> ringAtoms;
 
 		// Strict aromatic ring
-		bool aromatic;
+		bool aromatic = false;
 
 		// Planar Ring
-		bool planar;
-
+		bool planar = false;
 
 		thread_local static double normalLength;
 
@@ -25,8 +24,8 @@ namespace Gape
 		{
 		}
 
-		AromaticRingFeature(const int featureSetNumber, const SuperpositionMolecule* spMol,
-							const std::vector<const Atom*>& ringAtoms, const bool aromatic, const bool planar, const std::vector<const Atom *> &atomsInUse);
+		AromaticRingFeature(int featureSetNumber, const SuperpositionMolecule* spMol,
+							const std::vector<const Atom*>& ringAtoms, bool aromatic, bool planar, const std::vector<const Atom *> &atomsInUse);
 
 
 		static std::vector<std::shared_ptr<Feature>> findAromaticRings(

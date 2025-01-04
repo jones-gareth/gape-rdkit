@@ -44,9 +44,6 @@ public:
 
     void initialize();
 
-    virtual ~Array2D() {
-    }
-
     /**
      * get a value from the array
      *
@@ -166,7 +163,7 @@ public:
      * @param j
      * @return
      */
-    double rowSqrDistance(const int i, const int j);
+    double rowSqrDistance(int i, int j);
 
 protected:
     /**
@@ -183,30 +180,6 @@ protected:
     const size_t nRows, nColumns;
     //don't use vector for storage as vector doesn't work right for bool!
     const unique_ptr<T[]> data;
-};
-
-/**
- *  Horrible subclass that allows unique_ptr arrays- otherwise the initialization
- *  to default values results in a (illegal) unique_ptr copy.
- *
- *  This is replaced by the initialize method and the type traits for unique pointer
- *  below, but I left it in for reference.
- */
-template<typename T>
-class UniquePtrArray2D: public Array2D<unique_ptr<T>> {
-public:
-
-    UniquePtrArray2D(const UniquePtrArray2D & rhs) = delete;
-    UniquePtrArray2D & operator =(const UniquePtrArray2D & rhs) = delete;
-    UniquePtrArray2D(UniquePtrArray2D && rhs) = delete;
-    UniquePtrArray2D & operator =(UniquePtrArray2D && rhs) = delete;
-
-    UniquePtrArray2D(const size_t r, const size_t c) :
-            UniquePtrArray2D::Array2D(r, c, true) {
-        for (size_t i = 0; i < r * c; i++) {
-            Array2D<unique_ptr<T>>::data[i] = nullptr;
-        }
-    }
 };
 
 /**

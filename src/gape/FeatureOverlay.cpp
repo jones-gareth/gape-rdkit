@@ -321,7 +321,6 @@ namespace Gape {
      */
     void FeaturePointSet::addFeature(FeatureInformation &feature, const double maxSqrDistance) {
         const auto molecule = feature.feature->getMolecule();
-        bool added = false;
 
         // loop though any existing points, and add to closest
         shared_ptr<FeaturePoint> closestPoint = nullptr;

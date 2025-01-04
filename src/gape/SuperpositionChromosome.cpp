@@ -51,7 +51,7 @@ namespace Gape {
         integerStringChromosome(
             superpositionGa.getSuperposition().getIntegerStringLength(),
             superpositionGa.getRng(),
-            superpositionGa.getIntgerStringChromosomePolicy()) {
+            superpositionGa.getIntegerStringChromosomePolicy()) {
     }
 
     void SuperpositionChromosome::copyGene(const SuperpositionChromosome &from) {
@@ -201,9 +201,9 @@ namespace Gape {
                 closeMappings.insert(bestThree.thirdNo);
             }
 
-            auto numberPoints = closeMappings.size();
-            CoordMatrix fittingCoords2(4, numberPoints), otherCoords2(4, numberPoints);
-            int pointNumber = 0;
+            auto _numberPoints = closeMappings.size();
+            CoordMatrix fittingCoords2(4, _numberPoints), otherCoords2(4, _numberPoints);
+            int _pointNumber = 0;
             for (auto it = closeMappings.begin(); it != closeMappings.end(); ++it) {
                 auto featureNumber = *it;
                 auto fittingFeature = fittingFeatures[featureNumber];
@@ -211,24 +211,23 @@ namespace Gape {
                 auto fittingPoint = fittingFeature->getFittingPoint(fittingCoordinates);
                 auto otherPoint = otherFeature->getFittingPoint(otherCoordinates);
                 for (int i = 0; i < 3; i++) {
-                    fittingCoords(i, pointNumber) = fittingPoint[i];
-                    otherCoords(i, pointNumber) = otherPoint[i];
+                    fittingCoords(i, _pointNumber) = fittingPoint[i];
+                    otherCoords(i, _pointNumber) = otherPoint[i];
                 }
-                fittingCoords(3, pointNumber) = 1.0;
-                otherCoords(3, pointNumber) = 1.0;
-                ++pointNumber;
+                fittingCoords(3, _pointNumber) = 1.0;
+                otherCoords(3, _pointNumber) = 1.0;
+                ++_pointNumber;
             }
 
             matrix = leastSquaresFit(otherCoords, fittingCoords, boost::none);
         }
 
         otherCoordinates.transformCoordinates(matrix);
-        // TODO Remap chromosome
         if (remap) {
             for (size_t i = 0; i < fittingFeatures.size(); i++) {
                 if (closeMappings.find(i) == closeMappings.end()) {
-                    auto pos = start + i;
-                    integerStringChromosome.setValue(pos, -1);
+                    auto _pos = start + i;
+                    integerStringChromosome.setValue(_pos, -1);
                 }
                 REPORT(Reporter::DEBUG) << "V " << integerStringChromosome.getValue(pos);
             }
@@ -237,14 +236,14 @@ namespace Gape {
         if (Gape::Reporter::isReportingAt(Reporter::DEBUG)) {
             int i = 0;
             for (const auto &mappingFeature: fittingFeatures) {
-                auto pos = start + i;
-                REPORT(Reporter::DEBUG) << "V " << integerStringChromosome.getValue(pos);
+                auto _pos = start + i;
+                REPORT(Reporter::DEBUG) << "V " << integerStringChromosome.getValue(_pos);
                 if (auto otherFeature = featureMap.find(mappingFeature); otherFeature != featureMap.end()) {
                     REPORT(Reporter::DEBUG)
                         << mappingFeature->mappingInfo(*otherFeature->second, fittingCoordinates, otherCoordinates);
                 }
+                i++;
             }
-            i++;
         }
 
         return true;

@@ -21,16 +21,17 @@ namespace Gape {
 
 class BinaryTestGaChromosome: public BinaryStringChromosome {
 private:
-	BinaryTestGaChromosome(const BinaryTestGaChromosome & other) = delete;
-	BinaryTestGaChromosome & operator =(const BinaryTestGaChromosome & other) = delete;
 	double fitness = .0, xVal = .0, yVal = .0;
 public:
+    BinaryTestGaChromosome(const BinaryTestGaChromosome & other) = delete;
+    BinaryTestGaChromosome & operator =(const BinaryTestGaChromosome & other) = delete;
+
 	BinaryTestGaChromosome(RandomUtil & rng_,
 			BinaryStringChromosomePolicy & chromosomePolicy_) :
 			BinaryStringChromosome(44, rng_, chromosomePolicy_) {
 	}
-	virtual ~BinaryTestGaChromosome() {
-	}
+
+	~BinaryTestGaChromosome() = default;
 
 	double getFitness() const {
 		return fitness;

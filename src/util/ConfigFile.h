@@ -86,7 +86,7 @@ public:
 	 *
 	 * @return
 	 */
-	static const string configDirectory();
+	static string configDirectory();
 
 
 	/**

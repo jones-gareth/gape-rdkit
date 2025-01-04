@@ -1,6 +1,5 @@
 
-#ifndef FS_UTIL_H_
-#define FD_UTIL_H_
+#pragma once
 
 #include <string>
 #include <boost/filesystem.hpp>
@@ -32,7 +31,6 @@ T readObjectFromFile(const string & fileName, function<T(istream &)> func) {
     toLowerCase(test);
     bool gzipped = endsWith(test, ".gz");
 
-    ifstream in;
     if (gzipped) {
         GzipReader gzipReader(fileName);
         auto & in = gzipReader.getIn();
@@ -69,5 +67,3 @@ private:
 
 } //namespace
 
-
-#endif /* FS_UTIL_H_ */

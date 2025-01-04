@@ -56,7 +56,7 @@ namespace Gape {
 
         [[nodiscard]] const Superposition& getSuperposition() const { return superposition; }
 
-        [[nodiscard]] const IntegerStringChromosomePolicy& getIntgerStringChromosomePolicy() const {
+        [[nodiscard]] const IntegerStringChromosomePolicy& getIntegerStringChromosomePolicy() const {
             return integerStringChromosomePolicy;
         }
 

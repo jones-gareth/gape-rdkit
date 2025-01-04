@@ -23,7 +23,7 @@ namespace Gape {
 
         BinaryStringChromosomePolicy& operator=(const BinaryStringChromosomePolicy& other) = delete;
 
-        virtual ~BinaryStringChromosomePolicy();
+        ~BinaryStringChromosomePolicy() = default;
 
         bool mutate(int pos, bool currentValue) const;
 

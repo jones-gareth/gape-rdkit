@@ -15,9 +15,6 @@ namespace Gape {
 BinaryStringChromosomePolicy::BinaryStringChromosomePolicy(Gape::RandomUtil & rng_) : rng(rng_){
 }
 
-BinaryStringChromosomePolicy::~BinaryStringChromosomePolicy() {
-}
-
 bool BinaryStringChromosomePolicy::mutate(int pos, bool currentValue) const {
     return ! currentValue;
 }
