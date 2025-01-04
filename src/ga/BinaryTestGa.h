@@ -61,6 +61,10 @@ public:
 
 	void run();
 
+	static bool useNiches() {return false;}
+
+	static int getNicheSize() {return 0;}
+
 };
 
 }

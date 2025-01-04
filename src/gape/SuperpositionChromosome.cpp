@@ -259,19 +259,6 @@ namespace Gape {
 
     double SuperpositionChromosome::score() {
         hasFitness = false;
-        return getFitness();
-    }
-
-    bool SuperpositionChromosome::equals(const Gape::SuperpositionChromosome &other) const {
-        if (!binaryStringChromosome.equals(other.binaryStringChromosome)) {
-            return false;
-        }
-        return integerStringChromosome.equals(other.integerStringChromosome);
-    }
-
-    double SuperpositionChromosome::getFitness() {
-        if (hasFitness)
-            return fitness;
 
         assert(ok && fitted);
 
@@ -291,23 +278,36 @@ namespace Gape {
         // TODO: Constraints
 
         // features
-        featureOverlay = std::make_unique<FeatureOverlay>(*this);
+        featureOverlay = std::make_shared<FeatureOverlay>(*this);
         const auto featureScore = featureOverlay->scoreOverlay();
 
         fitness = featureScore
                   + settings.volumeWeight * volumeIntegral
                   - settings.conformationalWeight * conformationalEnergy;
 
-        
-        logger.debug("Fitness " + fitness);
+        REPORT(Reporter::DEBUG) << "Fitness " << fitness;
 
         hasFitness = true;
+        return fitness;
+        return getFitness();
+    }
+
+    bool SuperpositionChromosome::equals(const Gape::SuperpositionChromosome &other) const {
+        if (!binaryStringChromosome.equals(other.binaryStringChromosome)) {
+            return false;
+        }
+        return integerStringChromosome.equals(other.integerStringChromosome);
+    }
+
+    double SuperpositionChromosome::getFitness() const {
+        assert(hasFitness);
         return fitness;
     }
 
     double SuperpositionChromosome::rebuild() {
         hasFitness = false;
         fitMolecules(false);
+        score();
         return getFitness();
     }
 
@@ -331,16 +331,16 @@ namespace Gape {
     double SuperpositionChromosome::calculateVolumeIntegral() {
         const auto &molecules = superpositionGa.getSuperposition().getMolecules();
         auto numberMolecules = molecules.size();
-        volumeIntegrals = std::make_unique<Array2D<double>>(numberMolecules, numberMolecules);
+        volumeIntegrals = std::make_shared<Array2D<double> >(numberMolecules, numberMolecules);
         volumeIntegral = 0.0;
         double count = 0.0;
 
         for (size_t i = 0; i < numberMolecules; i++) {
-            const auto& moleculeA = molecules[i];
-            const auto& conformerA = conformerCoordinates[i]->getConformer();
+            const auto &moleculeA = molecules[i];
+            const auto &conformerA = conformerCoordinates[i]->getConformer();
             for (int j = i + 1; j < numberMolecules; j++) {
-                const auto& moleculeB = molecules[j];
-                const auto& conformerB = conformerCoordinates[j]->getConformer();
+                const auto &moleculeB = molecules[j];
+                const auto &conformerB = conformerCoordinates[j]->getConformer();
                 // we get a cleaner overlay if we compare against everything- at
                 // a CPU cost.
                 double vol = moleculeA->gaussianIntegral(*moleculeB, conformerA, conformerB);
@@ -354,5 +354,49 @@ namespace Gape {
 
         volumeIntegral = volumeIntegral / count;
         return volumeIntegral * 2;
+    }
+
+    /*
+     *
+     * Uses distance between features to determine if two chromosomes share a niche.
+     *
+     */
+    bool SuperpositionChromosome::sameNiche(const SuperpositionChromosome &other) const {
+        const auto &settings = superpositionGa.getSuperposition().settings.getGapeParameters();
+        if (!settings.useNiches) {
+            return false;
+        }
+
+        const auto featurePointSets = featureOverlay->getFeaturePointSets();
+        const auto otherFeaturePointSets = other.featureOverlay->getFeaturePointSets();
+        const int numberFeatures = std::accumulate(featurePointSets.begin(), featurePointSets.end(), 0,
+                                                   [](const auto &sum, const auto &pair) {
+                                                       return sum + pair.second->getFeatures().size();
+                                                   });
+        const auto nicheDistance = settings.nicheDistance;
+        const double sqrSumTolerance = numberFeatures * nicheDistance * nicheDistance;
+        double sumTolerance = 0.0;
+        for (const auto &[featureType, featurePointSet]: featurePointSets) {
+            const auto &features = featurePointSet->getFeatures();
+            const auto &otherFeatures = otherFeaturePointSets.at(featureType)->getFeatures();
+            assert(features.size() == otherFeatures.size());
+            for (int i = 0; i < features.size(); i++) {
+                const auto &featurePoint = features.at(i)->point;
+                const auto &otherFeaturePoint = otherFeatures.at(i)->point;
+                sumTolerance += (featurePoint - otherFeaturePoint).lengthSq();
+                if (sumTolerance > sqrSumTolerance) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    std::string SuperpositionChromosome::info() const {
+        const auto format = boost::format("Fit %7.1f [Donor %2.1f Acc %2.1f Ring %2.1f Conf %5.1f Vol %5.1f") % fitness
+                            % featureOverlay->getDonorHydrogenScore() % featureOverlay->getAcceptorAtomScore() %
+                            featureOverlay->getAromaticRingScore() % conformationalEnergy % volumeIntegral;
+        return format.str();
     }
 }

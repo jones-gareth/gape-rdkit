@@ -36,11 +36,11 @@ namespace Gape {
         std::vector<std::shared_ptr<SuperpositionCoordinates> > conformerCoordinates;
         std::vector<std::shared_ptr<SuperpositionCoordinates> > fittedCoordinates;
         std::vector<double> conformationalEnergies;
-        std::unique_ptr<Array2D<double>> volumeIntegrals = nullptr;
+        std::shared_ptr<Array2D<double>> volumeIntegrals = nullptr;
         double conformationalEnergy = 0.0;
         double volumeIntegral = 0.0;
-        double fitness;
-        std::unique_ptr<FeatureOverlay> featureOverlay;
+        double fitness = 0.0;
+        std::shared_ptr<FeatureOverlay> featureOverlay = nullptr;
 
         double calculateConformationalEnergy();
 
@@ -67,7 +67,7 @@ namespace Gape {
 
         void initialize();
 
-        double getFitness();
+        double getFitness() const;
 
         double score();
 
@@ -85,5 +85,9 @@ namespace Gape {
         bool equals(const SuperpositionChromosome &other) const;
 
         const std::vector<std::shared_ptr<SuperpositionCoordinates>>& getFittedCoordinates() const {return fittedCoordinates;}
+
+        bool sameNiche(const SuperpositionChromosome &other) const;
+
+        std::string info() const;
     };
 } // GapeApp

@@ -51,6 +51,8 @@ public:
 	}
 
 	std::string info() const;
+
+	static bool sameNiche(const BinaryTestGaChromosome &other) {return false;}
 };
 
 }

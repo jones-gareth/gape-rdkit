@@ -36,7 +36,7 @@ namespace Gape {
 		"numberOperations": 60000,
 		"selectionPressure": 1.001,
 		"useNiches": true,
-		"useNiches": true,
+		"nicheDistance": 1.0,
         "nicheSize": 5,
 		"nichingOff": 0.6,
 		"crossoverWeight": 95,
@@ -771,6 +771,7 @@ namespace Gape {
         gapeParameters.numberOperations = d["gapeParameters"]["numberOperations"].GetInt();
         gapeParameters.selectionPressure = d["gapeParameters"]["selectionPressure"].GetInt();
         gapeParameters.useNiches = d["gapeParameters"]["useNiches"].GetBool();
+        gapeParameters.nicheDistance = d["gapeParameters"]["nicheDistance"].GetDouble();
         gapeParameters.nicheSize = d["gapeParameters"]["nicheSize"].GetInt();
         gapeParameters.nichingOff = d["gapeParameters"]["nichingOff"].GetDouble();
         gapeParameters.crossoverWeight = d["gapeParameters"]["crossoverWeight"].GetInt();

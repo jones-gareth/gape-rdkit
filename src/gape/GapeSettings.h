@@ -44,6 +44,7 @@ namespace Gape {
 		int numberOperations = 60000;
         double selectionPressure = 1.0001;
         bool useNiches = true;
+        double nicheDistance = 1.0;
         int nicheSize = 5;
 		double nichingOff = 0.6;
 		int crossoverWeight = 95;

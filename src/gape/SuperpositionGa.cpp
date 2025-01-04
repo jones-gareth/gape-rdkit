@@ -48,6 +48,7 @@ namespace Gape {
         REPORT(Reporter::INFO) << population.info() << endl;
 
         for (int i = 0; i < numberOperations; i++) {
+
         }
         return nullptr;
     }
@@ -114,4 +115,13 @@ namespace Gape {
     }
 
 
+    bool SuperpositionGa::useNiches() const {
+        const auto &settings = getSuperposition().settings.getGapeParameters();
+        return settings.useNiches;
+    }
+
+    int SuperpositionGa::getNicheSize() const {
+        const auto &settings = getSuperposition().settings.getGapeParameters();
+        return settings.nicheSize;
+    }
 }

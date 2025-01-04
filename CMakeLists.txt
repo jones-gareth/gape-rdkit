@@ -2,6 +2,7 @@ project(Gape)
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 #set(CMAKE_VS_PLATFORM_TOOLSET v140)
+add_compile_definitions(INCLUDE_REPORTER)
 if (NOT RDBASE)
     set(RDBASE $ENV{RDBASE})
 endif()
@@ -116,7 +117,8 @@ MESSAGE(STATUS "allSources is ${allSources} ")
 # find all C sources
 set(allCSources ""
         src/gape/FeatureOverlay.cpp
-        src/gape/FeatureOverlay.h)
+        src/gape/FeatureOverlay.h
+        src/ga/IslandModel.h)
 foreach (_dir ${cSrcDirs})
     set(_pattern "src/${_dir}/*.c")
     file(GLOB _srcs ${_pattern})

@@ -71,5 +71,9 @@ namespace Gape {
         void run();
 
         std::shared_ptr<SuperpositionChromosome> createChromosome();
+
+        bool useNiches() const;
+
+        int getNicheSize() const;
     };
 }
