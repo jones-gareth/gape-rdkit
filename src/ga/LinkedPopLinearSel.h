@@ -51,6 +51,9 @@ namespace Gape {
     };
 
     template<typename Chromosome, typename PopulationPolicy>
+    class IslandModel;
+
+    template<typename Chromosome, typename PopulationPolicy>
     class LinkedPopLinearSel {
     private:
         PopulationPolicy &populationPolicy;
@@ -68,19 +71,12 @@ namespace Gape {
         int nAdded = 0;
         double totalScaledFitness, scaledFitnessStep;
         double totalOperatorWeights;
+        double bestScore = -std::numeric_limits<double>::max();
 
         static constexpr double SELECT_START = 5000.0;
 
-        LinkedPopLinearSel(const LinkedPopLinearSel &other) = delete;
-
-        LinkedPopLinearSel &operator=(const LinkedPopLinearSel &other) = delete;
-
-        bool addToPopulation(std::shared_ptr<Chromosome> &chromosome);
-
         bool addToPopulation(std::multimap<double, std::shared_ptr<Chromosome> > &pop,
                              std::shared_ptr<Chromosome> &chromosome);
-
-        std::shared_ptr<Chromosome> &selectParent();
 
         typename std::multimap<double,
             std::shared_ptr<Chromosome> >::const_iterator
@@ -90,9 +86,15 @@ namespace Gape {
             std::shared_ptr<Chromosome> >::const_iterator
         findInPopulation(std::shared_ptr<Chromosome> c) const;
 
-        double bestScore = -std::numeric_limits<double>::max();
+        bool addToPopulation(std::shared_ptr<Chromosome> &chromosome);
+
+        std::shared_ptr<Chromosome> &selectParent();
 
     public:
+        LinkedPopLinearSel(const LinkedPopLinearSel &other) = delete;
+
+        LinkedPopLinearSel &operator=(const LinkedPopLinearSel &other) = delete;
+
         explicit LinkedPopLinearSel(PopulationPolicy &populationPolicy_);
 
         ~LinkedPopLinearSel() = default;
@@ -105,7 +107,7 @@ namespace Gape {
 
         [[nodiscard]] std::string info() const;
 
-        const std::shared_ptr<Chromosome> &getBest() const;
+        const std::shared_ptr<Chromosome> getBest() const;
 
         [[nodiscard]] const std::vector<std::shared_ptr<Chromosome> > getTiedBest(
             double tolerance = 1e-6) const;
@@ -116,7 +118,7 @@ namespace Gape {
 
         NicheMatch<Chromosome> findNicheMatch(const Chromosome &c) const;
 
-       //  friend class IslandModel<Chromosome, PopulationPolicy>;
+        friend class IslandModel<Chromosome, PopulationPolicy>;
     };
 
     /**
@@ -138,7 +140,8 @@ namespace Gape {
           freeChromosomes() {
         totalOperatorWeights = 0;
         for (auto &operation: operations) {
-            totalOperatorWeights += operation->getWeight();
+            if (operation->operationName != OperationName::Migrate)
+                totalOperatorWeights += operation->getWeight();
         }
 
         // selection pressure is defined as the ratio between the fitness of the worst
@@ -291,6 +294,7 @@ namespace Gape {
 #ifdef INCLUDE_REPORTER
             REPORT(Reporter::TRACE) << "Child  " << i << ": " << child->info();
 #endif
+            // TODO: check for duplicate chromosomes before scoring?
             const auto fitness = child->score();
             if (fitness > bestScore) {
                 boost::format format = boost::format("Op %5d new best: ") % nOperations;
@@ -425,7 +429,7 @@ namespace Gape {
      * @return
      */
     template<typename Chromosome, typename PopulationPolicy>
-    const std::shared_ptr<Chromosome> &
+    const std::shared_ptr<Chromosome>
     LinkedPopLinearSel<Chromosome, PopulationPolicy>::getBest() const {
         auto iter = population.end();
         --iter;

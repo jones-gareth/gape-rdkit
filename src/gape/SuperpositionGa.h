@@ -22,6 +22,7 @@ namespace Gape {
         IntegerStringChromosomePolicy integerStringChromosomePolicy;
         BinaryStringChromosomePolicy binaryStringChromosomePolicy;
         int numberOperations = 0;
+        bool nichesOn = false;
 
         std::shared_ptr<SuperpositionChromosome> run(int runNumber);
 
@@ -31,7 +32,6 @@ namespace Gape {
         SuperpositionGa(const SuperpositionGa&) = delete;
 
         SuperpositionGa& operator=(const SuperpositionGa&) = delete;
-
 
         [[nodiscard]] std::vector<std::shared_ptr<GaOperation<SuperpositionChromosome>>>
         getOperations() const;
@@ -45,6 +45,11 @@ namespace Gape {
             const std::vector<std::shared_ptr<SuperpositionChromosome>>&
             parents,
             std::vector<std::shared_ptr<SuperpositionChromosome>>& children);
+
+        static void superpositionMigrationOperation(
+               const std::vector<std::shared_ptr<SuperpositionChromosome>>&
+               parents,
+               std::vector<std::shared_ptr<SuperpositionChromosome>>& children);
 
         [[nodiscard]] const Superposition& getSuperposition() const { return superposition; }
 

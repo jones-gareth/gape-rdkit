@@ -37,6 +37,15 @@ namespace Gape {
 
     std::shared_ptr<SuperpositionChromosome> SuperpositionGa::run(int runNumber) {
         const auto &gapeParameters = superposition.settings.getGapeParameters();
+
+        double startFittingRadius = gapeParameters.startFittingRadius;
+        double finishFittingRadius = gapeParameters.finishFittingRadius;
+        bool scaleFitting = gapeParameters.scaleFitting;
+        if (scaleFitting)
+            Feature::setRadius(startFittingRadius);
+        else
+            Feature::setRadius(finishFittingRadius);
+
         SuperpositionGaPopulation population(*this);
         auto format =
                 boost::format(
@@ -44,13 +53,51 @@ namespace Gape {
                 runNumber % numberOperations % getPopsize();
         REPORT(Reporter::INFO) << format.str();
         population.create();
+        REPORT(Reporter::DEBUG) << population.populationInfo();
         double bestScore = population.getBestScore();
+
+        nichesOn = gapeParameters.useNiches;
+        double nichingOff = gapeParameters.nichingOff;
+        int numberRebuilds = gapeParameters.numberRebuilds;
+        int reportInterval = 1000;
+        double d = numberOperations * nichingOff;
+        int opOff = static_cast<int>(std::ceil(d));
+		REPORT(Reporter::INFO) << "Turning off niching and fitting radius scaling at " << opOff;
+		int rebuildInterval = opOff / numberRebuilds;
 
         REPORT(Reporter::INFO) << population.info() << endl;
 
         for (int i = 0; i < numberOperations; i++) {
+            // Turn off niching after 80% to allow convergence
+            if (nichesOn && i >= opOff) {
+                REPORT(Reporter::INFO) << "OP " << i << ": turning off niching";
+                nichesOn = false;
+            }
+
+            // anneal fitting point radius
+            if (scaleFitting && i > 0 && i % rebuildInterval == 0) {
+                if (i >= opOff) {
+                    Feature::setRadius(finishFittingRadius);
+                    scaleFitting = false;
+                } else {
+                    const double frac = static_cast<double>(opOff - i) / static_cast<double>(opOff);
+                    const double radius = finishFittingRadius
+                            + (startFittingRadius - finishFittingRadius) * frac;
+                    Feature::setRadius(radius);
+                }
+                REPORT(Reporter::INFO) << "Setting fitting radius to " << Feature::getRadius();
+                population.rebuild();
+            }
+
+            population.iterate();
+
+            if (reportInterval > 0 && i > 1 && (i + 1) % reportInterval == 0)
+                REPORT(Reporter::INFO) << population.info();
+
         }
-        return nullptr;
+
+        const auto best = population.getBest();
+        return best;
     }
 
     std::vector<std::shared_ptr<GaOperation<SuperpositionChromosome> > > SuperpositionGa::getOperations() const {
@@ -59,6 +106,7 @@ namespace Gape {
             1, 1, parameters.mutationWeight, &superpositionMutateOperation);
         const auto crossoverOperation = std::make_shared<GaOperation<SuperpositionChromosome> >(OperationName::Crossover,
             2, 2, parameters.crossoverWeight, &superpositionCrossoverOperation);
+        const auto migrationOperation = std::make_shared<GaOperation<SuperpositionChromosome> >(OperationName::Migrate, 1, 1, parameters.migrationWeight, &superpositionMigrationOperation);
         std::vector operations{mutationOperation, crossoverOperation};
         return operations;
     }
@@ -103,6 +151,14 @@ namespace Gape {
         }
     }
 
+    void SuperpositionGa::superpositionMigrationOperation(
+       const std::vector<std::shared_ptr<SuperpositionChromosome> > &parents,
+       std::vector<std::shared_ptr<SuperpositionChromosome> > &children) {
+        assert(parents.size() == 1);
+        assert(children.size() == 1);
+        // migration does nothing
+    }
+
     void SuperpositionGa::run() {
         const auto numberRuns = superposition.settings.getGapeParameters().numberRuns;
         for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
@@ -116,6 +172,7 @@ namespace Gape {
 
 
     bool SuperpositionGa::useNiches() const {
+        if (!nichesOn) return false;
         const auto &settings = getSuperposition().settings.getGapeParameters();
         return settings.useNiches;
     }

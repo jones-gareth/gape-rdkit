@@ -15,8 +15,15 @@ namespace Gape {
         PopulationPolicy &populationPolicy;
         RandomUtil &rng;
         const size_t numberIslands;
-        std::vector<std::shared_ptr<LinkedPopLinearSel<Chromosome, PopulationPolicy> >> populations;
+        std::vector<std::shared_ptr<LinkedPopLinearSel<Chromosome, PopulationPolicy> > > populations;
         int currentPopulationNumber = 0;
+        double totalOperatorWeights = 0;
+        double migrationWeight = 0;
+        const std::vector<std::shared_ptr<GaOperation<Chromosome> > > operations;
+        std::shared_ptr<GaOperation<Chromosome> > migrationOperation;
+        size_t numberOperations = 0;
+        size_t numberMigrations = 0;
+        double bestScore = -std::numeric_limits<double>::max();
 
     public:
         explicit IslandModel(PopulationPolicy &populationPolicy);
@@ -33,7 +40,9 @@ namespace Gape {
 
         [[nodiscard]] std::string info() const;
 
-        [[nodiscard]] double getBestScore() const;
+        [[nodiscard]] double getBestScore() const { return bestScore; }
+
+        std::shared_ptr<Chromosome> getBest();
     };
 
     template<typename Chromosome, typename PopulationPolicy>
@@ -41,47 +50,68 @@ namespace Gape {
         PopulationPolicy>::IslandModel(PopulationPolicy &populationPolicy): populationPolicy(populationPolicy),
                                                                             rng(populationPolicy.getRng()),
                                                                             numberIslands(
-                                                                                populationPolicy.getNumberIslands()) {
+                                                                                populationPolicy.getNumberIslands()),
+                                                                            operations(
+                                                                                populationPolicy.getOperations()) {
         populations.reserve(populationPolicy.getNumberIslands());
         for (size_t i = 0; i < numberIslands; i++) {
-            populations.push_back(std::make_shared<LinkedPopLinearSel<Chromosome, PopulationPolicy>>(populationPolicy));
+            populations.
+                    push_back(std::make_shared<LinkedPopLinearSel<Chromosome, PopulationPolicy> >(populationPolicy));
+        }
+
+        totalOperatorWeights = 0;
+        for (auto &operation: operations) {
+            totalOperatorWeights += operation->getWeight();
+            if (operation->operationName == OperationName::Migrate) {
+                migrationWeight += operation->getWeight();
+                migrationOperation = operation;
+            }
         }
     }
 
     template<typename Chromosome, typename PopulationPolicy>
     void IslandModel<Chromosome, PopulationPolicy>::create() {
-        for (auto population : populations) {
+        bestScore = -std::numeric_limits<double>::max();
+        for (auto population: populations) {
             population->create();
+            auto testFitness = population->getBestScore();
+            if (testFitness < bestScore)
+                bestScore = testFitness;
         }
     }
 
     template<typename Chromosome, typename PopulationPolicy>
     void IslandModel<Chromosome, PopulationPolicy>::iterate() {
-        auto& pop = populations[currentPopulationNumber];
-        /*
-        int wt = rng.randomInt(0, totalOperatorWt + migrateWt - 1);
-        if (wt < migrateWt && nIslands > 1) {
-            migrate();
+        double val = rng.normalRand() * totalOperatorWeights;
+        auto &pop = populations[currentPopulationNumber];
+        if (val < migrationWeight) {
+            auto otherPopulationNumber = rng.randomInt(0, numberIslands-1);
+            if (otherPopulationNumber == currentPopulationNumber)
+                otherPopulationNumber++;
+            auto& parent = populations[otherPopulationNumber]->selectParent();
+            pop->addToPopulation(parent);
+            numberMigrations++;
         } else {
-            Operator op = pop.selectOperator();
-            pop.applyOperator(op);
+            pop->iterate();
         }
-        if (pop.getBest().getFitness() > bestFitness) {
-            getBest();
-            infoMessageLogger.infoMessage(bestInfo());
+
+        numberOperations++;
+        auto testFitness = pop->getBestScore();
+        if (testFitness > bestScore) {
+            testFitness = bestScore;
+            const auto format = boost::format("Island Pop %2d Op %5d new best: ") % (currentPopulationNumber+1) % numberOperations;
+            REPORT(Reporter::DETAIL) << format << pop->getBest()->info();
         }
-        nOperations++;
-        currentPopNo++;
-        if (currentPopNo == nIslands)
-            currentPopNo = 0;
-    */
+        currentPopulationNumber++;
+        if (currentPopulationNumber == numberIslands)
+            currentPopulationNumber = 0;
     }
 
     template<typename Chromosome, typename PopulationPolicy>
     void IslandModel<Chromosome, PopulationPolicy>::rebuild() {
         // TODO: chromosomes created by migrations may be shared between populations and we don't want to
         // score them twice (which we currently do)
-        for (auto population : populations) {
+        for (auto population: populations) {
             population->rebuild();
         }
     }
@@ -108,14 +138,11 @@ namespace Gape {
     }
 
     template<typename Chromosome, typename PopulationPolicy>
-    double IslandModel<Chromosome, PopulationPolicy>::getBestScore() const {
-        double bestScore = -std::numeric_limits<double>::max();
-        for (const auto &population : populations) {
-            double score = population->getBestScore();
-            if (score > bestScore) {
-                bestScore = score;
-            }
-        }
-        return bestScore;
+    shared_ptr<Chromosome> IslandModel<Chromosome, PopulationPolicy>::getBest() {
+        auto best = std::max_element(populations.begin(), populations.end(), [](const auto &a, const auto &b) {
+            return a->getBestScore() < b->getBestScore();
+        });
+        const auto c = *best;
+        return c->getBest();
     }
 }
