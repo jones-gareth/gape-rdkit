@@ -3,7 +3,7 @@
 #include "SuperpositionChromosome.h"
 
 namespace Gape {
-    SuperpositionGa::SuperpositionGa(const Superposition& superposition) : superposition(superposition),
+    SuperpositionGa::SuperpositionGa(const Superposition &superposition) : superposition(superposition),
                                                                            integerStringChromosomePolicy(
                                                                                getRng(),
                                                                                superposition.getIntegerStringLength()),
@@ -16,7 +16,7 @@ namespace Gape {
         }
         binaryStringChromosomePolicy.setAllowSwitch(true);
 
-        const auto& gapeParameters = superposition.settings.getGapeParameters();
+        const auto &gapeParameters = superposition.settings.getGapeParameters();
         int popsize = gapeParameters.populationSize;
         int numberIslands = gapeParameters.numberIslands;
         numberOperations = gapeParameters.numberOperations;
@@ -36,6 +36,7 @@ namespace Gape {
     }
 
     std::shared_ptr<SuperpositionChromosome> SuperpositionGa::run(int runNumber) {
+        const auto &gapeParameters = superposition.settings.getGapeParameters();
         SuperpositionGaPopulation population(*this);
         auto format =
                 boost::format(
@@ -48,31 +49,30 @@ namespace Gape {
         REPORT(Reporter::INFO) << population.info() << endl;
 
         for (int i = 0; i < numberOperations; i++) {
-
         }
         return nullptr;
     }
 
-    std::vector<std::shared_ptr<GaOperation<SuperpositionChromosome>>> SuperpositionGa::getOperations() const {
-        const auto& parameters = superposition.settings.getGapeParameters();
-        const auto mutationOperation = std::make_shared<GaOperation<SuperpositionChromosome>>(
+    std::vector<std::shared_ptr<GaOperation<SuperpositionChromosome> > > SuperpositionGa::getOperations() const {
+        const auto &parameters = superposition.settings.getGapeParameters();
+        const auto mutationOperation = std::make_shared<GaOperation<SuperpositionChromosome> >(OperationName::Mutate,
             1, 1, parameters.mutationWeight, &superpositionMutateOperation);
-        const auto crossoverOperation = std::make_shared<GaOperation<SuperpositionChromosome>>(
+        const auto crossoverOperation = std::make_shared<GaOperation<SuperpositionChromosome> >(OperationName::Crossover,
             2, 2, parameters.crossoverWeight, &superpositionCrossoverOperation);
         std::vector operations{mutationOperation, crossoverOperation};
         return operations;
     }
 
     void SuperpositionGa::superpositionMutateOperation(
-        const std::vector<std::shared_ptr<SuperpositionChromosome>>& parents,
-        std::vector<std::shared_ptr<SuperpositionChromosome>>& children) {
+        const std::vector<std::shared_ptr<SuperpositionChromosome> > &parents,
+        std::vector<std::shared_ptr<SuperpositionChromosome> > &children) {
         assert(parents.size() == 1);
         assert(children.size() == 1);
-        auto& parent = parents[0];
-        auto& child = children[0];
+        auto &parent = parents[0];
+        auto &child = children[0];
         child->copyGene(*parent);
 
-        if (auto& childBinaryString = child->binaryStringChromosome;
+        if (auto &childBinaryString = child->binaryStringChromosome;
             childBinaryString.getLength() > 0 && childBinaryString.getRng().randomBoolean()) {
             child->setOperationName(OperationName::BinaryStringMutate);
             childBinaryString.mutate();
@@ -83,11 +83,11 @@ namespace Gape {
     }
 
     void SuperpositionGa::superpositionCrossoverOperation(
-        const std::vector<std::shared_ptr<SuperpositionChromosome>>& parents,
-        std::vector<std::shared_ptr<SuperpositionChromosome>>& children) {
+        const std::vector<std::shared_ptr<SuperpositionChromosome> > &parents,
+        std::vector<std::shared_ptr<SuperpositionChromosome> > &children) {
         assert(parents.size() == 2);
         assert(children.size() == 2);
-        if (const auto& parent1BinaryString = parents[0]->binaryStringChromosome;
+        if (const auto &parent1BinaryString = parents[0]->binaryStringChromosome;
             parent1BinaryString.getLength() > 0 && parent1BinaryString.getRng().randomBoolean()) {
             children[0]->setOperationName(OperationName::BinaryStringCrossover);
             children[1]->setOperationName(OperationName::BinaryStringCrossover);
@@ -123,5 +123,10 @@ namespace Gape {
     int SuperpositionGa::getNicheSize() const {
         const auto &settings = getSuperposition().settings.getGapeParameters();
         return settings.nicheSize;
+    }
+
+    int SuperpositionGa::getNumberIslands() const {
+        const auto &settings = getSuperposition().settings.getGapeParameters();
+        return settings.numberIslands;
     }
 }

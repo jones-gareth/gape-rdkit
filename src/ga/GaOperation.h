@@ -14,96 +14,116 @@
 #include <vector>
 
 namespace Gape {
+    enum class OperationName {
+        BinaryStringMutate,
+        BinaryStringCrossover,
+        IntegerStringMutate,
+        IntegerStringCrossover,
+        Create,
+        Mutate,
+        Crossover,
+        Migrate,
+        None
+    };
 
-template <typename Chromosome>
-class GaOperation {
- private:
-  const size_t nParents, nChildren;
-  const double weight;
-  void (*opfunction)(const std::vector<std::shared_ptr<Chromosome>>& parents,
-                     std::vector<std::shared_ptr<Chromosome>>& children);
-  GaOperation(const GaOperation&) = delete;
-  GaOperation& operator=(const GaOperation& other) = delete;
+    template<typename Chromosome>
+    class GaOperation {
+    public:
+        const OperationName operationName;
 
- public:
-  GaOperation(int nParents_, int nChildren_, double weight_,
-              void (*opfunction_)(
-                  const std::vector<std::shared_ptr<Chromosome>>& parents,
-                  std::vector<std::shared_ptr<Chromosome>>& children))
-      : nParents(nParents_),
-        nChildren(nChildren_),
-        weight(weight_),
-        opfunction(opfunction_) {}
-  virtual ~GaOperation() {}
+    private:
+        const size_t nParents, nChildren;
+        const double weight;
 
-  size_t getnChildren() const { return nChildren; }
+        void (*opfunction)(const std::vector<std::shared_ptr<Chromosome> > &parents,
+                           std::vector<std::shared_ptr<Chromosome> > &children);
 
-  size_t getnParents() const { return nParents; }
+    public:
+        GaOperation(const GaOperation &) = delete;
 
-  double getWeight() const { return weight; }
+        GaOperation &operator=(const GaOperation &other) = delete;
 
-  void (*getOpfunction())(
-      const std::vector<std::shared_ptr<Chromosome>>& parents,
-      std::vector<std::shared_ptr<Chromosome>>& children) {
-    return opfunction;
-  }
-};
+        GaOperation(const OperationName operationName_, int nParents_, int nChildren_, double weight_,
+                    void (*opfunction_)(
+                        const std::vector<std::shared_ptr<Chromosome> > &parents,
+                        std::vector<std::shared_ptr<Chromosome> > &children))
+            : operationName(operationName_),
+              nParents(nParents_),
+              nChildren(nChildren_),
+              weight(weight_),
+              opfunction(opfunction_) {
+        }
 
-// Templates for string based chromosomes
+        virtual ~GaOperation() {
+        }
 
-template <typename T>
-void mutateOperation(const std::vector<std::shared_ptr<T>>& parents,
-                     std::vector<std::shared_ptr<T>>& children) {
-  auto parent = parents[0];
-  auto child = children[0];
-  child->copyGene(*parent);
-  child->mutate();
-}
+        size_t getnChildren() const { return nChildren; }
 
-template <typename T>
-void onePointCrossoverOperation(const std::vector<std::shared_ptr<T>>& parents,
-                                std::vector<std::shared_ptr<T>>& children) {
-  auto parent1 = parents[0];
-  auto child1 = children[0];
-  auto parent2 = parents[1];
-  auto child2 = children[1];
+        size_t getnParents() const { return nParents; }
 
-  parent1->onePointCrossover(*parent2, *child1, *child2);
-}
+        double getWeight() const { return weight; }
 
-template <typename T>
-void twoPointCrossoverOperation(const std::vector<std::shared_ptr<T>>& parents,
-                                std::vector<std::shared_ptr<T>>& children) {
-  auto parent1 = parents[0];
-  auto child1 = children[0];
-  auto parent2 = parents[1];
-  auto child2 = children[1];
+        void (*getOpfunction())(
+            const std::vector<std::shared_ptr<Chromosome> > &parents,
+            std::vector<std::shared_ptr<Chromosome> > &children) {
+            return opfunction;
+        }
+    };
 
-  parent1->twoPointCrossover(*parent2, *child1, *child2);
-}
+    // Templates for string based chromosomes
 
-template <typename T>
-void fullMixingOperation(const std::vector<std::shared_ptr<T>>& parents,
-                                std::vector<std::shared_ptr<T>>& children) {
-  auto parent1 = parents[0];
-  auto child1 = children[0];
-  auto parent2 = parents[1];
-  auto child2 = children[1];
+    template<typename T>
+    void mutateOperation(const std::vector<std::shared_ptr<T> > &parents,
+                         std::vector<std::shared_ptr<T> > &children) {
+        auto parent = parents[0];
+        auto child = children[0];
+        child->copyGene(*parent);
+        child->mutate();
+    }
 
-  parent1->fullMixing(*parent2, *child1, *child2);
-}
+    template<typename T>
+    void onePointCrossoverOperation(const std::vector<std::shared_ptr<T> > &parents,
+                                    std::vector<std::shared_ptr<T> > &children) {
+        auto parent1 = parents[0];
+        auto child1 = children[0];
+        auto parent2 = parents[1];
+        auto child2 = children[1];
 
-template <typename T>
-void fullMixingAndCrossoverOperation(const std::vector<std::shared_ptr<T>>& parents,
-                                std::vector<std::shared_ptr<T>>& children) {
-  auto parent1 = parents[0];
-  auto child1 = children[0];
-  auto parent2 = parents[1];
-  auto child2 = children[1];
+        parent1->onePointCrossover(*parent2, *child1, *child2);
+    }
 
-  parent1->fullMixingAndCrossover(*parent2, *child1, *child2);
-}
+    template<typename T>
+    void twoPointCrossoverOperation(const std::vector<std::shared_ptr<T> > &parents,
+                                    std::vector<std::shared_ptr<T> > &children) {
+        auto parent1 = parents[0];
+        auto child1 = children[0];
+        auto parent2 = parents[1];
+        auto child2 = children[1];
 
-}  // Gape
+        parent1->twoPointCrossover(*parent2, *child1, *child2);
+    }
+
+    template<typename T>
+    void fullMixingOperation(const std::vector<std::shared_ptr<T> > &parents,
+                             std::vector<std::shared_ptr<T> > &children) {
+        auto parent1 = parents[0];
+        auto child1 = children[0];
+        auto parent2 = parents[1];
+        auto child2 = children[1];
+
+        parent1->fullMixing(*parent2, *child1, *child2);
+    }
+
+    template<typename T>
+    void fullMixingAndCrossoverOperation(const std::vector<std::shared_ptr<T> > &parents,
+                                         std::vector<std::shared_ptr<T> > &children) {
+        auto parent1 = parents[0];
+        auto child1 = children[0];
+        auto parent2 = parents[1];
+        auto child2 = children[1];
+
+        parent1->fullMixingAndCrossover(*parent2, *child1, *child2);
+    }
+} // Gape
 
 #endif /* GAOPERATION_H_ */

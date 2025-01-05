@@ -21,10 +21,10 @@ using namespace Gape;
  */
 void BinaryTestGa::createOperations() {
 	shared_ptr<GaOperation<BinaryTestGaChromosome> > mutationOperation(
-			new GaOperation<BinaryTestGaChromosome>(1, 1, 50.0,
+			new GaOperation<BinaryTestGaChromosome>(OperationName::BinaryStringMutate, 1, 1, 50.0,
 					&BinaryTestGa::mutate));
 	shared_ptr<GaOperation<BinaryTestGaChromosome> > crossoverOperation(
-			new GaOperation<BinaryTestGaChromosome>(2, 2, 50.0,
+			new GaOperation<BinaryTestGaChromosome>(OperationName::Crossover, 2, 2, 50.0,
 					&BinaryTestGa::crossover));
 	operations.reserve(2);
 	operations.push_back(mutationOperation);

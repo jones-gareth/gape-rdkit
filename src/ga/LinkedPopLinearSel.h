@@ -28,6 +28,7 @@
 #include <limits>
 
 #include "GaOperation.h"
+// #include "IslandModel.h"
 #include "util/RandomUtil.h"
 
 // Don't include Reporter for RDKit build as it does not play well with Windows
@@ -70,9 +71,9 @@ namespace Gape {
 
         static constexpr double SELECT_START = 5000.0;
 
-        LinkedPopLinearSel(const LinkedPopLinearSel &other);
+        LinkedPopLinearSel(const LinkedPopLinearSel &other) = delete;
 
-        LinkedPopLinearSel &operator=(const LinkedPopLinearSel &other);
+        LinkedPopLinearSel &operator=(const LinkedPopLinearSel &other) = delete;
 
         bool addToPopulation(std::shared_ptr<Chromosome> &chromosome);
 
@@ -92,10 +93,9 @@ namespace Gape {
         double bestScore = -std::numeric_limits<double>::max();
 
     public:
-        LinkedPopLinearSel(PopulationPolicy &populationPolicy_);
+        explicit LinkedPopLinearSel(PopulationPolicy &populationPolicy_);
 
-        virtual ~LinkedPopLinearSel() {
-        };
+        ~LinkedPopLinearSel() = default;
 
         void create();
 
@@ -103,18 +103,20 @@ namespace Gape {
 
         void rebuild();
 
-        std::string info() const;
+        [[nodiscard]] std::string info() const;
 
         const std::shared_ptr<Chromosome> &getBest() const;
 
-        const std::vector<std::shared_ptr<Chromosome> > getTiedBest(
+        [[nodiscard]] const std::vector<std::shared_ptr<Chromosome> > getTiedBest(
             double tolerance = 1e-6) const;
 
-        std::string populationInfo() const;
+        [[nodiscard]] std::string populationInfo() const;
 
-        double getBestScore() const { return bestScore; }
+        [[nodiscard]] double getBestScore() const { return bestScore; }
 
         NicheMatch<Chromosome> findNicheMatch(const Chromosome &c) const;
+
+       //  friend class IslandModel<Chromosome, PopulationPolicy>;
     };
 
     /**
@@ -162,7 +164,7 @@ namespace Gape {
             currentFitness += scaledFitnessStep;
         }
 #ifdef INCLUDE_REPORTER
-  REPORT(Reporter::TRACE) << "totalScaledFitness " << totalScaledFitness
+        REPORT(Reporter::TRACE) << "totalScaledFitness " << totalScaledFitness
                           << " predictTotalScaledFitness "
                           << predictTotalScaledFitness;
 #endif
@@ -170,7 +172,7 @@ namespace Gape {
 
         double predictEndFitness = SELECT_START + (popsize - 1.0) * scaledFitnessStep;
 #ifdef INCLUDE_REPORTER
-  REPORT(Reporter::TRACE) << "endFitness " << endFitness
+        REPORT(Reporter::TRACE) << "endFitness " << endFitness
                           << " predictEndFitness " << predictEndFitness;
 #endif
         assert(abs(endFitness - predictEndFitness) < 1.0e-10);
@@ -192,7 +194,7 @@ namespace Gape {
         }
 
 #ifdef INCLUDE_REPORTER
-  REPORT(Reporter::DETAIL) << "Created population: " << info();
+        REPORT(Reporter::DETAIL) << "Created population: " << info();
 #endif
     }
 
@@ -210,7 +212,7 @@ namespace Gape {
 
         population.swap(newPopulation);
 #ifdef INCLUDE_REPORTER
-  REPORT(Reporter::DETAIL) << "Rebuilt population: " << info();
+        REPORT(Reporter::DETAIL) << "Rebuilt population: " << info();
 #endif
     }
 
@@ -277,7 +279,7 @@ namespace Gape {
         for (size_t i = 0; i < selectedOperation->getnParents(); i++) {
             std::shared_ptr<Chromosome> parent = selectParent();
 #ifdef INCLUDE_REPORTER
-    REPORT(Reporter::TRACE) << "Parent " << i << ": " << parent->info();
+            REPORT(Reporter::TRACE) << "Parent " << i << ": " << parent->info();
 #endif
             parents.push_back(parent);
         }
@@ -287,16 +289,23 @@ namespace Gape {
         int i = 0;
         for (auto &child: children) {
 #ifdef INCLUDE_REPORTER
-    REPORT(Reporter::TRACE) << "Child  " << i << ": " << child->info();
+            REPORT(Reporter::TRACE) << "Child  " << i << ": " << child->info();
 #endif
-            child->score();
+            const auto fitness = child->score();
+            if (fitness > bestScore) {
+                boost::format format = boost::format("Op %5d new best: ") % nOperations;
+                bestScore = fitness;
+#ifdef INCLUDE_REPORTER
+                REPORT(Reporter::DETAIL) << format << child->info();
+#endif
+            }
             addToPopulation(child);
             i++;
         }
 
         nOperations++;
 #ifdef INCLUDE_REPORTER
-  REPORT(Reporter::TRACE) << "Finished iteration " << nOperations;
+        REPORT(Reporter::TRACE) << "Finished iteration " << nOperations;
 #endif
     }
 
@@ -326,7 +335,7 @@ namespace Gape {
         std::shared_ptr<Chromosome> &chromosome) {
         if (!chromosome->isOk()) {
 #ifdef INCLUDE_REPORTER
-    REPORT(Reporter::DEBUG) << "Bad chromosome not adding to population";
+            REPORT(Reporter::DEBUG) << "Bad chromosome not adding to population";
 #endif
             nFail++;
             freeChromosomes.push_back(chromosome);
@@ -338,7 +347,7 @@ namespace Gape {
         // don't add if we have an exact match
         if (match != population.end()) {
 #ifdef INCLUDE_REPORTER
-    REPORT(Reporter::DEBUG) << "Found exact match not adding to population";
+            REPORT(Reporter::DEBUG) << "Found exact match not adding to population";
 #endif
             nDuplicates++;
             freeChromosomes.push_back(chromosome);
@@ -372,7 +381,7 @@ namespace Gape {
             auto worst = pop.begin()->second;
             pop.erase(pop.begin());
 #ifdef INCLUDE_REPORTER
-    REPORT(Reporter::TRACE) << "Removing the worst individual";
+            REPORT(Reporter::TRACE) << "Removing the worst individual";
 #endif
             freeChromosomes.push_back(worst);
         }
@@ -382,7 +391,7 @@ namespace Gape {
         std::pair<double, std::shared_ptr<Chromosome> > pair(fitness, chromosome);
         pop.insert(pair);
 #ifdef INCLUDE_REPORTER
-  REPORT(Reporter::TRACE) << "Inserted a new chromosome, fitness " << fitness
+        REPORT(Reporter::TRACE) << "Inserted a new chromosome, fitness " << fitness
                           << " popsize " << pop.size() << " "
                           << chromosome->info();
 #endif
@@ -393,7 +402,7 @@ namespace Gape {
             boost::format format = boost::format("Op %5d new best: ") % nOperations;
             bestScore = fitness;
 #ifdef INCLUDE_REPORTER
-    REPORT(Reporter::DETAIL) << format << getBest()->info();
+            REPORT(Reporter::DETAIL) << format << getBest()->info();
 #endif
         }
         return true;

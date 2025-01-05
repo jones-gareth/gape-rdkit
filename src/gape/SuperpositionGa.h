@@ -7,23 +7,15 @@
 
 #include "ga/BinaryStringChromosomePolicy.h"
 #include "ga/IntegerStringChromosomePolicy.h"
+#include "ga/IslandModel.h"
 
 namespace Gape {
     class SuperpositionChromosome;
     class SuperpositionGa;
 
-    typedef LinkedPopLinearSel<SuperpositionChromosome, SuperpositionGa>
+    typedef IslandModel<SuperpositionChromosome, SuperpositionGa>
     SuperpositionGaPopulation;
 
-    enum class OperationName {
-        BinaryStringMutate,
-        BinaryStringCrossover,
-        IntegerStringMutate,
-        IntegerStringCrossover,
-        Create,
-        Migrate,
-        None
-    };
 
     class SuperpositionGa : public GaBase {
         const Superposition& superposition;
@@ -72,8 +64,10 @@ namespace Gape {
 
         std::shared_ptr<SuperpositionChromosome> createChromosome();
 
-        bool useNiches() const;
+        [[nodiscard]] bool useNiches() const;
 
-        int getNicheSize() const;
+        [[nodiscard]] int getNicheSize() const;
+
+        [[nodiscard]] int getNumberIslands() const;
     };
 }
