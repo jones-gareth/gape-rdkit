@@ -10,12 +10,15 @@
 #include <cassert>
 #include <boost/format.hpp>
 #include <GraphMol/FileParsers/MolSupplier.h>
+#include <GraphMol/FileParsers/MolWriters.h>
 
 #include <boost/program_options.hpp>
+#include <util/GzipWriter.h>
 
 using namespace Gape;
 using namespace boost::program_options;
 namespace options = boost::program_options;
+using namespace RDKit;
 
 /**
  * GAPE overlap algorithm
@@ -109,11 +112,12 @@ int main(int argc, char *argv[]) {
         molecules.push_back(superpositionMolecule);
     }
 
-    std::ofstream preparedFile("preparedMols.sdf");
+    GzipWriter gzipWriter("preparedMols.sdf.gz");
+    SDWriter sdWriter(&gzipWriter.getOut());
     for (auto &superpositionMolecule: molecules) {
-        preparedFile << superpositionMolecule->ToMolBlock() << "$$$$" << std::endl;
+        sdWriter.write(superpositionMolecule->getMol());
     }
-    preparedFile.close();
+    sdWriter.close();
 
     Superposition superposition(molecules, settings);
     SuperpositionGa ga(superposition);

@@ -191,7 +191,7 @@ namespace Gape {
         // molecule pharm counts and feature counts are the same. This is
         // also done in groupPoints
         numberPharmacophorePoints = 0;
-        for (const auto& feature: features) {
+        for (const auto &feature: features) {
             feature->isPharmacophoreFeature = false;
             feature->numberMatches = 0;
         }
@@ -205,9 +205,9 @@ namespace Gape {
         return score;
     }
 
-    int FeaturePointSet::getPharmacoporeCount() const {
+    int FeaturePointSet::getPharmacophoreCount() const {
         int count = 0;
-        for (const auto& feature: features) {
+        for (const auto &feature: features) {
             if (feature->isPharmacophoreFeature) count++;
         }
         return count;
@@ -338,7 +338,7 @@ namespace Gape {
         }
 
         if (closestPoint == nullptr) {
-                // add updating center
+            // add updating center
             closestPoint->addFeaturePoint(feature, true);
         } else {
             // no close points so create a new feature point with this
@@ -359,9 +359,10 @@ namespace Gape {
      *
      * @param problem
      */
-    FeatureOverlay::FeatureOverlay(const SuperpositionChromosome &superpositionChromosome): superpositionChromosome(superpositionChromosome) {
+    FeatureOverlay::FeatureOverlay(const SuperpositionChromosome &superpositionChromosome): superpositionChromosome(
+        superpositionChromosome) {
         assert(numberMolecules() > 2);
-        const auto& settings = superpositionChromosome.superpositionGa.getSuperposition().settings.getGapeParameters();
+        const auto &settings = superpositionChromosome.superpositionGa.getSuperposition().settings.getGapeParameters();
 
         if (settings.donorHydrogenWeight > 0) {
             setupFeaturePointSet(FeatureType::DonorInteractionPoint);
@@ -374,20 +375,20 @@ namespace Gape {
         }
     }
 
-	/**
-	 * Initializes a feature set. Creates a FeaturePointSet.
-	 *
-	 * @param featureType
-	 */
+    /**
+     * Initializes a feature set. Creates a FeaturePointSet.
+     *
+     * @param featureType
+     */
     void FeatureOverlay::setupFeaturePointSet(const FeatureType featureType) {
-        std::vector<std::shared_ptr<FeatureInformation>> setFeatures;
+        std::vector<std::shared_ptr<FeatureInformation> > setFeatures;
         auto moleculeNumber = 0;
-        const auto& superpositionCoordinates = superpositionChromosome.getFittedCoordinates();
-        for (const auto& molecule: superpositionChromosome.superpositionGa.getSuperposition().getMolecules()) {
-            const auto& coordinates = superpositionCoordinates[moleculeNumber];
-            const auto& features = molecule->getFeatures().at(featureType);
-            for (const auto& feature: features) {
-                auto featureInformation= std::make_shared<FeatureInformation>(feature.get(), *coordinates);
+        const auto &superpositionCoordinates = superpositionChromosome.getFittedCoordinates();
+        for (const auto &molecule: superpositionChromosome.superpositionGa.getSuperposition().getMolecules()) {
+            const auto &coordinates = superpositionCoordinates[moleculeNumber];
+            const auto &features = molecule->getFeatures().at(featureType);
+            for (const auto &feature: features) {
+                auto featureInformation = std::make_shared<FeatureInformation>(feature.get(), *coordinates);
                 setFeatures.push_back(featureInformation);
             }
             moleculeNumber++;
@@ -396,15 +397,15 @@ namespace Gape {
         featurePointSets.emplace(featureType, featurePointSet);
     }
 
-	/**
-	 * Takes the current saved feature coordinates and determines GAPE score.
-	 * More typically we'll call scoreFeature for each feature.
-	 *
-	 * @return feature score.
-	 */
+    /**
+     * Takes the current saved feature coordinates and determines GAPE score.
+     * More typically we'll call scoreFeature for each feature.
+     *
+     * @return feature score.
+     */
     double FeatureOverlay::scoreOverlay() {
         score = .0;
-        const auto& settings = superpositionChromosome.superpositionGa.getSuperposition().settings.getGapeParameters();
+        const auto &settings = superpositionChromosome.superpositionGa.getSuperposition().settings.getGapeParameters();
 
         if (settings.donorHydrogenWeight > 0) {
             donorHydrogenScore = groupFeatures(FeatureType::DonorInteractionPoint);
@@ -422,7 +423,19 @@ namespace Gape {
         return score;
     }
 
-	/**
+    int FeatureOverlay::numberPharmacophorePoints() const {
+        const int numberPharmacophorePoints = std::accumulate(featurePointSets.begin(), featurePointSets.end(), 0,
+                                                              [](const int sum,
+                                                                 const std::pair<FeatureType, std::shared_ptr<
+                                                                     FeaturePointSet> > &pair) {
+                                                                  const auto n = pair.second->numberPharmacophorePoints;
+                                                                  assert(n == pair.second->getPharmacophoreCount());
+                                                                  return sum + n;
+                                                              });
+        return numberPharmacophorePoints;
+    }
+
+    /**
 	 * Determines GAPE score for a feature. First clusters in 3D space then
 	 * scores clusters.
 	 *
@@ -436,5 +449,4 @@ namespace Gape {
         const auto setScore = featurePointSet->calculateScore();
         return setScore;
     }
-
 }

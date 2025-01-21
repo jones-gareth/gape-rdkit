@@ -89,5 +89,10 @@ namespace Gape {
         bool sameNiche(const SuperpositionChromosome &other) const;
 
         std::string info() const;
+
+        void outputSolution(std::ostream& outStream, const std::string& prefix) const;
+
+        void outputPharmacophoreAsMol(std::ostream& outStream, const std::string &prefix) const;
+
     };
 } // GapeApp

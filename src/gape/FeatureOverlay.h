@@ -57,6 +57,8 @@ namespace Gape {
         const std::map<FeatureType, std::shared_ptr<FeaturePointSet> > &getFeaturePointSets() const {
             return featurePointSets;
         };
+
+        int numberPharmacophorePoints() const;
     };
 
     /**
@@ -131,7 +133,7 @@ namespace Gape {
         const static int maxRelocations;
 
 
-        int getPharmacoporeCount() const;
+        int getPharmacophoreCount() const;
 
         void addFeature(FeatureInformation &feature, const double maxSqrDistance);
 
@@ -154,5 +156,7 @@ namespace Gape {
         double calculateScore();
 
         const std::vector<std::shared_ptr<FeatureInformation> > &getFeatures() const { return features; };
+
+        friend class FeatureOverlay;
     };
 }

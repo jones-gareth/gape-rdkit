@@ -27,7 +27,7 @@ using namespace std;
 
 class GzipWriter {
 public:
-	GzipWriter(string file);
+	explicit GzipWriter(const string &file);
 	virtual ~GzipWriter();
 
 	/**

@@ -10,6 +10,7 @@
 #include "util/LeastSquaresFit.h"
 #include "util/Reporter.h"
 #include <set>
+#include <GraphMol/FileParsers/MolWriters.h>
 
 #include "FeatureOverlay.h"
 
@@ -397,5 +398,60 @@ namespace Gape {
                             % featureOverlay->getDonorHydrogenScore() % featureOverlay->getAcceptorAtomScore() %
                             featureOverlay->getAromaticRingScore() % conformationalEnergy % volumeIntegral;
         return format.str();
+    }
+
+    void SuperpositionChromosome::outputSolution(std::ostream &outStream, const std::string &prefix) const {
+        SDWriter writer(&outStream);
+        std::vector<std::string> props {"CONFORMATIONAL_ENERGY"};
+        writer.setProps(props);
+        const auto &superposition = superpositionGa.getSuperposition();
+        for (int i = 0; i < superpositionGa.numberMolecules(); i++) {
+            const auto &mol = superpositionGa.getSuperposition().getMolecules()[i];
+            RWMol rdMol(mol->getMol());
+
+            rdMol.clearConformers();
+            auto &conformer = fittedCoordinates[i]->getConformer();
+            rdMol.addConformer(&conformer);
+
+            rdMol.setProp("CONFORMATIONAL_ENERGY", conformationalEnergies[i]);
+            auto name = rdMol.getProp<std::string>(common_properties::_Name);
+            if (mol.get() == superposition.getBaseMolecule()) {
+                name = prefix + name + " Base Molecule";
+            } else if (mol.get() == superposition.getFittingMolecule()) {
+                name = prefix + name + " Fitting Molecule";
+            } else {
+                name = prefix + name;
+            }
+            rdMol.setProp(common_properties::_Name, name);
+            rdMol.setProp("CONFORMATIONAL_ENERGY", conformationalEnergies[i]);
+            writer.write(rdMol);
+        }
+        writer.close();
+
+    }
+
+    void SuperpositionChromosome::outputPharmacophoreAsMol(std::ostream &outStream, const std::string &prefix) const {
+        SDWriter writer(&outStream);
+        RWMol pharmMol;
+        Conformer pharmConformer(featureOverlay->numberPharmacophorePoints());
+        pharmMol.setProp("FITNESS", fitness);
+        pharmMol.setProp("VOLUME_INTEGRAL", volumeIntegral);
+        pharmMol.setProp("CONFORMATIONAL_ENERGY", conformationalEnergy);
+        pharmMol.setProp("DONOR_HYDROGEN_SCORE", featureOverlay->getDonorHydrogenScore());
+        pharmMol.setProp("ACCEPTOR_ATOM_SCORE", featureOverlay->getAcceptorAtomScore());
+        pharmMol.setProp("AROMATIC_RING_SCORE", featureOverlay->getAromaticRingScore());
+        int count = 0;
+        for (const auto& [featureType, featurePointSet]: featureOverlay->getFeaturePointSets()) {
+            for (const auto featurePoint: featurePointSet->getFeatures()) {
+                if (featurePoint->isPharmacophoreFeature) {
+                    pharmMol.addAtom(new Atom(0));
+                    pharmConformer.setAtomPos(count, featurePoint->point);
+                    ++count;
+                }
+            }
+        }
+
+        writer.write(pharmMol);
+        writer.close();
     }
 }

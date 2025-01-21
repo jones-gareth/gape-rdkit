@@ -10,7 +10,7 @@
 namespace Gape {
 using namespace std;
 
-GzipWriter::GzipWriter(string file) :
+GzipWriter::GzipWriter(const string &file) :
 		outFile(file), fileDescriptorSink(file) {
 	// use the file_descriptor_sink instead of ofstream as that seems to hang output.
 	//outFileStream.open(outFile, ios_base::out | ios_base::binary);
