@@ -47,6 +47,7 @@ namespace Gape {
         double calculateVolumeIntegral();
 
     public:
+        int solutionNumber = 0;
         const SuperpositionGa &superpositionGa;
         BinaryStringChromosome binaryStringChromosome;
         IntegerStringChromosome integerStringChromosome;

@@ -1,4 +1,7 @@
 #include "SuperpositionGa.h"
+
+#include <chrono>
+
 #include "util/Reporter.h"
 #include "SuperpositionChromosome.h"
 
@@ -62,8 +65,8 @@ namespace Gape {
         int reportInterval = 1000;
         double d = numberOperations * nichingOff;
         int opOff = static_cast<int>(std::ceil(d));
-		REPORT(Reporter::INFO) << "Turning off niching and fitting radius scaling at " << opOff;
-		int rebuildInterval = opOff / numberRebuilds;
+        REPORT(Reporter::INFO) << "Turning off niching and fitting radius scaling at " << opOff;
+        int rebuildInterval = opOff / numberRebuilds;
 
         REPORT(Reporter::INFO) << population.info() << endl;
 
@@ -82,7 +85,7 @@ namespace Gape {
                 } else {
                     const double frac = static_cast<double>(opOff - i) / static_cast<double>(opOff);
                     const double radius = finishFittingRadius
-                            + (startFittingRadius - finishFittingRadius) * frac;
+                                          + (startFittingRadius - finishFittingRadius) * frac;
                     Feature::setRadius(radius);
                 }
                 REPORT(Reporter::INFO) << "Setting fitting radius to " << Feature::getRadius();
@@ -93,7 +96,6 @@ namespace Gape {
 
             if (reportInterval > 0 && i > 1 && (i + 1) % reportInterval == 0)
                 REPORT(Reporter::INFO) << population.info();
-
         }
 
         const auto best = population.getBest();
@@ -104,9 +106,11 @@ namespace Gape {
         const auto &parameters = superposition.settings.getGapeParameters();
         const auto mutationOperation = std::make_shared<GaOperation<SuperpositionChromosome> >(OperationName::Mutate,
             1, 1, parameters.mutationWeight, &superpositionMutateOperation);
-        const auto crossoverOperation = std::make_shared<GaOperation<SuperpositionChromosome> >(OperationName::Crossover,
+        const auto crossoverOperation = std::make_shared<GaOperation<SuperpositionChromosome> >(
+            OperationName::Crossover,
             2, 2, parameters.crossoverWeight, &superpositionCrossoverOperation);
-        const auto migrationOperation = std::make_shared<GaOperation<SuperpositionChromosome> >(OperationName::Migrate, 1, 1, parameters.migrationWeight, &superpositionMigrationOperation);
+        const auto migrationOperation = std::make_shared<GaOperation<SuperpositionChromosome> >(
+            OperationName::Migrate, 1, 1, parameters.migrationWeight, &superpositionMigrationOperation);
         std::vector operations{mutationOperation, crossoverOperation};
         return operations;
     }
@@ -152,17 +156,60 @@ namespace Gape {
     }
 
     void SuperpositionGa::superpositionMigrationOperation(
-       const std::vector<std::shared_ptr<SuperpositionChromosome> > &parents,
-       std::vector<std::shared_ptr<SuperpositionChromosome> > &children) {
+        const std::vector<std::shared_ptr<SuperpositionChromosome> > &parents,
+        std::vector<std::shared_ptr<SuperpositionChromosome> > &children) {
         assert(parents.size() == 1);
         assert(children.size() == 1);
         // migration does nothing
     }
 
     void SuperpositionGa::run() {
+        const auto batchStart = std::chrono::high_resolution_clock::now();
         const auto numberRuns = superposition.settings.getGapeParameters().numberRuns;
+        solutions.clear();
+        solutions.reserve(numberRuns);
         for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
-            run(runNumber);
+            const auto runStart = std::chrono::high_resolution_clock::now();
+            const auto best = run(runNumber);
+            best->solutionNumber = runNumber;
+            const auto n = runNumber + 1;
+            REPORT(Reporter::INFO) << "Best solution for run number " << n << best->info();
+            const auto fileName = boost::format("GA_solution_%d.sdf") % n;
+            const auto prefix = boost::format("Solution number %d") % n;
+            std::fstream out{fileName.str(), std::fstream::out};
+            best->outputSolution(out, prefix.str());
+            out.close();
+            solutions.push_back(best);
+            const auto runEnd = std::chrono::high_resolution_clock::now();
+            const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(runEnd - runStart);
+            const auto timeString = boost::format("Run time %5.2f") % (duration.count() / 1000.0);
+            REPORT(Reporter::INFO) << timeString.str();
+        }
+
+        const auto batchEnd = std::chrono::high_resolution_clock::now();
+        const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(batchEnd - batchStart);
+        const auto timeString = boost::format("Batch time %5.2f") % (duration.count() / 1000.0);
+        REPORT(Reporter::INFO) << timeString.str();
+
+        if (numberRuns > 0) {
+            std::sort(solutions.begin(), solutions.end(),
+                      [](const auto &a, const auto &b) {
+                          return a->getFitness() > b->getFitness();
+                      });
+
+
+            for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
+                const auto &c = solutions[runNumber];
+                const auto n = runNumber + 1;
+                const auto msg = boost::format("Rank %2d solution %2d fitness %5.2f") % n % (c->solutionNumber + 1) % c
+                                 ->getFitness();
+                REPORT(Reporter::INFO) << msg.str();
+                const auto fileName = boost::format("GA_rank_%d.sdf") % n;
+                const auto prefix = boost::format("Solution rank %d") % n;
+                std::fstream out{fileName.str(), std::fstream::out};
+                c->outputSolution(out, prefix.str());
+                out.close();
+            }
         }
     }
 

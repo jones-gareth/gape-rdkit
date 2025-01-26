@@ -10,6 +10,8 @@
 #include "util/LeastSquaresFit.h"
 #include "util/Reporter.h"
 #include <set>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/join.hpp>
 #include <GraphMol/FileParsers/MolWriters.h>
 
 #include "FeatureOverlay.h"
@@ -402,7 +404,7 @@ namespace Gape {
 
     void SuperpositionChromosome::outputSolution(std::ostream &outStream, const std::string &prefix) const {
         SDWriter writer(&outStream);
-        std::vector<std::string> props {"CONFORMATIONAL_ENERGY"};
+        std::vector<std::string> props{"CONFORMATIONAL_ENERGY"};
         writer.setProps(props);
         const auto &superposition = superpositionGa.getSuperposition();
         for (int i = 0; i < superpositionGa.numberMolecules(); i++) {
@@ -427,11 +429,17 @@ namespace Gape {
             writer.write(rdMol);
         }
         writer.close();
-
+        outputPharmacophoreAsMol(outStream, prefix);
     }
 
     void SuperpositionChromosome::outputPharmacophoreAsMol(std::ostream &outStream, const std::string &prefix) const {
         SDWriter writer(&outStream);
+        std::vector<std::string> props{
+            "FITNESS", "VOLUME_INTEGRAL", "CONFORMATIONAL_ENERGY", "DONOR_HYDROGEN_SCORE", "ACCEPTOR_ATOM_SCORE",
+            "AROMATIC_RING_SCORE", "PHARMACOPHORE", "PHARMACOPHORE_FEATURES"
+        };
+        writer.setProps(props);
+
         RWMol pharmMol;
         Conformer pharmConformer(featureOverlay->numberPharmacophorePoints());
         pharmMol.setProp("FITNESS", fitness);
@@ -441,17 +449,30 @@ namespace Gape {
         pharmMol.setProp("ACCEPTOR_ATOM_SCORE", featureOverlay->getAcceptorAtomScore());
         pharmMol.setProp("AROMATIC_RING_SCORE", featureOverlay->getAromaticRingScore());
         int count = 0;
-        for (const auto& [featureType, featurePointSet]: featureOverlay->getFeaturePointSets()) {
-            for (const auto featurePoint: featurePointSet->getFeatures()) {
+        std::vector<std::string> pharmLabels;
+        std::vector<std::string> featureLabels;
+        for (const auto &[featureType, featurePointSet]: featureOverlay->getFeaturePointSets()) {
+            for (const auto& featurePoint: featurePointSet->getFeatures()) {
                 if (featurePoint->isPharmacophoreFeature) {
                     pharmMol.addAtom(new Atom(0));
                     pharmConformer.setAtomPos(count, featurePoint->point);
+                    auto pharmLabel = featurePoint->feature->pharmLabel();
+                    pharmLabels.push_back(pharmLabel);
+                    auto featureLabel = featurePoint->feature->featureLabel(featurePoint->coordinates);
+                    featureLabels.push_back(featureLabel);
                     ++count;
                 }
             }
         }
 
+        auto pharmLabel = boost::algorithm::join(pharmLabels, "\n");
+        auto featureLabel = boost::algorithm::join(featureLabels, "\n");
+        pharmMol.setProp("PHARMACOPHORE", pharmLabel);
+        pharmMol.setProp("PHARMACOPHORE_FEATURES", pharmLabel);
+
         writer.write(pharmMol);
         writer.close();
+
+        // TODO: second molecule with features
     }
 }

@@ -23,6 +23,7 @@ namespace Gape {
         BinaryStringChromosomePolicy binaryStringChromosomePolicy;
         int numberOperations = 0;
         bool nichesOn = false;
+        std::vector<std::shared_ptr<SuperpositionChromosome>> solutions;
 
         std::shared_ptr<SuperpositionChromosome> run(int runNumber);
 
