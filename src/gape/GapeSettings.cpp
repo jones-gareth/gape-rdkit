@@ -767,9 +767,9 @@ namespace Gape {
         gapeParameters.numberRuns = d["gapeParameters"]["numberRuns"].GetInt();
         gapeParameters.guessGaParameters =d["gapeParameters"]["guessGaParameters"].GetBool();
         gapeParameters.numberIslands =d["gapeParameters"]["numberIslands"].GetInt();
-        gapeParameters.populationSize = d["gapeParameters"]["populationsSize"].GetInt();
+        gapeParameters.populationSize = d["gapeParameters"]["populationSize"].GetInt();
         gapeParameters.numberOperations = d["gapeParameters"]["numberOperations"].GetInt();
-        gapeParameters.selectionPressure = d["gapeParameters"]["selectionPressure"].GetInt();
+        gapeParameters.selectionPressure = d["gapeParameters"]["selectionPressure"].GetDouble();
         gapeParameters.useNiches = d["gapeParameters"]["useNiches"].GetBool();
         gapeParameters.nicheDistance = d["gapeParameters"]["nicheDistance"].GetDouble();
         gapeParameters.nicheSize = d["gapeParameters"]["nicheSize"].GetInt();

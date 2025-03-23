@@ -10,6 +10,10 @@ if (NOT RDLIB)
     set(RDLIB $ENV{RDLIB})
 endif()
 
+# I think all the RDKit fiddling in this file can be replaced by find_pakage:
+# Find RDKit package
+# find_package(RDKit REQUIRED)
+
 
 MESSAGE(STATUS "RDBASE is  ${RDBASE}")
 MESSAGE(STATUS "RDLIB  is  ${RDLIB}")

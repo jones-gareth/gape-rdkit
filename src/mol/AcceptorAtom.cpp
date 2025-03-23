@@ -377,7 +377,7 @@ namespace Gape
 		}
 
 		const auto& coord = conformer.getAtomPos(atom->getIdx());
-		const auto& atom2 = molecule->getMol().atomNeighbors(atom).begin().current;
+		const auto& atom2 = *molecule->getMol().atomNeighbors(atom).begin();
 		const auto& coord2 = conformer.getAtomPos(atom2->getIdx());
 
 		RDGeom::Point3D lonePair;
@@ -417,7 +417,7 @@ namespace Gape
 		}
 
 		const auto& mol = molecule->getMol();
-		const auto otherAtom = mol.atomNeighbors(atom).begin().current;
+		const auto otherAtom = *mol.atomNeighbors(atom).begin();
 		const Atom* thirdAtom = nullptr;
 		for (const auto a : mol.atomNeighbors(otherAtom))
 		{
@@ -452,7 +452,7 @@ namespace Gape
 		}
 
 		const auto& mol = molecule->getMol();
-		const auto otherAtom = mol.atomNeighbors(atom).begin().current;
+		const auto otherAtom = *mol.atomNeighbors(atom).begin();
 		const Atom* thirdAtom = nullptr;
 		for (const auto a : mol.atomNeighbors(otherAtom))
 		{
@@ -492,7 +492,7 @@ namespace Gape
 		}
 
 		const auto& coord = conformer.getAtomPos(atom->getIdx());
-		const auto& atom2 = molecule->getMol().atomNeighbors(atom).begin().current;
+		const auto& atom2 = *molecule->getMol().atomNeighbors(atom).begin();
 		const auto& coord2 = conformer.getAtomPos(atom2->getIdx());
 
 		RDGeom::Point3D lonePair1, lonePair2, lonePair3;

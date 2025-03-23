@@ -316,7 +316,7 @@ getNumBonds();
             return false;
         }
 
-        const auto neighbor = mol.atomNeighbors(&atom).begin().current;
+        const auto neighbor = *mol.atomNeighbors(&atom).begin();
         return isNitroNitrogen(*neighbor);
     }
 
@@ -339,7 +339,7 @@ getNumBonds();
         if (atom.getAtomicNum() != 8 || atom.getDegree() != 1) {
             return false;
         }
-        const auto neighbor = mol.atomNeighbors(&atom).begin().current;
+        const auto neighbor = *mol.atomNeighbors(&atom).begin();
         return isCarboxylateCarbon(*neighbor);
     }
 
