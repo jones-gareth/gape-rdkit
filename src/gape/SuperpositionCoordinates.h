@@ -6,49 +6,43 @@
 
 using namespace RDKit;
 
-namespace Gape
-{
+namespace Gape {
+    class SuperpositionMolecule;
 
-	class SuperpositionCoordinates
-	{
-		Conformer conformer;
-		std::map<FeatureType, std::map<const Atom*, std::vector<RDGeom::Point3D>>> featureCoordinates;
+    class SuperpositionCoordinates {
+        SuperpositionMolecule *molecule;
+        Conformer conformer;
+        std::map<FeatureType, std::map<const Atom *, std::vector<RDGeom::Point3D> > > featureCoordinates;
 
-	public:
-		explicit SuperpositionCoordinates(Conformer c) : conformer(std::move(c))
-		{
-		}
+    public:
+        explicit SuperpositionCoordinates(SuperpositionMolecule *molecule, Conformer c) : molecule(molecule),
+            conformer(std::move(c)) {
+        }
 
-		void addFeatureCoordinates(FeatureType featureType, const Atom* atom,
-								   const std::vector<RDGeom::Point3D>& coordinates);
-	
-		const std::vector<RDGeom::Point3D>& getFeatureCoordinates(FeatureType featureType, const Atom* atom) const
-		{
-			return featureCoordinates.at(featureType).at(atom);
-		}
+        void addFeatureCoordinates(FeatureType featureType, const Atom *atom,
+                                   const std::vector<RDGeom::Point3D> &coordinates);
 
-		Conformer& getConformer()
-		{
-			return conformer;
-		}
+        const std::vector<RDGeom::Point3D> &getFeatureCoordinates(FeatureType featureType, const Atom *atom) const;
 
-		std::map<FeatureType, std::map<const Atom*, std::vector<RDGeom::Point3D>>>& getFeatureCoordinates()
-		{
-			return featureCoordinates;
-		}
+        Conformer &getConformer() {
+            return conformer;
+        }
 
-		const Conformer& getConformer() const
-		{
-			return conformer;
-		}
+        std::map<FeatureType, std::map<const Atom *, std::vector<RDGeom::Point3D> > > &getFeatureCoordinates() {
+            return featureCoordinates;
+        }
 
-		const std::map<FeatureType, std::map<const Atom*, std::vector<RDGeom::Point3D>>>& getFeatureCoordinates() const
-		{
-			return featureCoordinates;
-		}
+        const Conformer &getConformer() const {
+            return conformer;
+        }
 
-		std::vector<const Atom*> getFeatureAtoms(FeatureType featureType) const;
+        const std::map<FeatureType, std::map<const Atom *, std::vector<RDGeom::Point3D> > > &
+        getFeatureCoordinates() const {
+            return featureCoordinates;
+        }
+
+        std::vector<const Atom *> getFeatureAtoms(FeatureType featureType) const;
 
         void transformCoordinates(const Eigen::Transform<double, 3, Eigen::Affine> &transform);
-	};
+    };
 }

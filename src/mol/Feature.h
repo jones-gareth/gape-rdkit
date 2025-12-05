@@ -133,6 +133,8 @@ namespace Gape
 		thread_local static double alpha, gaussianN, radius;
 
 	public:
+		virtual ~Feature() = default;
+
 		static constexpr int N_BUILTIN_FEATURES = 4, MAX_FEATURES = 14;
 
         /**

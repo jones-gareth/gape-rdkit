@@ -192,7 +192,9 @@ namespace Gape {
             std::shared_ptr<Chromosome> chromosome =
                     populationPolicy.createChromosome();
             chromosome->initialize();
-            chromosome->score();
+            if (chromosome->isOk()) {
+                chromosome->score();
+            }
             addToPopulation(chromosome);
         }
 

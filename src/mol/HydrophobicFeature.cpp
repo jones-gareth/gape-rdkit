@@ -9,9 +9,10 @@ namespace Gape
 {
 	HydrophobicFeature::HydrophobicFeature(const int featureSetNumber, const SuperpositionMolecule* spMol,
 	                                       const Atom* featureAtom) : Feature(
-		FeatureType::DonorInteractionPoint, featureSetNumber,
+		FeatureType::HydrophobicAtom, featureSetNumber,
 		"HYDROPHOBIC_ATOM", true)
 	{
+		atom = featureAtom;
 	}
 
 

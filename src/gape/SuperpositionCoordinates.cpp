@@ -1,18 +1,25 @@
 ﻿#include "SuperpositionCoordinates.h"
 #include <Geometry/Transform3D.h>
+#include "SuperpositionMolecule.h"
 
 namespace Gape
 {
 	void SuperpositionCoordinates::addFeatureCoordinates(FeatureType featureType, const Atom* atom,
 	                                                     const std::vector<RDGeom::Point3D>& coordinates)
 	{
+		assert(&atom->getOwningMol() == &molecule->getMol());
 		if (featureCoordinates.find(featureType) == featureCoordinates.end())
 		{
 			const std::map<const Atom*, std::vector<RDGeom::Point3D>> featureTypeCoordinates;
 			featureCoordinates.emplace(featureType, featureTypeCoordinates);
 		}
-		auto featureTypeCoordinates = featureCoordinates[featureType];
+		auto  &featureTypeCoordinates = featureCoordinates[featureType];
 		featureTypeCoordinates.emplace(atom, coordinates);
+	}
+
+	const std::vector<RDGeom::Point3D> &SuperpositionCoordinates::getFeatureCoordinates(FeatureType featureType, const Atom *atom) const {
+		assert(&atom->getOwningMol() == &molecule->getMol());
+		return featureCoordinates.at(featureType).at(atom);
 	}
 
 	std::vector<const Atom*> SuperpositionCoordinates::getFeatureAtoms(const FeatureType featureType) const

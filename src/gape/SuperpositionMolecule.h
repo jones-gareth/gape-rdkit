@@ -105,6 +105,8 @@ namespace Gape {
          */
         bool isNitroOxygen(const Atom& atom) const;
 
+        bool isEtherOxygen(const Atom &atom) const;
+
         /**
          * Checks to see if this oxygen is in a carboxylate group
          *

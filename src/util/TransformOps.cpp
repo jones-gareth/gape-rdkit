@@ -6,6 +6,7 @@
 
 
 #include <Geometry/point.h>
+#include "Reporter.h"
 
 namespace Gape
 {
@@ -36,7 +37,8 @@ namespace Gape
 	 */
 	void setUpZAxisTransformation(const RDGeom::Point3D& point1, const RDGeom::Point3D& point2, RDGeom::Transform3D& transformIn, RDGeom::Transform3D& transformOut)
 	{
-		auto diff = point1 - point2;
+		// determine position of point 2 once point1 is at the origin
+		auto diff = point2 - point1;
 		diff.normalize();
 		const double a = diff.x;
 		const double b = diff.y;
@@ -51,22 +53,43 @@ namespace Gape
 		// computer Graphics, McGraw Hill, 1981 pp 346-348.
 
 		RDGeom::Transform3D trans, invTrans, xRot, invXRot, yRot, invYRot;
+		// moves point1 to origin
 		trans.SetTranslation(-point1);
+		// moves origin to point1
 		invTrans.SetTranslation(point1);
 		const double v = sqrt(b * b + c * c);
 		if (v > .0)
 		{
+			// angle to rotate around x-axis to bring point 2 into zx plane
 			double* in = xRot.getData();
 			double* out = invXRot.getData();
 			in[5] = in[10] = out[5] = out[10] = c / v;
-			in[6] = out[9] = b / v;
-			in[9] = out[6] = -b / v;
+			in[9] = out[6] = b / v;
+			in[6] = out[9] = -b / v;
 		}
 		double* in = yRot.getData();
 		double* out = invYRot.getData();
-		in[0] = in[10] = out[0] = out[10] = v;
+		in[0] = in[10] = out[0] = out[10] = -v;
 		in[2] = out[8] = a;
 		in[8] = out[2] = -a;
+
+#ifndef NDEBUG
+		auto newPoint = trans * point1;
+		newPoint = trans * point2;
+		REPORT(Reporter::DEBUG) << "translated point2 " << point2 << " to " << newPoint;
+		newPoint = xRot * newPoint;
+		REPORT(Reporter::DEBUG) << "rotated about x Axis to " << newPoint;
+		newPoint = yRot * newPoint;
+		REPORT(Reporter::DEBUG) << "rotated about y Axis to " << newPoint;
+		assert(equals(newPoint[0], 0.0, 1e-10));
+		assert(equals(newPoint[1], 0.0, 1e-10));
+		assert(newPoint[2] < 0.0);
+		newPoint = invTrans * invXRot * invYRot * newPoint;
+		REPORT(Reporter::DEBUG) << "reverse rotated and translated to " << newPoint;
+		for (int i=0; i < 3; i++) {
+			assert(equals(newPoint[i], point2[i], 1e-10));
+		}
+#endif
 
 		transformIn.assign(yRot * xRot * trans);
 		transformOut.assign(invTrans * invXRot * invYRot);

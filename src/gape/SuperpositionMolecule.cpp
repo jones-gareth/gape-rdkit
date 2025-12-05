@@ -38,8 +38,8 @@ namespace Gape {
         return energy;
     }
 
-    SuperpositionMolecule::SuperpositionMolecule(const ROMol &inputMol, const GapeSettings &settings) : settings(
-        settings) {
+    SuperpositionMolecule::SuperpositionMolecule(const ROMol &inputMol,
+                                                 const GapeSettings &settings) : settings(settings) {
         mol = inputMol;
         MolOps::addHs(mol, false, true);
         MolOps::findSSSR(mol);
@@ -51,9 +51,8 @@ namespace Gape {
         } else {
             assert(mol.getNumConformers() == 0);
         }
-        auto name = mol.getProp<std::string>("_Name");
-        REPORT(Reporter::DEBUG) << "mol " << name << " mum atoms " << mol.getNumAtoms() << " num bonds " << mol.
-getNumBonds();
+        REPORT(Reporter::DEBUG) << "mol " << getName() << " mum atoms " << mol.getNumAtoms() << " num bonds " << mol.
+                                              getNumBonds();
     }
 
     void SuperpositionMolecule::generate3D() {
@@ -320,6 +319,25 @@ getNumBonds();
         return isNitroNitrogen(*neighbor);
     }
 
+    bool SuperpositionMolecule::isEtherOxygen(const Atom &atom) const {
+        if (atom.getAtomicNum() != 8 || atom.getDegree() != 2) {
+            return false;
+        }
+        int singleBondCount = 0;
+        for (const auto *bond: atom.getOwningMol().atomBonds(&atom)) {
+            const auto bondType = bond->getBondType();
+            switch (bondType) {
+                case Bond::BondType::SINGLE:
+                    singleBondCount++;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return singleBondCount == 2;
+    }
+
     bool SuperpositionMolecule::isNitroNitrogen(const Atom &atom) const {
         if (atom.getAtomicNum() != 7 || atom.getDegree() != 3) {
             return false;
@@ -419,7 +437,7 @@ getNumBonds();
     }
 
     void SuperpositionMolecule::buildSuperpositionCoordinates() {
-        superpositionCoordinates = std::make_unique<SuperpositionCoordinates>(referenceConformer);
+        superpositionCoordinates = std::make_unique<SuperpositionCoordinates>(this, referenceConformer);
         for (const auto &feature: allFeatures) {
             feature->calculateCoordinates(*superpositionCoordinates);
         }
@@ -460,7 +478,8 @@ getNumBonds();
      * @param mol
      * @return
      */
-    double SuperpositionMolecule::gaussianIntegral(const SuperpositionMolecule &otherMolecule, const Conformer &conformer,
+    double SuperpositionMolecule::gaussianIntegral(const SuperpositionMolecule &otherMolecule,
+                                                   const Conformer &conformer,
                                                    const Conformer &otherConformer) const {
         const GaussianList gaussians(*this, conformer);
         const GaussianList otherGaussians(otherMolecule, otherConformer);

@@ -44,6 +44,7 @@ namespace Gape {
         molecule = spMol;
         atom = featureAtom;
         const auto &mol = molecule->getMol();
+        assert(&mol == &atom->getOwningMol());
         for (const auto nbr: mol.atomNeighbors(atom)) {
             assert(donor == nullptr);
             donor = nbr;

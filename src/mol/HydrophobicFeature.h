@@ -16,8 +16,8 @@ namespace Gape
 	class HydrophobicFeature : public Feature
 	{
 	public:
-		HydrophobicFeature(const int featureSetNumber) : Feature(FeatureType::DonorInteractionPoint, featureSetNumber,
-		                                                         "DONOR_HYDROGEN", true)
+		explicit HydrophobicFeature(const int featureSetNumber) : Feature(FeatureType::HydrophobicAtom, featureSetNumber,
+		                                                         "HYDROPHOBIC_ATOM", true)
 		{
 		}
 

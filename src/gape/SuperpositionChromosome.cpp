@@ -21,7 +21,7 @@ namespace Gape {
         double firstSqrDist = 1e100, secondSqrDist = 1e100, thirdSqrDist = 1e100;
         int firstNo, secondNo, thirdNo;
 
-        void checkBest(const int index, const double sqrDist) {
+        void checkBest(int index, const double sqrDist) {
             REPORT(Reporter::DEBUG) << "checking " << index << " sqrDist " << sqrDist;
             if (sqrDist < firstSqrDist) {
                 thirdNo = secondNo;
@@ -116,7 +116,7 @@ namespace Gape {
         const auto fittingMolecule = superposition.getFittingMolecule();
         for (const auto &molecule: molecules) {
             const auto otherCoordinates = std::make_shared<SuperpositionCoordinates>(
-                *conformerCoordinates[moleculeNumber]);
+                *conformerCoordinates[moleculeNumber++]);
             fittedCoordinates.push_back(otherCoordinates);
             if (molecule.get() == fittingMolecule)
                 continue;
@@ -136,18 +136,30 @@ namespace Gape {
                                               const SuperpositionMolecule &otherMolecule,
                                               const SuperpositionCoordinates &fittingCoordinates,
                                               SuperpositionCoordinates &otherCoordinates, bool remap) {
+        assert(&fittingMolecule.getMol() == &fittingCoordinates.getConformer().getOwningMol());
+        assert(&otherMolecule.getMol() == &otherCoordinates.getConformer().getOwningMol());
         auto &fittingFeatures = fittingMolecule.getAllFeatures();
+        std::vector<shared_ptr<Feature> > usedFittingFeatures;
+        usedFittingFeatures.reserve(fittingFeatures.size());
         int pos = start;
         std::map<std::shared_ptr<Feature>, std::shared_ptr<Feature> > featureMap;
         for (const auto &mappingFeature: fittingFeatures) {
             const int otherMapping = integerStringChromosome.getValue(pos++);
             if (otherMapping == -1)
                 continue;
+            usedFittingFeatures.push_back(mappingFeature);
             const auto &otherMoleculeFeatures = otherMolecule.getFeatures();
             if (const auto &otherFeatures = otherMoleculeFeatures.find(mappingFeature->getFeatureType());
                 otherFeatures != otherMoleculeFeatures.end()) {
+                if (otherFeatures->second.size() <= otherMapping) {
+                    std::cout << "oops" << std::endl;
+                }
+                assert(otherFeatures->second.size() > otherMapping);
                 const auto &otherFeature = otherFeatures->second[otherMapping];
+                // featureMap.insert(std::make_pair(mappingFeature, otherFeature));
                 featureMap[mappingFeature] = otherFeature;
+            } else {
+                assert(false);
             }
         }
 
@@ -159,7 +171,8 @@ namespace Gape {
 
         CoordMatrix fittingCoords(4, numberPoints), otherCoords(4, numberPoints);
         int pointNumber = 0;
-        for (const auto &[fittingFeature, otherFeature]: featureMap) {
+        for (const auto &fittingFeature: usedFittingFeatures) {
+            const auto &otherFeature = featureMap[fittingFeature];
             auto fittingPoint = fittingFeature->getFittingPoint(fittingCoordinates);
             auto otherPoint = otherFeature->getFittingPoint(otherCoordinates);
             for (int i = 0; i < 3; i++) {
@@ -172,15 +185,17 @@ namespace Gape {
         }
 
         auto matrix = leastSquaresFit(otherCoords, fittingCoords, boost::none);
-        std::set<int> closeMappings;
+        std::vector<double> closeDistances;
 
+        internal::transform_right_product_impl<Transform<double, 3, 2>, Matrix<double, 4, -1> >::ResultType
+                transformedOtherCoords;
+        std::set<int> closeMappings;
         if (remap) {
-            auto transformedOtherCoords = matrix * otherCoords;
+            transformedOtherCoords = matrix * otherCoords;
             REPORT(Reporter::TRACE) << "First pass transformed coordinates " << std::endl << transformedOtherCoords;
             // 2nd pass fitting
             BestThree bestThree;
             for (int i = 0; i < pointNumber; i++) {
-                // auto c1 = transformedOtherCoords.col(i);
                 auto sqrDist = sqrDistance(transformedOtherCoords.col(i), fittingCoords.col(i));
                 if (sqrDist < passOneDistance * passOneDistance) {
                     closeMappings.insert(i);
@@ -199,52 +214,91 @@ namespace Gape {
                     REPORT(Reporter::DETAIL) << "fitMolecule 2nd pass failed";
                     return false;
                 }
+                closeMappings.clear();
                 closeMappings.insert(bestThree.firstNo);
                 closeMappings.insert(bestThree.secondNo);
                 closeMappings.insert(bestThree.thirdNo);
             }
 
-            auto _numberPoints = closeMappings.size();
-            CoordMatrix fittingCoords2(4, _numberPoints), otherCoords2(4, _numberPoints);
+            auto numberPoints2 = closeMappings.size();
+            CoordMatrix fittingCoords2(4, numberPoints2), otherCoords2(4, numberPoints2);
             int _pointNumber = 0;
             for (auto it = closeMappings.begin(); it != closeMappings.end(); ++it) {
                 auto featureNumber = *it;
-                auto fittingFeature = fittingFeatures[featureNumber];
+                auto fittingFeature = usedFittingFeatures[featureNumber];
                 auto otherFeature = featureMap[fittingFeature];
                 auto fittingPoint = fittingFeature->getFittingPoint(fittingCoordinates);
                 auto otherPoint = otherFeature->getFittingPoint(otherCoordinates);
                 for (int i = 0; i < 3; i++) {
-                    fittingCoords(i, _pointNumber) = fittingPoint[i];
-                    otherCoords(i, _pointNumber) = otherPoint[i];
+                    fittingCoords2(i, _pointNumber) = fittingPoint[i];
+                    otherCoords2(i, _pointNumber) = otherPoint[i];
                 }
-                fittingCoords(3, _pointNumber) = 1.0;
-                otherCoords(3, _pointNumber) = 1.0;
+                fittingCoords2(3, _pointNumber) = 1.0;
+                otherCoords2(3, _pointNumber) = 1.0;
                 ++_pointNumber;
             }
 
-            matrix = leastSquaresFit(otherCoords, fittingCoords, boost::none);
+            matrix = leastSquaresFit(otherCoords2, fittingCoords2, boost::none);
+#ifndef NDEBUG
+            transformedOtherCoords = matrix * otherCoords;
+            if (Reporter::isReportingAt(Reporter::DEBUG)) {
+                REPORT(Reporter::DEBUG) << "Second pass transformed coordinates " << std::endl << transformedOtherCoords;
+                for (auto it = closeMappings.begin(); it != closeMappings.end(); ++it) {
+                    auto featureNumber = *it;
+                    auto transformedOther = transformedOtherCoords.col(featureNumber);
+                    auto sqrDist = sqrDistance(transformedOther, fittingCoords.col(featureNumber));
+                    REPORT(Reporter::DEBUG) << "Close position " << featureNumber << " sqrDistance " << sqrDist;
+                    closeDistances.push_back(sqrDist);
+                }
+            }
+#endif
         }
 
         otherCoordinates.transformCoordinates(matrix);
+#ifndef NDEBUG
         if (remap) {
+            // check that transform is consistent with LS fitting
+            int i = 0;
+            for (auto it = closeMappings.begin(); it != closeMappings.end(); ++it) {
+                auto featureNumber = *it;
+                auto fittingFeature = usedFittingFeatures[featureNumber];
+                auto otherFeature = featureMap[fittingFeature];
+                const auto & otherPoint = otherFeature->getFittingPoint(otherCoordinates);
+                auto checkPoint = transformedOtherCoords.col(featureNumber);
+                assert(abs(otherPoint[0] - checkPoint[0]) < 0.001);
+                assert(abs(otherPoint[1] - checkPoint[1]) < 0.001);
+                assert(abs(otherPoint[2] - checkPoint[2]) < 0.001);
+                auto checkDistance = fittingFeature->calculateSqrDist(*otherFeature, fittingCoordinates, otherCoordinates);
+                assert(abs(closeDistances[i] - checkDistance) < 0.001);
+                ++i;
+            }
+        }
+#endif
+        if (remap) {
+            std::set<Feature *> closeFeatures;
+            for (const int m: closeMappings) {
+                closeFeatures.insert(usedFittingFeatures[m].get());
+            }
             for (size_t i = 0; i < fittingFeatures.size(); i++) {
-                if (closeMappings.find(i) == closeMappings.end()) {
-                    auto _pos = start + i;
+                auto _pos = start + i;
+                if (closeFeatures.find(fittingFeatures[i].get()) == closeFeatures.end()) {
                     integerStringChromosome.setValue(_pos, -1);
                 }
-                REPORT(Reporter::DEBUG) << "V " << integerStringChromosome.getValue(pos);
+                REPORT(Reporter::DEBUG) << "V " << integerStringChromosome.getValue(_pos);
             }
         }
 
-        if (Gape::Reporter::isReportingAt(Reporter::DEBUG)) {
+        if (Reporter::isReportingAt(Reporter::DEBUG)) {
             int i = 0;
-            for (const auto &mappingFeature: fittingFeatures) {
+            for (const auto &fittingFeature: fittingFeatures) {
                 auto _pos = start + i;
-                REPORT(Reporter::DEBUG) << "V " << integerStringChromosome.getValue(_pos);
-                if (auto otherFeature = featureMap.find(mappingFeature); otherFeature != featureMap.end()) {
-                    REPORT(Reporter::DEBUG)
-                        << mappingFeature->mappingInfo(*otherFeature->second, fittingCoordinates, otherCoordinates);
-                }
+                auto val = integerStringChromosome.getValue(_pos);
+                if (val != -1) {
+                    auto otherFeature = featureMap[fittingFeature];
+                    auto checkDistance = fittingFeature->calculateSqrDist(*otherFeature, fittingCoordinates, otherCoordinates);
+                    REPORT(Reporter::DEBUG) <<  "P " << _pos << " V " << val << " " <<
+                            fittingFeature->mappingInfo(*otherFeature, fittingCoordinates, otherCoordinates);
+                    }
                 i++;
             }
         }
@@ -452,7 +506,7 @@ namespace Gape {
         std::vector<std::string> pharmLabels;
         std::vector<std::string> featureLabels;
         for (const auto &[featureType, featurePointSet]: featureOverlay->getFeaturePointSets()) {
-            for (const auto& featurePoint: featurePointSet->getFeatures()) {
+            for (const auto &featurePoint: featurePointSet->getFeatures()) {
                 if (featurePoint->isPharmacophoreFeature) {
                     pharmMol.addAtom(new Atom(0));
                     pharmConformer.setAtomPos(count, featurePoint->point);
