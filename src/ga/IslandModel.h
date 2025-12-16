@@ -75,7 +75,7 @@ namespace Gape {
         for (auto population: populations) {
             population->create();
             auto testFitness = population->getBestScore();
-            if (testFitness < bestScore)
+            if (testFitness > bestScore)
                 bestScore = testFitness;
         }
     }

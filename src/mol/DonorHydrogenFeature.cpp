@@ -124,8 +124,16 @@ namespace Gape {
                 FeatureScore result(.0, .0);
                 return result;
             }
+            const auto donorCoordinate = coordinates.getConformer().getAtomPos(donor->getIdx());
+            const auto otherDonorCoordinate = otherCoordinates.getConformer().getAtomPos(other.donor->getIdx());
+#ifndef NDEBUG
+            const auto testVec1 = coordinate - donorCoordinate;
+            const auto testVec2 = otherCoordinate - otherDonorCoordinate;
+            assert(abs(testVec1.length() - hBondLen) < 1e-6);
+            assert(abs(testVec2.length() - hBondLen) < 1e-6);
+#endif
             const auto vec1 = donorCoordinate - midPoint;
-            const auto vec2 = other.donorCoordinate - midPoint;
+            const auto vec2 = otherDonorCoordinate - midPoint;
             const double angle = vec1.angleTo(vec2);
             REPORT(Reporter::DEBUG) << "Angle " << angle << " max " << maxDonorDonorAngle << " min "
 					<< minDonorDonorAngle;

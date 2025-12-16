@@ -157,7 +157,6 @@ namespace Gape {
         assert(acceptorIt != acceptors.end());
         hydrogenBondingType = acceptorIt->second.get();
         charged = PartialCharge::getPartialCharge(featureAtom) < maxAcceptorPartialCharge;
-        REPORT(Reporter::DEBUG) << "N Lone Pairs " << nLonePairs;
         acceptorAtom = std::make_unique<AcceptorAtom>(molecule, atom);
     }
 
@@ -186,6 +185,10 @@ namespace Gape {
         std::vector<RDGeom::Point3D> lonePairs;
         const auto &conformer = superpositionCoordinates.getConformer();
         acceptorAtom->addLonePairs(conformer, lonePairs);
+        int nLonePairs = lonePairs.size();
+        REPORT(Reporter::DEBUG) << "Added " << nLonePairs << " lone pairs to " << info();
+        assert(nLonePairs > 0);
+        assert(acceptorAtom->getNumberLonePairs() == nLonePairs);
         superpositionCoordinates.addFeatureCoordinates(FeatureType::AcceptorAtomFeature, atom, lonePairs);
     }
 
@@ -235,6 +238,19 @@ namespace Gape {
         const auto &lonePairs = coordinates.getFeatureCoordinates(FeatureType::AcceptorAtomFeature, atom);
         const auto &otherLonePairs = otherCoordinates.
                 getFeatureCoordinates(FeatureType::AcceptorAtomFeature, other.atom);
+#ifndef NDEBUG
+        for (const auto &lonePair: lonePairs) {
+            const auto vec = coordinate - lonePair;
+            const auto lpLength = vec.length();
+            assert(abs(lpLength-hBondLen) < 1e06);
+        }
+        for (const auto &lonePair: otherLonePairs) {
+            const auto vec = otherCoordinate - lonePair;
+            const auto lpLength = vec.length();
+            assert(abs(lpLength-hBondLen) < 1e06);
+        }
+#endif
+
 
         if (geometry == HydrogenBondGeometry::None || otherGeometry == HydrogenBondGeometry::None || geometry ==
             HydrogenBondGeometry::Cone || otherGeometry == HydrogenBondGeometry::Cone)

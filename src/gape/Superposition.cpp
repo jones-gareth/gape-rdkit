@@ -153,7 +153,7 @@ namespace Gape {
             }
             if (molecule->isFixed())
                 continue;
-            integerEntryPoints[no] = no * static_cast<int>(molecule->numberMappingFeatures());
+            integerEntryPoints[no] = no * static_cast<int>(fittingMolecule->numberMappingFeatures());
             ++no;
         }
 
@@ -188,19 +188,19 @@ namespace Gape {
     }
 
     void Superposition::setWeights() const {
-        if (!settings.getGapeParameters().useActivities) {
-            for (const auto& molecule: molecules) {
-                molecule->weight = 1.0;
-            }
-
+        if (settings.getGapeParameters().useActivities) {
             const std::function acc = [this](double& sum, const SuperpositionMolPtr& mol) {
                 return sum + (mol->activity() + this->baseMolecule->activity()) / 2.0;
             };
             const auto totalActivity = reduce(molecules, 0.0, acc);
-            const auto avgActivity = totalActivity / (static_cast<double>(molecules.size()) - 1.0);
+            const auto avgActivity = totalActivity / (static_cast<double>(molecules.size()));
 
             for (const auto& molecule: molecules) {
                 molecule->weight = molecule->activity() / avgActivity;
+            }
+        } else {
+            for (const auto& molecule: molecules) {
+                molecule->weight = 1.0;
             }
         }
     }

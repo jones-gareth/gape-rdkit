@@ -117,7 +117,7 @@ namespace Gape {
         std::string getName() const;
         size_t numberFeatures() const;
         size_t numberMappingFeatures() const;
-        double act = 0.0;
+        double act = 6;
         const std::map<const FeatureType, std::vector<std::shared_ptr<Feature>>>& getFeatures() const {
             return features;
         }

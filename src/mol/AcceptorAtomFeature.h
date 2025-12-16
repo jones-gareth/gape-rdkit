@@ -37,8 +37,6 @@ namespace Gape
 		// Now stored in SuperpositionCoordinates
 		// std::vector<RDGeom::Point3D> lonePairCoords;
 
-		int nLonePairs = 0;
-
 		// We could cache these if we're spending a lot of time calculating them
 		// Coordinate for storing a point that should be solvent accessible
 		// 	RDGeom::Point3D solvationPoint;

@@ -283,7 +283,7 @@ namespace Gape {
             "name": "Tertiary Amine",
             "probability": 0.32,
             "geometry": "dir",
-            "smarts": "[NX3](*)(*)*"
+            "smarts": "[NX3](-*)(-*)-*"
         },
         {
             "type": "acceptor",

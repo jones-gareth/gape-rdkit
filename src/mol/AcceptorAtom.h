@@ -221,6 +221,6 @@ namespace Gape
 		                                          RDGeom::Point3D& lonePair1, RDGeom::Point3D& lonePair2, double alpha,
 		                                          double lonePairLength);
 
-
+		int getNumberLonePairs() const { return numberLonePairs; }
 	};
 }

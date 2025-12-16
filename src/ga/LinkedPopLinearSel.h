@@ -297,21 +297,23 @@ namespace Gape {
             REPORT(Reporter::TRACE) << "Child  " << i << ": " << child->info();
 #endif
             // TODO: check for duplicate chromosomes before scoring?
-            const auto fitness = child->score();
-            if (fitness > bestScore) {
-                boost::format format = boost::format("Op %5d new best: ") % nOperations;
-                bestScore = fitness;
+            if (child->isOk()) {
+                const auto fitness = child->score();
+                if (fitness > bestScore) {
+                    boost::format format = boost::format("Op %5d new best: ") % nOperations;
+                    bestScore = fitness;
 #ifdef INCLUDE_REPORTER
-                REPORT(Reporter::DETAIL) << format << child->info();
+                    REPORT(Reporter::DETAIL) << format << child->info();
 #endif
+                }
+                addToPopulation(child);
             }
-            addToPopulation(child);
             i++;
         }
 
         nOperations++;
 #ifdef INCLUDE_REPORTER
-        REPORT(Reporter::TRACE) << "Finished iteration " << nOperations;
+        REPORT(Reporter::DEBUG) << "Finished iteration " << nOperations;
 #endif
     }
 
@@ -366,7 +368,7 @@ namespace Gape {
                 if (nicheMatch.betterThanMatch) {
                     // niche match, but better than worst member of niche
 #ifdef INCLUDE_REPORTER
-                    REPORT(Reporter::DEBUG) << "Niche match: replaceing";
+                    REPORT(Reporter::DEBUG) << "Niche match: replacing";
 #endif
                     // in this case remove the niche match
                     const auto it = findInPopulation(nicheMatch.match);

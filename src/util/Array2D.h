@@ -14,6 +14,7 @@
 
 #include <array>
 #include <cassert>
+#include <iostream>
 #include <memory>
 #include <sstream>
 
@@ -83,6 +84,9 @@ public:
         assert(c < nColumns);
 
         data[r * nColumns + c] = value;
+        if (get(r, c) != value) {
+            std::cout << "oops" << std::endl;
+        }
         assert(get(r, c) == value);
     }
 

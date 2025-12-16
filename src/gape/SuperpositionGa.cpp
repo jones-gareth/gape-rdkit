@@ -130,6 +130,7 @@ namespace Gape {
             childBinaryString.mutate();
         } else {
             child->setOperationName(OperationName::IntegerStringMutate);
+            child->copyConformerCoordinates(*parent);
             child->integerStringChromosome.mutate();
         }
     }
@@ -139,6 +140,8 @@ namespace Gape {
         std::vector<std::shared_ptr<SuperpositionChromosome> > &children) {
         assert(parents.size() == 2);
         assert(children.size() == 2);
+        children[0]->copyGene(*parents[0]);
+        children[1]->copyGene(*parents[1]);
         if (const auto &parent1BinaryString = parents[0]->binaryStringChromosome;
             parent1BinaryString.getLength() > 0 && parent1BinaryString.getRng().randomBoolean()) {
             children[0]->setOperationName(OperationName::BinaryStringCrossover);
@@ -147,6 +150,8 @@ namespace Gape {
                                                   children[0]->binaryStringChromosome,
                                                   children[1]->binaryStringChromosome);
         } else {
+            children[0]->copyConformerCoordinates(*parents[0]);
+            children[1]->copyConformerCoordinates(*parents[1]);
             children[0]->setOperationName(OperationName::IntegerStringCrossover);
             children[1]->setOperationName(OperationName::IntegerStringCrossover);
             parents[0]->integerStringChromosome.fullMixing(parents[1]->integerStringChromosome,

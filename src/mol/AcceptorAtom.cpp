@@ -6,6 +6,8 @@
 
 #include <boost/format.hpp>
 
+#include "MolUtil.h"
+
 namespace Gape {
     const double AcceptorAtom::lonePairLength = 2.9;
 
@@ -290,19 +292,23 @@ namespace Gape {
             }
         }
 
+
+        // the RDKit atom->getHybridization does not always give the results I expect. For example,
+        // tetrahedral N will return Atom::SP2
         if (molecule->isNitroOxygen(*atom)) {
             // hardwire Nitro oxygens
             total = 3;
         } else if (molecule->isEtherOxygen(*atom)) {
             // RDKit reports ether as having SP2 hybridization
             total = 4;
-        } else if (atom->getHybridization() == Atom::SP) {
+        } else if (hasTripleBonds(atom)) {
             total = 2;
-        } else if (atom->getHybridization() == Atom::SP2) {
+        } else if (likelySp2(atom)) {
             total = 3;
-        } else if (atom->getHybridization() == Atom::SP3) {
+        } else if (nConnections == countSingleBonds(atom)) {
             total = 4;
         }
+        assert(total > 0);
 
         return total - nConnections;
     }
@@ -329,6 +335,7 @@ namespace Gape {
         }
 
         // shouldn't get here
+        assert(false);
         return 0;
     }
 
@@ -499,19 +506,21 @@ namespace Gape {
             add2LpToSp3(conformer, lonePairs);
         }
         else {
-            if (atom->getHybridization() == Atom::SP3) {
+            // the RDKit atom->getHybridization does not always give the results I expect. For example,
+            // tetrahedral N will return Atom::SP2
+            if (countSingleBonds(atom) == atom->getDegree()) {
                 if (numberLonePairs == 1)
                     add1LpToSp3(conformer, lonePairs);
                 else if (numberLonePairs == 2)
                     add2LpToSp3(conformer, lonePairs);
                 else if (numberLonePairs == 3)
                     add3LpToSp3(conformer, lonePairs);
-            } else if (atom->getHybridization() == Atom::SP2) {
+            } else if (likelySp2(atom)) {
                 if (numberLonePairs == 1)
                     add1LpToSp2(conformer, lonePairs);
                 else if (numberLonePairs == 2)
                     add2LpToSp2(conformer, lonePairs);
-            } else if (atom->getHybridization() == Atom::SP) {
+            } else if (hasTripleBonds(atom)) {
                 if (numberLonePairs == 1)
                     addLpToSp1(conformer, lonePairs);
             } else {
@@ -520,6 +529,8 @@ namespace Gape {
                 );
             }
         }
+
+        assert(lonePairs.size() == numberLonePairs);
     }
 
     void AcceptorAtom::addOnePairToAtom(const Conformer &conformer, std::vector<RDGeom::Point3D> &lonePairs) const {

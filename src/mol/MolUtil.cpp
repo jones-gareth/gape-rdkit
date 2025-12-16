@@ -59,4 +59,38 @@ namespace Gape {
         auto diff = p2 - p1;
         return diff.lengthSq();
     }
+
+    int countSingleBonds(const Atom *atom) {
+        const auto &mol = atom->getOwningMol();
+        int count = 0;
+        for (const auto &bond: mol.atomBonds(atom)) {
+            auto bondType = bond->getBondType();
+            if (bondType == Bond::BondType::SINGLE) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    bool likelySp2(const Atom *atom) {
+        const auto &mol = atom->getOwningMol();
+        for (const auto &bond: mol.atomBonds(atom)) {
+            auto bondType = bond->getBondType();
+            if (bondType == Bond::BondType::DOUBLE || bondType == Bond::BondType::AROMATIC) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool hasTripleBonds(const Atom *atom) {
+        const auto &mol = atom->getOwningMol();
+        for (const auto &bond: mol.atomBonds(atom)) {
+            auto bondType = bond->getBondType();
+            if (bondType == Bond::BondType::TRIPLE) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

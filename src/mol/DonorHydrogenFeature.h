@@ -12,7 +12,6 @@ namespace Gape
 	{
 	private:
 		const Atom* donor = nullptr;
-		RDGeom::Point3D donorCoordinate;
 		const HydrogenBondingType* hydrogenBondingType = nullptr;
 
 		/**

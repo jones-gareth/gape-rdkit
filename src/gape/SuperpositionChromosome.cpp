@@ -138,7 +138,7 @@ namespace Gape {
                                               SuperpositionCoordinates &otherCoordinates, bool remap) {
         assert(&fittingMolecule.getMol() == &fittingCoordinates.getConformer().getOwningMol());
         assert(&otherMolecule.getMol() == &otherCoordinates.getConformer().getOwningMol());
-        auto &fittingFeatures = fittingMolecule.getAllFeatures();
+        auto &fittingFeatures = fittingMolecule.getAllMappingFeatures();
         std::vector<shared_ptr<Feature> > usedFittingFeatures;
         usedFittingFeatures.reserve(fittingFeatures.size());
         int pos = start;
@@ -151,9 +151,6 @@ namespace Gape {
             const auto &otherMoleculeFeatures = otherMolecule.getFeatures();
             if (const auto &otherFeatures = otherMoleculeFeatures.find(mappingFeature->getFeatureType());
                 otherFeatures != otherMoleculeFeatures.end()) {
-                if (otherFeatures->second.size() <= otherMapping) {
-                    std::cout << "oops" << std::endl;
-                }
                 assert(otherFeatures->second.size() > otherMapping);
                 const auto &otherFeature = otherFeatures->second[otherMapping];
                 // featureMap.insert(std::make_pair(mappingFeature, otherFeature));
@@ -316,6 +313,9 @@ namespace Gape {
     double SuperpositionChromosome::score() {
         hasFitness = false;
 
+        if (!(ok && fitted)) {
+            std:cout << "oops" << endl;
+        }
         assert(ok && fitted);
 
         fitness = .0;
@@ -345,7 +345,6 @@ namespace Gape {
 
         hasFitness = true;
         return fitness;
-        return getFitness();
     }
 
     bool SuperpositionChromosome::equals(const Gape::SuperpositionChromosome &other) const {
@@ -375,6 +374,9 @@ namespace Gape {
         for (size_t i = 0; i < molecules.size(); i++) {
             const auto &molecule = molecules[i];
             const auto &conformer = conformerCoordinates[i]->getConformer();
+            if (molecule->getMol().getNumAtoms() != conformer.getPositions().size()) {
+                std::cout << "oops" << std::endl;
+            }
             const auto moleculeConformerEnergy = molecule->calculateConformationalEnergy(conformer);
             conformationalEnergies.push_back(moleculeConformerEnergy);
             conformationalEnergy += moleculeConformerEnergy;
@@ -529,4 +531,9 @@ namespace Gape {
 
         // TODO: second molecule with features
     }
+
+    void SuperpositionChromosome::copyConformerCoordinates(const SuperpositionChromosome &other) {
+        conformerCoordinates = other.conformerCoordinates;
+    }
+
 }

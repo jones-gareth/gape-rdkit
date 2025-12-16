@@ -95,5 +95,7 @@ namespace Gape {
 
         void outputPharmacophoreAsMol(std::ostream& outStream, const std::string &prefix) const;
 
+        void copyConformerCoordinates(const SuperpositionChromosome &other);
+
     };
 } // GapeApp

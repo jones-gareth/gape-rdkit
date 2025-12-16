@@ -10,7 +10,7 @@
 
 namespace Gape {
     void FeaturePoint::addFeaturePoint(FeatureInformation &f, const bool updateCenter) {
-        assert(features.find(&f) != features.end());
+        assert(features.find(&f) == features.end());
         features.insert(&f);
         const auto &point = f.point;
         sum.x += point.x;
@@ -100,6 +100,7 @@ namespace Gape {
         // check for pharmacophore point
         if (numberMatched > 1 || (numMolecules == 2 && numberMatched == 1)) {
             assert(!baseFeature->isPharmacophoreFeature);
+            REPORT(Reporter::DEBUG) << "Is pharmacophore feature number matched " << numberMatched;
             baseFeature->isPharmacophoreFeature = true;
             baseFeature->numberMatches = numberMatched;
             pharmacoporePoint = true;
@@ -150,7 +151,7 @@ namespace Gape {
 
         // determine any pharmacophore scale up.
         if (testMatched > 2) {
-            REPORT(Reporter::DEBUG) << "testMatched (2) " << testMatched;
+            REPORT(Reporter::DEBUG) << "testMatched (2) pharmacophore scale up" << testMatched;
             testScore *= pow(testMatched, settings.pharmacophoreFactor);
         }
 
@@ -337,7 +338,7 @@ namespace Gape {
             }
         }
 
-        if (closestPoint == nullptr) {
+        if (closestPoint != nullptr) {
             // add updating center
             closestPoint->addFeaturePoint(feature, true);
         } else {

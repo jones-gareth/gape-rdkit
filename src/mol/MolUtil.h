@@ -22,5 +22,11 @@ namespace Gape {
 
     double squareDistance(const RDGeom::Point3D &p1, const RDGeom::Point3D &p2);
 
+    int countSingleBonds(const Atom *atom);
+
+    bool likelySp2(const Atom *atom);
+
+    bool hasTripleBonds(const Atom *atom);
+
 } // namespace Gape
 #endif //GAPE_MOLUTIL_H

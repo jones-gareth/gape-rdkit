@@ -126,7 +126,8 @@ namespace Gape
 		const auto normal1 = center + normal;
 		const auto normal2 = center - normal;
 
-		std::vector<RDGeom::Point3D> centerAndNormals(2);
+		std::vector<RDGeom::Point3D> centerAndNormals;
+		centerAndNormals.reserve(3);
 		centerAndNormals.push_back(center);
 		centerAndNormals.push_back(normal1);
 		centerAndNormals.push_back(normal2);
@@ -144,11 +145,11 @@ namespace Gape
 	{
 		const auto& other = dynamic_cast<const AromaticRingFeature&>(otherFeature);
 		const auto& centerAndNormals = coordinates.getFeatureCoordinates(FeatureType::AromaticRing, atom);
-		const auto& otherCenterAndNormals = coordinates.getFeatureCoordinates(FeatureType::AromaticRing, other.atom);
+		const auto& otherCenterAndNormals = otherCoordinates.getFeatureCoordinates(FeatureType::AromaticRing, other.atom);
 
 		// Center score
 		const auto& center = centerAndNormals[0];
-		const auto& otherCenter = otherCenterAndNormals[1];
+		const auto& otherCenter = otherCenterAndNormals[0];
 		const auto centerSqrDistance = (center - otherCenter).lengthSq();
 		const auto vol = Feature::score(centerSqrDistance);
 
@@ -157,10 +158,20 @@ namespace Gape
 		for (int i = 1; i < 3; i++)
 		{
 			const auto& normal = centerAndNormals[i];
+#ifndef NDEBUG
+			const auto vec = normal - center;
+			const auto checkLength = vec.length();
+			assert(abs(checkLength - normalLength) < 1e-6);
+#endif
 			double v = .0;
 			for (int j = 1; j < 3; j++)
 			{
 				const auto& otherNormal = otherCenterAndNormals[j];
+#ifndef NDEBUG
+				const auto vec = otherNormal - otherCenter;
+				const auto checkLength = vec.length();
+				assert(abs(checkLength - normalLength) < 1e-6);
+#endif
 				const auto sqrDistance = (normal - otherNormal).lengthSq();
 				const auto t = Feature::score(sqrDistance);
 				if (t > v)
