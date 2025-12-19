@@ -344,7 +344,8 @@ namespace Gape {
         } else {
             // no close points so create a new feature point with this
             // feature.
-            auto newFeaturePoint = *std::next(freeFeaturePoints.begin());
+            assert(freeFeaturePoints.size() > 0);
+            auto newFeaturePoint = *freeFeaturePoints.begin();
             freeFeaturePoints.erase(newFeaturePoint);
             newFeaturePoint->seed(feature);
             featurePoints.insert(newFeaturePoint);

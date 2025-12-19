@@ -72,11 +72,11 @@ namespace Gape {
 
         const auto &superposition = superpositionGa.getSuperposition();
         const auto &molecules = superposition.getMolecules();
-        conformerCoordinates.clear();
         conformerCoordinates.reserve(molecules.size());\
 
         if (operationName != OperationName::IntegerStringCrossover && operationName !=
             OperationName::IntegerStringMutate) {
+            conformerCoordinates.clear();
             for (int moleculeNumber = 0; moleculeNumber < molecules.size(); moleculeNumber++) {
                 const auto &molecule = molecules[moleculeNumber];
                 auto moleculeCoordinates = std::make_shared<SuperpositionCoordinates>(
@@ -253,7 +253,7 @@ namespace Gape {
 
         otherCoordinates.transformCoordinates(matrix);
 #ifndef NDEBUG
-        if (remap) {
+        if (remap && Reporter::isReportingAt(Reporter::DEBUG)) {
             // check that transform is consistent with LS fitting
             int i = 0;
             for (auto it = closeMappings.begin(); it != closeMappings.end(); ++it) {
@@ -452,7 +452,7 @@ namespace Gape {
     }
 
     std::string SuperpositionChromosome::info() const {
-        const auto format = boost::format("Fit %7.1f [Donor %2.1f Acc %2.1f Ring %2.1f Conf %5.1f Vol %5.1f") % fitness
+        const auto format = boost::format("Fit %7.1f [Donor %2.1f Acc %2.1f Ring %2.1f Conf %5.1f Vol %5.1f]") % fitness
                             % featureOverlay->getDonorHydrogenScore() % featureOverlay->getAcceptorAtomScore() %
                             featureOverlay->getAromaticRingScore() % conformationalEnergy % volumeIntegral;
         return format.str();

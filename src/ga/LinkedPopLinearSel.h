@@ -211,8 +211,23 @@ namespace Gape {
         std::multimap<double, std::shared_ptr<Chromosome> > newPopulation;
         for (auto &entry: population) {
             auto chromosome = entry.second;
-            chromosome->score();
-            addToPopulation(newPopulation, chromosome);
+            double oldFitness = chromosome->getFitness();
+            double fitness = chromosome->score();
+            std::pair<double, std::shared_ptr<Chromosome> > pair(fitness, chromosome);
+            newPopulation.insert(pair);
+#ifdef INCLUDE_REPORTER
+            REPORT(Reporter::TRACE) << "Inserted a rebuild chromosome, fitness " << fitness
+                              << " old fitness " << oldFitness << " popsize " << newPopulation.size() << " "
+                              << chromosome->info();
+#endif
+
+            if (fitness > bestScore) {
+                boost::format format = boost::format("Op %5d new best: ") % nOperations;
+                bestScore = fitness;
+#ifdef INCLUDE_REPORTER
+                REPORT(Reporter::DETAIL) << format << getBest()->info();
+#endif
+            }
         }
 
         population.swap(newPopulation);
