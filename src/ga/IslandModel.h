@@ -89,8 +89,15 @@ namespace Gape {
             if (otherPopulationNumber == currentPopulationNumber)
                 otherPopulationNumber++;
             auto& parent = populations[otherPopulationNumber]->selectParent();
-            pop->addToPopulation(parent);
-            numberMigrations++;
+            auto child = pop->fetchChild();
+
+            child->copyGene(*parent);
+            child->setOperationName(OperationName::Migrate);
+            if (child->isOk()) {
+                child->score();
+                pop->addToPopulation(child);
+                numberMigrations++;
+            }
         } else {
             pop->iterate();
         }
@@ -99,7 +106,7 @@ namespace Gape {
         auto testFitness = pop->getBestScore();
         if (testFitness > bestScore) {
             testFitness = bestScore;
-            const auto format = boost::format("Island Pop %2d Op %5d new best: ") % (currentPopulationNumber+1) % numberOperations;
+            const auto format = boost::format("Island Pop %2d Op %5d Mig %5d new best: ") % (currentPopulationNumber+1) % numberOperations % numberMigrations;
             REPORT(Reporter::DETAIL) << format << pop->getBest()->info();
         }
         currentPopulationNumber++;

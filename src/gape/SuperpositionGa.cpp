@@ -111,7 +111,7 @@ namespace Gape {
             2, 2, parameters.crossoverWeight, &superpositionCrossoverOperation);
         const auto migrationOperation = std::make_shared<GaOperation<SuperpositionChromosome> >(
             OperationName::Migrate, 1, 1, parameters.migrationWeight, &superpositionMigrationOperation);
-        std::vector operations{mutationOperation, crossoverOperation};
+        std::vector operations{mutationOperation, crossoverOperation, migrationOperation};
         return operations;
     }
 
@@ -161,11 +161,13 @@ namespace Gape {
     }
 
     void SuperpositionGa::superpositionMigrationOperation(
+        // this function is never called migraton is handled in IslandModel::iterate
         const std::vector<std::shared_ptr<SuperpositionChromosome> > &parents,
         std::vector<std::shared_ptr<SuperpositionChromosome> > &children) {
         assert(parents.size() == 1);
         assert(children.size() == 1);
-        // migration does nothing
+        children[0]->copyGene(*parents[0]);
+        children[0]->setOperationName(OperationName::Migrate);
     }
 
     void SuperpositionGa::run() {

@@ -76,7 +76,7 @@ namespace Gape {
 
     class GapeSettings {
     public:
-        explicit GapeSettings(const std::string &configFile = "");
+        explicit GapeSettings(const std::string &configFile="");
 
         GapeSettings(const GapeSettings &) = delete;
 

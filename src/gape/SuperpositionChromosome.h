@@ -81,6 +81,8 @@ namespace Gape {
 
         bool isOk();
 
+        void clean();
+
         double rebuild();
 
         bool equals(const SuperpositionChromosome &other) const;

@@ -34,11 +34,12 @@ int main(int argc, char *argv[]) {
 
     std::string inputFile;
     std::string reportingLevel;
+    std::string configFile;
     options_description desc("Allowed options");
     desc.add_options()
             ("help", "Help message")
             ("inputFile", options::value<std::string>(&inputFile)->default_value("../../../resources/5ht3.smi"), "input structures")
-            ("configFile", options::value<std::string>(), "Optional JSON configuration file")
+            ("configFile", options::value<std::string>(&configFile), "Optional JSON configuration file")
             ("reportingLevel", options::value<std::string>(&reportingLevel)->default_value("DEBUG"),
              "Reporting level [TRACE, DEBUG, DETAIL, NORMAL, INFO, WARN, FATAL]");
 
@@ -54,10 +55,6 @@ int main(int argc, char *argv[]) {
     auto usage =
             (boost::format("usage: %s [-f] [-n <atom_no>] <smarts> <target>\n")
              % argv[0]).str();
-
-    if (vm.count("configFile")) {
-
-    }
 
 	if (reportingLevel == "TRACE")
 	{
@@ -89,7 +86,7 @@ int main(int argc, char *argv[]) {
     }
 
     RDKit::SmilesMolSupplier smilesMolSupplier(inputFile, " ", 0, 1, false, true);
-    GapeSettings settings;
+    GapeSettings settings(configFile);
     std::vector<std::shared_ptr<Gape::SuperpositionMolecule>> molecules;
 
     int ligandNum = 0;

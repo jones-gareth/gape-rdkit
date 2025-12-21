@@ -20,28 +20,28 @@ namespace Gape {
         "flipAmideBonds": true,
         // Perform common ionizations at physiological Ph
         "solvateStructures": true,
-		"baseMoleculeSelection": "minRotatableBonds",
-		"fittingMoleculeSelection": "baseMolecule",
-		"useActivities": false,
-		"scaleFitting": true,
-		"startFittingRadius": 3.5,
-		"finishFittingRadius": 1.5,
-		"numberRebuilds": 24,
+        "baseMoleculeSelection": "minRotatableBonds",
+        "fittingMoleculeSelection": "baseMolecule",
+        "useActivities": false,
+        "scaleFitting": true,
+        "startFittingRadius": 3.5,
+        "finishFittingRadius": 1.5,
+        "numberRebuilds": 24,
         "ignoreVdwAttractive": true,
         "ignoreTorsion": false,
-		"numberRuns": 10,
+        "numberRuns": 10,
         "guessGaParameters": true,
-		"numberIslands": 5,
-		"populationSize": 100,
-		"numberOperations": 60000,
-		"selectionPressure": 1.001,
-		"useNiches": true,
-		"nicheDistance": 1.0,
+        "numberIslands": 5,
+        "populationSize": 100,
+        "numberOperations": 60000,
+        "selectionPressure": 1.001,
+        "useNiches": true,
+        "nicheDistance": 1.0,
         "nicheSize": 5,
-		"nichingOff": 0.6,
-		"crossoverWeight": 95,
-		"mutationWeight": 95,
-		"migrationWeight": 10,
+        "nichingOff": 0.6,
+        "crossoverWeight": 95,
+        "mutationWeight": 95,
+        "migrationWeight": 10,
         "donorHydrogenWeight": 1750,
         "acceptorAtomWeight": 1750,
         "aromaticRingWeight": 2000,
@@ -49,9 +49,9 @@ namespace Gape {
         "conformationalWeight": 10,
         "constraintWeight": 100,
         "vdwCutoff": 100,
-		"scalePharmacophore": true,
+        "scalePharmacophore": true,
         "geometricWeightCriterion": 0.5,
-		"pharmacophoreFactor": 0.5
+        "pharmacophoreFactor": 0.5
     },
     "solvationRules": [
         {
@@ -536,203 +536,215 @@ namespace Gape {
         }
     ], )JSON"
             R"JSON(
-	"partialChargeGroups": [
-		{
-			"name": "Guanidinium 1",
-			"formal": 1,
-			"partial": 0.333,
-			"smarts": "[N^2H2X3]=C(-N)-N",
-			"multiple": false
-		},
-		{
-			"name": "Guanidinium 2",
-			"formal": 0,
-			"partial": 0.333,
-			"smarts": "N-C(=[N^2H2X3])-N",
-			"multiple": false
-		},
-		{
-			"name": "Amidine 1",
-			"formal": 0,
-			"partial": 0.5,
-			"smarts": "[NX3]-C=[NX3]",
-			"multiple": false
-		},
-		{
-			"name": "Amidine 2",
-			"formal": 1,
-			"partial": 0.5,
-			"smarts": "[NX3]=C-[NX3]",
-			"multiple": false
-		},
-		{
-			"name": "Ortho Aminopryidine 1",
-			"formal": 1,
-			"partial": 0.5,
-			"smarts": "[nX3H1]1:c(-[NH2]):c:[c,n]:c:c:1",
-			"multiple": false
-		},
-		{
-			"name": "Ortho Aminopryidine 2",
-			"formal": 0,
-			"partial": 0.5,
-			"smarts": "[NH2]-c1:[nX3H1]:c:c:[c,n]:c:1",
-			"multiple": false
-		},
-		{
-			"name": "Para Aminopryidine 1",
-			"formal": 1,
-			"partial": 0.5,
-			"smarts": "[nX3H1]1:c:[c,n]:c(-[NH2]):c:c:1",
-			"multiple": false
-		},
-		{
-			"name": "Para Aminopryidine 2",
-			"formal": 0,
-			"partial": 0.5,
-			"smarts": "[NH2]-c1:c:c:[nX3H1]:c:[c,n]:1",
-			"multiple": false
-		},
-		{
-			"name": "Carboxylate 1",
-			"formal": -1,
-			"partial": -0.5,
-			"smarts": "[OX1]-C=O",
-			"multiple": false
-		},
-		{
-			"name": "Carboxylate 2",
-			"formal": 0,
-			"partial": -0.5,
-			"smarts": "O=C-[OX1]",
-			"multiple": false
-		},
-		{
-			"name": "Hydroxamate 1",
-			"formal": 1,
-			"partial": -0.5,
-			"smarts": "[OX1]-N=O",
-			"multiple": false
-		},
-		{
-			"name": "Hydroxamate 2",
-			"formal": 0,
-			"partial": -0.5,
-			"smarts": "O=N-[OX1]",
-			"multiple": false
-		},
-		{
-			"name": "Tetrazole 1",
-			"formal": 0,
-			"partial": -0.25,
-			"smarts": "[nX2]1:n:n:c:n:1",
-			"multiple": false
-		},
-		{
-			"name": "Tetrazole 2",
-			"formal": -1,
-			"partial": -0.25,
-			"smarts": "n[X2]1:n:n:n:c:1",
-			"multiple": false
-		},
-		{
-			"name": "Acylsulponamide",
-			"formal": -1,
-			"partial": -1.0,
-			"smarts": "[NX2H](-C=O)-S(=O)=O",
-			"multiple": false
-		},
-		{
-			"name": "Wyeth heterocycle",
-			"formal": -1,
-			"partial": -1.0,
-			"smarts": "[NX2]1-C(=O)-O-N-C(=O)-1",
-			"multiple": false
-		},
-		{
-			"name": "Phosphinyl 1",
-			"formal": -1,
-			"partial": -0.6667,
-			"smarts": "[OX1]-P(=O)-[OX1]",
-			"multiple": true
-		},
-		{
-			"name": "Phosphinyl 2",
-			"formal": 0,
-			"partial": -0.6667,
-			"smarts": "O=P(-[OX1])-[OX1]",
-			"multiple": true
-		},
-		{
-			"name": "Phosphinyl 3",
-			"formal": -1,
-			"partial": -0.5,
-			"smarts": "[OX1]-P=O",
-			"multiple": false
-		},
-		{
-			"name": "Phosphinyl 4",
-			"formal": 0,
-			"partial": -0.5,
-			"smarts": "O=P-[OX1]",
-			"multiple": false
-		},
-		{
-			"name": "Sulphonyl 1",
-			"formal": -1,
-			"partial": -0.5,
-			"smarts": "[OX1]-S(=O)=O",
-			"multiple": false
-		},
-		{
-			"name": "Sulphonyl 2",
-			"formal": 0,
-			"partial": -0.5,
-			"smarts": "O=S(=O)-[OX1]",
-			"multiple": false
-		},
-		{
-			"name": "Imidazole 1",
-			"formal": 1,
-			"partial": 0.5,
-			"smarts": "[nX3H1]1:c:[nX3H1]:c:c:1",
-			"multiple": false
-		},
-		{
-			"name": "Imidazole 2",
-			"formal": 1,
-			"partial": 1.0,
-			"smarts": "[nX3H1]1:c:[nX3H0]:c:c:1",
-			"multiple": false
-		},
-		{
-			"name": "Pyridine",
-			"formal": 1,
-			"partial": 1.0,
-			"smarts": "[nX3H1]1:c:c:c:c:c:1",
-			"multiple": false
-		},
-	    {
-			"name": "Charged Amine",
-			"formal": 1,
-			"partial": 1.0,
-			"smarts": "[N^3X4]",
-			"multiple": false
-		},
-	    {
-			"name": "N sp2+",
-			"formal": 1,
-			"partial": 1.0,
-			"smarts": "[N^2X3]=*",
-			"multiple": false
-		}
-	]
+    "partialChargeGroups": [
+        {
+            "name": "Guanidinium 1",
+            "formal": 1,
+            "partial": 0.333,
+            "smarts": "[N^2H2X3]=C(-N)-N",
+            "multiple": false
+        },
+        {
+            "name": "Guanidinium 2",
+            "formal": 0,
+            "partial": 0.333,
+            "smarts": "N-C(=[N^2H2X3])-N",
+            "multiple": false
+        },
+        {
+            "name": "Amidine 1",
+            "formal": 0,
+            "partial": 0.5,
+            "smarts": "[NX3]-C=[NX3]",
+            "multiple": false
+        },
+        {
+            "name": "Amidine 2",
+            "formal": 1,
+            "partial": 0.5,
+            "smarts": "[NX3]=C-[NX3]",
+            "multiple": false
+        },
+        {
+            "name": "Ortho Aminopryidine 1",
+            "formal": 1,
+            "partial": 0.5,
+            "smarts": "[nX3H1]1:c(-[NH2]):c:[c,n]:c:c:1",
+            "multiple": false
+        },
+        {
+            "name": "Ortho Aminopryidine 2",
+            "formal": 0,
+            "partial": 0.5,
+            "smarts": "[NH2]-c1:[nX3H1]:c:c:[c,n]:c:1",
+            "multiple": false
+        },
+        {
+            "name": "Para Aminopryidine 1",
+            "formal": 1,
+            "partial": 0.5,
+            "smarts": "[nX3H1]1:c:[c,n]:c(-[NH2]):c:c:1",
+            "multiple": false
+        },
+        {
+            "name": "Para Aminopryidine 2",
+            "formal": 0,
+            "partial": 0.5,
+            "smarts": "[NH2]-c1:c:c:[nX3H1]:c:[c,n]:1",
+            "multiple": false
+        },
+        {
+            "name": "Carboxylate 1",
+            "formal": -1,
+            "partial": -0.5,
+            "smarts": "[OX1]-C=O",
+            "multiple": false
+        },
+        {
+            "name": "Carboxylate 2",
+            "formal": 0,
+            "partial": -0.5,
+            "smarts": "O=C-[OX1]",
+            "multiple": false
+        },
+        {
+            "name": "Hydroxamate 1",
+            "formal": 1,
+            "partial": -0.5,
+            "smarts": "[OX1]-N=O",
+            "multiple": false
+        },
+        {
+            "name": "Hydroxamate 2",
+            "formal": 0,
+            "partial": -0.5,
+            "smarts": "O=N-[OX1]",
+            "multiple": false
+        },
+        {
+            "name": "Tetrazole 1",
+            "formal": 0,
+            "partial": -0.25,
+            "smarts": "[nX2]1:n:n:c:n:1",
+            "multiple": false
+        },
+        {
+            "name": "Tetrazole 2",
+            "formal": -1,
+            "partial": -0.25,
+            "smarts": "n[X2]1:n:n:n:c:1",
+            "multiple": false
+        },
+        {
+            "name": "Acylsulponamide",
+            "formal": -1,
+            "partial": -1.0,
+            "smarts": "[NX2H](-C=O)-S(=O)=O",
+            "multiple": false
+        },
+        {
+            "name": "Wyeth heterocycle",
+            "formal": -1,
+            "partial": -1.0,
+            "smarts": "[NX2]1-C(=O)-O-N-C(=O)-1",
+            "multiple": false
+        },
+        {
+            "name": "Phosphinyl 1",
+            "formal": -1,
+            "partial": -0.6667,
+            "smarts": "[OX1]-P(=O)-[OX1]",
+            "multiple": true
+        },
+        {
+            "name": "Phosphinyl 2",
+            "formal": 0,
+            "partial": -0.6667,
+            "smarts": "O=P(-[OX1])-[OX1]",
+            "multiple": true
+        },
+        {
+            "name": "Phosphinyl 3",
+            "formal": -1,
+            "partial": -0.5,
+            "smarts": "[OX1]-P=O",
+            "multiple": false
+        },
+        {
+            "name": "Phosphinyl 4",
+            "formal": 0,
+            "partial": -0.5,
+            "smarts": "O=P-[OX1]",
+            "multiple": false
+        },
+        {
+            "name": "Sulphonyl 1",
+            "formal": -1,
+            "partial": -0.5,
+            "smarts": "[OX1]-S(=O)=O",
+            "multiple": false
+        },
+        {
+            "name": "Sulphonyl 2",
+            "formal": 0,
+            "partial": -0.5,
+            "smarts": "O=S(=O)-[OX1]",
+            "multiple": false
+        },
+        {
+            "name": "Imidazole 1",
+            "formal": 1,
+            "partial": 0.5,
+            "smarts": "[nX3H1]1:c:[nX3H1]:c:c:1",
+            "multiple": false
+        },
+        {
+            "name": "Imidazole 2",
+            "formal": 1,
+            "partial": 1.0,
+            "smarts": "[nX3H1]1:c:[nX3H0]:c:c:1",
+            "multiple": false
+        },
+        {
+            "name": "Pyridine",
+            "formal": 1,
+            "partial": 1.0,
+            "smarts": "[nX3H1]1:c:c:c:c:c:1",
+            "multiple": false
+        },
+        {
+            "name": "Charged Amine",
+            "formal": 1,
+            "partial": 1.0,
+            "smarts": "[N^3X4]",
+            "multiple": false
+        },
+        {
+            "name": "N sp2+",
+            "formal": 1,
+            "partial": 1.0,
+            "smarts": "[N^2X3]=*",
+            "multiple": false
+        }
+    ]
 }
     )JSON";
 
     GapeSettings::GapeSettings(const std::string& configFile) {
         rapidjson::Document d;
-        d.Parse<rapidjson::kParseCommentsFlag>(defaultConfigStr.c_str());
+        std::string configJson;
+        if (configFile == "") {
+            configJson = defaultConfigStr;
+        } else {
+            std::ifstream ifs(configFile);
+            std::string content((std::istreambuf_iterator<char>(ifs)),
+                                (std::istreambuf_iterator<char>()));
+            configJson = content;
+        }
+        std::ofstream out("configFileIn.json");
+        out << configJson;
+        out.close();
+        d.Parse<rapidjson::kParseCommentsFlag>(configJson.c_str());
 
         gapeParameters.flattenBonds = d["gapeParameters"]["flattenBonds"].GetBool();
         gapeParameters.flipAmideBonds = d["gapeParameters"]["flipAmideBonds"].GetBool();
@@ -787,7 +799,7 @@ namespace Gape {
         gapeParameters.vdwCutoff = d["gapeParameters"]["vdwCutoff"].GetDouble();
         gapeParameters.scalePharmacophore = d["gapeParameters"]["scalePharmacophore"].GetBool();
         gapeParameters.geometricWeightCriterion = d["gapeParameters"]["geometricWeightCriterion"].GetDouble();
-    	gapeParameters.pharmacophoreFactor = d["gapeParameters"]["pharmacophoreFactor"].GetDouble();
+        gapeParameters.pharmacophoreFactor = d["gapeParameters"]["pharmacophoreFactor"].GetDouble();
 
         auto const& jsonSolvationRules = d["solvationRules"];
         solvationRules.clear();

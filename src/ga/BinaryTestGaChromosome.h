@@ -37,6 +37,12 @@ public:
 		return fitness;
 	}
 
+	void clean() {
+		fitness = .0;
+		xVal = .0;
+		yVal = .0;
+	}
+
 	bool isOk() {
 		return true;
 	}

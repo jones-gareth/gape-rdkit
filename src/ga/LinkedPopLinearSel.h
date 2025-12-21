@@ -103,6 +103,8 @@ namespace Gape {
 
         void iterate();
 
+        std::shared_ptr<Chromosome> fetchChild();
+
         void rebuild();
 
         [[nodiscard]] std::string info() const;
@@ -286,13 +288,7 @@ namespace Gape {
         }
 
         for (size_t i = 0; i < selectedOperation->getnChildren(); i++) {
-            std::shared_ptr<Chromosome> child = nullptr;
-            if (freeChromosomes.empty()) {
-                child = populationPolicy.createChromosome();
-            } else {
-                child = freeChromosomes.back();
-                freeChromosomes.pop_back();
-            }
+            auto child = fetchChild();
             children.push_back(child);
         }
 
@@ -330,6 +326,19 @@ namespace Gape {
 #ifdef INCLUDE_REPORTER
         REPORT(Reporter::DEBUG) << "Finished iteration " << nOperations;
 #endif
+    }
+
+    template<typename Chromosome, typename PopulationPolicy>
+    std::shared_ptr<Chromosome> LinkedPopLinearSel<Chromosome, PopulationPolicy>::fetchChild() {
+        std::shared_ptr<Chromosome> child = nullptr;
+        if (freeChromosomes.empty()) {
+            child = populationPolicy.createChromosome();
+        } else {
+            child = freeChromosomes.back();
+            child->clean();
+            freeChromosomes.pop_back();
+        }
+        return child;
     }
 
     /**

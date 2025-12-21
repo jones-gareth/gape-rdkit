@@ -202,13 +202,13 @@ namespace Gape {
             // If we can't find three points then use the best three points
             // within MAX_PASS_DISTANCE
             if (closeMappings.size() < 3) {
-                REPORT(Reporter::DETAIL) <<
+                REPORT(Reporter::DEBUG) <<
                                          "Best Three " + bestThree.firstNo << " "
                                          << bestThree.secondNo << " " << bestThree.thirdNo;
                 // If the third point is too far away then the mapping has
                 // failed
                 if (bestThree.thirdSqrDist > maxPassDistance * maxPassDistance) {
-                    REPORT(Reporter::DETAIL) << "fitMolecule 2nd pass failed";
+                    REPORT(Reporter::DEBUG) << "fitMolecule 2nd pass failed";
                     return false;
                 }
                 closeMappings.clear();
@@ -308,6 +308,17 @@ namespace Gape {
             fitMolecules(true);
         }
         return ok;
+    }
+
+    void SuperpositionChromosome::clean() {
+        ok = false;
+        fitted = false;
+        hasFitness = false;
+        conformerCoordinates.clear();
+        fittedCoordinates.clear();
+        conformationalEnergies.clear();
+        volumeIntegrals = nullptr;
+        featureOverlay = nullptr;
     }
 
     double SuperpositionChromosome::score() {
@@ -465,11 +476,12 @@ namespace Gape {
         const auto &superposition = superpositionGa.getSuperposition();
         for (int i = 0; i < superpositionGa.numberMolecules(); i++) {
             const auto &mol = superpositionGa.getSuperposition().getMolecules()[i];
-            RWMol rdMol(mol->getMol());
+            RWMol rdMol = mol->getMol();
 
             rdMol.clearConformers();
             auto &conformer = fittedCoordinates[i]->getConformer();
-            rdMol.addConformer(&conformer);
+            auto molConformer = new Conformer(conformer);
+            rdMol.addConformer(molConformer);
 
             rdMol.setProp("CONFORMATIONAL_ENERGY", conformationalEnergies[i]);
             auto name = rdMol.getProp<std::string>(common_properties::_Name);
