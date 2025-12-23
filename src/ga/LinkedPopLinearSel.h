@@ -227,14 +227,14 @@ namespace Gape {
                 boost::format format = boost::format("Op %5d new best: ") % nOperations;
                 bestScore = fitness;
 #ifdef INCLUDE_REPORTER
-                REPORT(Reporter::DETAIL) << format << getBest()->info();
+                REPORT(Reporter::DEBUG) << format << getBest()->info();
 #endif
             }
         }
 
         population.swap(newPopulation);
 #ifdef INCLUDE_REPORTER
-        REPORT(Reporter::DETAIL) << "Rebuilt population: " << info();
+        REPORT(Reporter::DEBUG) << "Rebuilt population: " << info();
 #endif
     }
 
@@ -314,7 +314,7 @@ namespace Gape {
                     boost::format format = boost::format("Op %5d new best: ") % nOperations;
                     bestScore = fitness;
 #ifdef INCLUDE_REPORTER
-                    REPORT(Reporter::DETAIL) << format << child->info();
+                    REPORT(Reporter::DEBUG) << format << child->info();
 #endif
                 }
                 addToPopulation(child);
@@ -389,6 +389,7 @@ namespace Gape {
         if (populationPolicy.useNiches()) {
             const auto nicheMatch = findNicheMatch(*chromosome);
             if (nicheMatch.hasNicheMatch) {
+                nNiche++;
                 if (nicheMatch.betterThanMatch) {
                     // niche match, but better than worst member of niche
 #ifdef INCLUDE_REPORTER
@@ -434,7 +435,7 @@ namespace Gape {
             boost::format format = boost::format("Op %5d new best: ") % nOperations;
             bestScore = fitness;
 #ifdef INCLUDE_REPORTER
-            REPORT(Reporter::DETAIL) << format << getBest()->info();
+            REPORT(Reporter::DEBUG) << format << getBest()->info();
 #endif
         }
         return true;

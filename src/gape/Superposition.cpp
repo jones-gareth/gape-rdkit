@@ -131,6 +131,7 @@ namespace Gape {
                 throw std::runtime_error("Unknown selection strategy");
         }
         REPORT(Reporter::INFO) << "Base molecule is " << baseMolecule->getName();
+        REPORT(Reporter::INFO) << "Fitting molecule is " << fittingMolecule->getName();
 
 
         const std::function isMapped = [this](const SuperpositionMolPtr& mol) {

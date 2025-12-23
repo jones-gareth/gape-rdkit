@@ -8,6 +8,7 @@
 #include "util/Reporter.h"
 
 #include <cassert>
+#include <filesystem>
 #include <boost/format.hpp>
 #include <GraphMol/FileParsers/MolSupplier.h>
 #include <GraphMol/FileParsers/MolWriters.h>
@@ -19,6 +20,22 @@ using namespace Gape;
 using namespace boost::program_options;
 namespace options = boost::program_options;
 using namespace RDKit;
+
+namespace DETAIL {
+    void cleanupFiles() {
+        for (const auto& entry: std::filesystem::directory_iterator(".")) {
+            const auto& filename = entry.path().filename().string();
+            std::string cmp = "GA_rank_";
+            std::string cmp2 = "GA_solution_";
+            if (filename.compare(0, cmp.length(), cmp) == 0) {
+                std::filesystem::remove(entry.path());
+            }
+            else if (filename.compare(0, cmp2.length(), cmp2) == 0) {
+                std::filesystem::remove(entry.path());
+            }
+        }
+    }
+}
 
 /**
  * GAPE overlap algorithm
@@ -52,9 +69,7 @@ int main(int argc, char *argv[]) {
     }
     options::notify(vm);
 
-    auto usage =
-            (boost::format("usage: %s [-f] [-n <atom_no>] <smarts> <target>\n")
-             % argv[0]).str();
+    DETAIL::cleanupFiles();
 
 	if (reportingLevel == "TRACE")
 	{

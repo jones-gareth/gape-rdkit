@@ -24,6 +24,7 @@ namespace Gape {
         size_t numberOperations = 0;
         size_t numberMigrations = 0;
         double bestScore = -std::numeric_limits<double>::max();
+        std::shared_ptr<Chromosome> bestChromosome;
 
     public:
         explicit IslandModel(PopulationPolicy &populationPolicy);
@@ -42,6 +43,7 @@ namespace Gape {
 
         [[nodiscard]] double getBestScore() const { return bestScore; }
 
+        std::shared_ptr<Chromosome> getBestChromosome() const { return bestChromosome; }
         std::shared_ptr<Chromosome> getBest();
     };
 
@@ -62,7 +64,7 @@ namespace Gape {
         totalOperatorWeights = 0;
         for (auto &operation: operations) {
             totalOperatorWeights += operation->getWeight();
-            if (operation->operationName == OperationName::Migrate) {
+            if (operation->operationName == OperationName::Migrate && numberIslands > 1) {
                 migrationWeight += operation->getWeight();
                 migrationOperation = operation;
             }
@@ -75,8 +77,10 @@ namespace Gape {
         for (auto population: populations) {
             population->create();
             auto testFitness = population->getBestScore();
-            if (testFitness > bestScore)
+            if (testFitness > bestScore) {
                 bestScore = testFitness;
+                bestChromosome = population->getBest();
+            }
         }
     }
 
@@ -106,8 +110,9 @@ namespace Gape {
         auto testFitness = pop->getBestScore();
         if (testFitness > bestScore) {
             testFitness = bestScore;
+            bestChromosome = pop->getBest();
             const auto format = boost::format("Island Pop %2d Op %5d Mig %5d new best: ") % (currentPopulationNumber+1) % numberOperations % numberMigrations;
-            REPORT(Reporter::DETAIL) << format << pop->getBest()->info();
+            REPORT(Reporter::DEBUG) << format << bestChromosome->info();
         }
         currentPopulationNumber++;
         if (currentPopulationNumber == numberIslands)
@@ -138,15 +143,17 @@ namespace Gape {
     std::string IslandModel<Chromosome, PopulationPolicy>::info() const {
         std::stringstream ss;
 
+        const auto format = boost::format("Op %5d Mig %5d \nBest: ")  % numberOperations % numberMigrations;
+        ss << format << bestChromosome->info() << std::endl;
         for (size_t i = 0; i < numberIslands; i++) {
-            ss << "Island " << i + 1 << " " << populations.at(i)->info();
+            ss << "Island " << i + 1 << " " << populations.at(i)->info() << std::endl;
         }
         return ss.str();
     }
 
     template<typename Chromosome, typename PopulationPolicy>
     shared_ptr<Chromosome> IslandModel<Chromosome, PopulationPolicy>::getBest() {
-        auto best = std::max_element(populations.begin(), populations.end(), [](const auto &a, const auto &b) {
+        auto best = std::max_element(populations.cbegin(), populations.cend(), [](const auto &a, const auto &b) {
             return a->getBestScore() < b->getBestScore();
         });
         const auto c = *best;

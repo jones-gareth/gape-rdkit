@@ -23,6 +23,14 @@ namespace Gape {
         FeatureInformation(const Feature *feature, const SuperpositionCoordinates &coordinates): feature(feature),
             point(feature->getFittingPoint(coordinates)), coordinates(coordinates) {
         }
+
+        std::string featureLabel() const {
+            return feature->featureLabel(coordinates);
+        }
+
+        unique_ptr<PharmFeatureGeometry> getPharmFeatureGeometry() const {
+            return feature->getPharmFeatureGeometry(coordinates);
+        }
     };
 
     class SuperpositionChromosome {

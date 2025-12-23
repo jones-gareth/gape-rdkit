@@ -20,7 +20,7 @@ namespace Gape {
         "flipAmideBonds": true,
         // Perform common ionizations at physiological Ph
         "solvateStructures": true,
-        "baseMoleculeSelection": "minRotatableBonds",
+        "baseMoleculeSelection": "maxFeatures",
         "fittingMoleculeSelection": "baseMolecule",
         "useActivities": false,
         "scaleFitting": true,

@@ -10,7 +10,6 @@
 #include "util/LeastSquaresFit.h"
 #include "util/Reporter.h"
 #include <set>
-#include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <GraphMol/FileParsers/MolWriters.h>
 
@@ -111,8 +110,8 @@ namespace Gape {
         fittedCoordinates.clear();
         fittedCoordinates.reserve(molecules.size());
         int moleculeNumber = 0;
-        int fittingMoleculeNumber = 0;
-        const auto &fittingMoleculeCoordinates = conformerCoordinates[fittingMoleculeNumber];
+        int chromosomeMoleculeNumber = 0;
+        const auto &fittingMoleculeCoordinates = conformerCoordinates[superposition.getFittingMoleculeNumber()];
         const auto fittingMolecule = superposition.getFittingMolecule();
         for (const auto &molecule: molecules) {
             const auto otherCoordinates = std::make_shared<SuperpositionCoordinates>(
@@ -122,7 +121,7 @@ namespace Gape {
                 continue;
             if (molecule->isFixed())
                 continue;
-            auto pos = superposition.getIntegerEntryPoints()[fittingMoleculeNumber++];
+            auto pos = superposition.getIntegerEntryPoints()[chromosomeMoleculeNumber++];
             ok = fitMolecule(pos, *fittingMolecule, *molecule, *fittingMoleculeCoordinates, *otherCoordinates, remap);
             if (!ok) {
                 return;
@@ -162,7 +161,7 @@ namespace Gape {
 
         auto numberPoints = featureMap.size();
         if (numberPoints < 3) {
-            REPORT(Reporter::DETAIL) << "First pass less than 3 fitting points";
+            REPORT(Reporter::DEBUG) << "First pass less than 3 fitting points";
             return false;
         }
 
@@ -239,7 +238,8 @@ namespace Gape {
 #ifndef NDEBUG
             transformedOtherCoords = matrix * otherCoords;
             if (Reporter::isReportingAt(Reporter::DEBUG)) {
-                REPORT(Reporter::DEBUG) << "Second pass transformed coordinates " << std::endl << transformedOtherCoords;
+                REPORT(Reporter::DEBUG) << "Second pass transformed coordinates " << std::endl <<
+ transformedOtherCoords;
                 for (auto it = closeMappings.begin(); it != closeMappings.end(); ++it) {
                     auto featureNumber = *it;
                     auto transformedOther = transformedOtherCoords.col(featureNumber);
@@ -260,12 +260,13 @@ namespace Gape {
                 auto featureNumber = *it;
                 auto fittingFeature = usedFittingFeatures[featureNumber];
                 auto otherFeature = featureMap[fittingFeature];
-                const auto & otherPoint = otherFeature->getFittingPoint(otherCoordinates);
+                const auto &otherPoint = otherFeature->getFittingPoint(otherCoordinates);
                 auto checkPoint = transformedOtherCoords.col(featureNumber);
                 assert(abs(otherPoint[0] - checkPoint[0]) < 0.001);
                 assert(abs(otherPoint[1] - checkPoint[1]) < 0.001);
                 assert(abs(otherPoint[2] - checkPoint[2]) < 0.001);
-                auto checkDistance = fittingFeature->calculateSqrDist(*otherFeature, fittingCoordinates, otherCoordinates);
+                auto checkDistance = fittingFeature->calculateSqrDist(*otherFeature, fittingCoordinates,
+                                                                      otherCoordinates);
                 assert(abs(closeDistances[i] - checkDistance) < 0.001);
                 ++i;
             }
@@ -292,10 +293,11 @@ namespace Gape {
                 auto val = integerStringChromosome.getValue(_pos);
                 if (val != -1) {
                     auto otherFeature = featureMap[fittingFeature];
-                    auto checkDistance = fittingFeature->calculateSqrDist(*otherFeature, fittingCoordinates, otherCoordinates);
-                    REPORT(Reporter::DEBUG) <<  "P " << _pos << " V " << val << " " <<
+                    auto checkDistance = fittingFeature->calculateSqrDist(
+                        *otherFeature, fittingCoordinates, otherCoordinates);
+                    REPORT(Reporter::DEBUG) << "P " << _pos << " V " << val << " " <<
                             fittingFeature->mappingInfo(*otherFeature, fittingCoordinates, otherCoordinates);
-                    }
+                }
                 i++;
             }
         }
@@ -325,7 +327,8 @@ namespace Gape {
         hasFitness = false;
 
         if (!(ok && fitted)) {
-            std:cout << "oops" << endl;
+        std:
+            cout << "oops" << endl;
         }
         assert(ok && fitted);
 
@@ -406,10 +409,10 @@ namespace Gape {
 
         for (size_t i = 0; i < numberMolecules; i++) {
             const auto &moleculeA = molecules[i];
-            const auto &conformerA = conformerCoordinates[i]->getConformer();
+            const auto &conformerA = fittedCoordinates[i]->getConformer();
             for (int j = i + 1; j < numberMolecules; j++) {
                 const auto &moleculeB = molecules[j];
-                const auto &conformerB = conformerCoordinates[j]->getConformer();
+                const auto &conformerB = fittedCoordinates[j]->getConformer();
                 // we get a cleaner overlay if we compare against everything- at
                 // a CPU cost.
                 double vol = moleculeA->gaussianIntegral(*moleculeB, conformerA, conformerB);
@@ -508,44 +511,85 @@ namespace Gape {
         };
         writer.setProps(props);
 
+        int count = 0;
+        std::vector<RDGeom::Point3D> points;
+        std::vector<std::string> pharmLabels;
+        std::vector<std::string> featureLabels;
         RWMol pharmMol;
-        Conformer pharmConformer(featureOverlay->numberPharmacophorePoints());
+        for (const auto &[featureType, featurePointSet]: featureOverlay->getFeaturePointSets()) {
+            for (const auto &featurePoint: featurePointSet->getFeatures()) {
+                if (featurePoint->isPharmacophoreFeature) {
+                    pharmMol.addAtom(new Atom(0));
+                    points.push_back(featurePoint->point);
+                    count++;
+
+                    auto pharmLabel = featurePoint->feature->pharmLabel();
+                    pharmLabels.push_back(pharmLabel);
+                    auto featureLabel = featurePoint->featureLabel();
+                    featureLabels.push_back(featureLabel);
+                }
+            }
+        }
+        auto pharmLabel = boost::algorithm::join(pharmLabels, "\n");
+        auto featureLabel = boost::algorithm::join(featureLabels, "\n");
+
         pharmMol.setProp("FITNESS", fitness);
         pharmMol.setProp("VOLUME_INTEGRAL", volumeIntegral);
         pharmMol.setProp("CONFORMATIONAL_ENERGY", conformationalEnergy);
         pharmMol.setProp("DONOR_HYDROGEN_SCORE", featureOverlay->getDonorHydrogenScore());
         pharmMol.setProp("ACCEPTOR_ATOM_SCORE", featureOverlay->getAcceptorAtomScore());
         pharmMol.setProp("AROMATIC_RING_SCORE", featureOverlay->getAromaticRingScore());
-        int count = 0;
-        std::vector<std::string> pharmLabels;
-        std::vector<std::string> featureLabels;
+        pharmMol.setProp("PHARMACOPHORE", pharmLabel);
+        pharmMol.setProp("PHARMACOPHORE_FEATURES", featureLabel);
+        pharmMol.setProp(common_properties::_Name, prefix + " Pharmacophore");
+        auto conformer = new Conformer(points.size());
+        for (int i = 0; i < points.size(); i++) {
+            conformer->setAtomPos(i, points[i]);
+        }
+        pharmMol.addConformer(conformer);
+        writer.write(pharmMol);
+
+        points.clear();
+        count = 0;
+        RWMol pharmGeometryMol;
         for (const auto &[featureType, featurePointSet]: featureOverlay->getFeaturePointSets()) {
             for (const auto &featurePoint: featurePointSet->getFeatures()) {
                 if (featurePoint->isPharmacophoreFeature) {
-                    pharmMol.addAtom(new Atom(0));
-                    pharmConformer.setAtomPos(count, featurePoint->point);
-                    auto pharmLabel = featurePoint->feature->pharmLabel();
-                    pharmLabels.push_back(pharmLabel);
-                    auto featureLabel = featurePoint->feature->featureLabel(featurePoint->coordinates);
-                    featureLabels.push_back(featureLabel);
-                    ++count;
+                    auto geometry = featurePoint->getPharmFeatureGeometry();
+                    for (int i = 0; i < geometry->getNumPoints(); i++) {
+                        pharmGeometryMol.addAtom(new Atom(0));
+                        points.push_back(geometry->getPoint(i));
+                    }
+                    for (int i = 0; i < geometry->getNumPoints(); i++) {
+                        for (int j = i + 1; j < geometry->getNumPoints(); j++) {
+                            pharmGeometryMol.addBond(count + i, count + j, Bond::BondType::SINGLE);
+                        }
+                    }
+                    count += geometry->getNumPoints();
                 }
             }
         }
 
-        auto pharmLabel = boost::algorithm::join(pharmLabels, "\n");
-        auto featureLabel = boost::algorithm::join(featureLabels, "\n");
-        pharmMol.setProp("PHARMACOPHORE", pharmLabel);
-        pharmMol.setProp("PHARMACOPHORE_FEATURES", pharmLabel);
+        pharmGeometryMol.setProp("FITNESS", fitness);
+        pharmGeometryMol.setProp("VOLUME_INTEGRAL", volumeIntegral);
+        pharmGeometryMol.setProp("CONFORMATIONAL_ENERGY", conformationalEnergy);
+        pharmGeometryMol.setProp("DONOR_HYDROGEN_SCORE", featureOverlay->getDonorHydrogenScore());
+        pharmGeometryMol.setProp("ACCEPTOR_ATOM_SCORE", featureOverlay->getAcceptorAtomScore());
+        pharmGeometryMol.setProp("AROMATIC_RING_SCORE", featureOverlay->getAromaticRingScore());
+        pharmGeometryMol.setProp("PHARMACOPHORE", pharmLabel);
+        pharmGeometryMol.setProp("PHARMACOPHORE_FEATURES", featureLabel);
+        pharmGeometryMol.setProp(common_properties::_Name, prefix + " Pharmacophore Geometry");
+        conformer = new Conformer(points.size());
+        for (int i = 0; i < points.size(); i++) {
+            conformer->setAtomPos(i, points[i]);
+        }
+        pharmGeometryMol.addConformer(conformer);
+        writer.write(pharmGeometryMol);
 
-        writer.write(pharmMol);
         writer.close();
-
-        // TODO: second molecule with features
     }
 
     void SuperpositionChromosome::copyConformerCoordinates(const SuperpositionChromosome &other) {
         conformerCoordinates = other.conformerCoordinates;
     }
-
 }

@@ -18,7 +18,7 @@ namespace Gape {
         // two passes in;
 
         for (int pass = 0; pass < 2; ++pass) {
-            REPORT(Reporter::DETAIL) << "Solvation pass " << pass + 1;
+            REPORT(Reporter::DEBUG) << "Solvation pass " << pass + 1;
             bool matched = false;
 
             for (const auto &solvationRule: rules) {

@@ -43,6 +43,8 @@ namespace Gape {
         [[nodiscard]] const std::vector<int>& getIntegerEntryPoints() const { return integerEntryPoints; }
         [[nodiscard]] const SuperpositionMolecule* getFittingMolecule() const { return fittingMolecule; }
         [[nodiscard]] const SuperpositionMolecule* getBaseMolecule() const { return baseMolecule; }
+        int getFittingMoleculeNumber() const { return fittingMoleculeNumber; }
+        int getBaseMoleculeNumber() const { return baseMoleculeNumber; }
 
         const GapeSettings& settings;
 

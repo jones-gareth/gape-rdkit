@@ -10,7 +10,7 @@ if (NOT RDLIB)
     set(RDLIB $ENV{RDLIB})
 endif()
 
-# I think all the RDKit fiddling in this file can be replaced by find_pakage:
+# I think all the RDKit fiddling in this file can be replaced by find_package:
 # Find RDKit package
 # find_package(RDKit REQUIRED)
 
