@@ -1,5 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
 project(Gape)
-cmake_minimum_required(VERSION 2.8)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 #set(CMAKE_VS_PLATFORM_TOOLSET v140)
 add_compile_definitions(INCLUDE_REPORTER)
@@ -18,7 +18,7 @@ endif()
 MESSAGE(STATUS "RDBASE is  ${RDBASE}")
 MESSAGE(STATUS "RDLIB  is  ${RDLIB}")
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # boost
@@ -43,8 +43,8 @@ set(EIGEN_INCLUDE_DIR "${EIGEN_ROOT}")
 #]]
 
 include(ExternalProject)
-set(EIGEN_BUILD_DIR   ${CMAKE_BINARY_DIR}/eigen)
-set(EIGEN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/eigen_include)
+set(EIGEN_BUILD_DIR   ${CMAKE_BINARY_DIR}/External/eigen)
+set(EIGEN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/External/eigen_include)
 set(EIGEN_INCLUDE_DIR ${EIGEN_INSTALL_DIR})
 ExternalProject_Add(
         eigen
@@ -56,17 +56,56 @@ ExternalProject_Add(
         ${CMAKE_COMMAND} -E copy_directory ${EIGEN_BUILD_DIR}/src/eigen/Eigen ${EIGEN_INCLUDE_DIR}/Eigen
         && ${CMAKE_COMMAND} -E copy_directory ${EIGEN_BUILD_DIR}/src/eigen/unsupported ${EIGEN_INCLUDE_DIR}/unsupported
         TEST_COMMAND ""
+        UPDATE_COMMAND ""
+)
+
+set(RAPIDJSON_BUILD_DIR   ${CMAKE_BINARY_DIR}/External/rapidjson)
+set(RAPIDJSON_INSTALL_DIR ${CMAKE_SOURCE_DIR}/External/rapidjson_include)
+set(RAPIDJSON_INCLUDE_DIR ${RAPIDJSON_INSTALL_DIR})
+ExternalProject_Add(
+        rapidjson
+        PREFIX ${RAPIDJSON_BUILD_DIR}
+        GIT_REPOSITORY "https://github.com/Tencent/rapidjson.git"
+        GIT_TAG v1.1.0
+        TIMEOUT 10
+        CMAKE_ARGS
+        -DRAPIDJSON_BUILD_TESTS=OFF
+        -DRAPIDJSON_BUILD_DOC=OFF
+        -DRAPIDJSON_BUILD_EXAMPLES=OFF
+        CONFIGURE_COMMAND
+        ${CMAKE_COMMAND} -E copy_directory ${RAPIDJSON_BUILD_DIR}/src/rapidjson/include/rapidjson ${RAPIDJSON_INCLUDE_DIR}/rapidjson
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
+        UPDATE_COMMAND ""
+)
+
+set(CATCH2_BUILD_DIR   ${CMAKE_BINARY_DIR}/External/catch2)
+set(CATCH2_INSTALL_DIR ${CMAKE_SOURCE_DIR}/External/catch2_include)
+set(CATCH2_INCLUDE_DIR ${CATCH2_INSTALL_DIR})
+
+ExternalProject_Add(
+        catch2
+        PREFIX ${CATCH2_BUILD_DIR}
+        GIT_REPOSITORY "https://github.com/catchorg/Catch2.git"
+        GIT_TAG v2.13.8
+        TIMEOUT 10
+        CMAKE_ARGS
+        CONFIGURE_COMMAND ""
+        ${CMAKE_COMMAND} -E copy_directory ${CATCH2_BUILD_DIR}/src/catch2/single_include/catch2 ${CATCH2_INCLUDE_DIR}/catch2
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
+        UPDATE_COMMAND ""
 )
 
 # include directories
 include_directories(
         "src"
-        "/usr/local/include"
         ${Boost_INCLUDE_DIRS}
         ${RDBASE}/Code
         ${EIGEN_INCLUDE_DIR}
-        ${RDBASE}/External/rapidjson-1.1.0/include
-        ${RDBASE}/External/catch/catch/single_include)
+        ${RAPIDJSON_INCLUDE_DIR}
+        ${CATCH2_INCLUDE_DIR}
+)
 link_directories ( ${RDLIB} )
 
 # Set the directories under src which contain cpp files to be compiled
@@ -84,6 +123,8 @@ if (MSVC)
     # force all boost libraries to dynamic link (we already disabled
     # autolinking, so I don't know why we need this, but we do!)
     add_definitions( -DBOOST_ALL_DYN_LINK )
+    # set iterator debug level to 0 to avoid issues with mixing with RDKit release libraries on a debug build
+    add_compile_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
 elseif (UNIX)
     set(LIB_PREFIX "RDKit")
     set(OS_LIBS, "m")

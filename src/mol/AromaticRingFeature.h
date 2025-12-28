@@ -16,7 +16,7 @@ namespace Gape
 		// Planar Ring
 		bool planar = false;
 
-		thread_local static double normalLength;
+		const static double normalLength;
 
 	public:
 		AromaticRingFeature(int featureSetNumber) :

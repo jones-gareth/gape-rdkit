@@ -92,8 +92,8 @@ namespace Gape
 		 */
 		bool mappingFeature = true;
 
-		thread_local static double maximumGaussianScore;
-		thread_local static double solventVolOk;
+		const static double maximumGaussianScore;
+		const static double solventVolOk;
 
 		/**
 		 * The score function must set this variable
@@ -126,10 +126,10 @@ namespace Gape
 		static double solvationAlpha;
 
 	private:
-		// TODO move scoring and book-keeping to another class
 		/**
 		 * Gaussian parameters for the core built in features.
 		 */
+		// TODO this won't work if multithread GA operations
 		thread_local static double alpha, gaussianN, radius;
 
 	public:

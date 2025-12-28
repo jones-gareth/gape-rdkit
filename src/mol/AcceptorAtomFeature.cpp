@@ -12,17 +12,17 @@
 #include "mol/PartialCharge.h"
 
 namespace Gape {
-    thread_local double AcceptorAtomFeature::maxLonePairLonePairAngle = 50.0 * M_PI / 180.0;
-    thread_local double AcceptorAtomFeature::minLonePairLonePairAngle = 20.0 * M_PI / 180.0;
-    thread_local double AcceptorAtomFeature::maxForwardAcceptorAngle = 80.0 * M_PI / 180.0;
-    thread_local double AcceptorAtomFeature::minForwardAcceptorAngle = 50.0 * M_PI / 180.0;
-    thread_local double AcceptorAtomFeature::maxPlanePlaneAngle = 50.0 * M_PI / 180.0;
-    thread_local double AcceptorAtomFeature::minPlanePlaneAngle = 20.0 * M_PI / 180.0;
-    thread_local double AcceptorAtomFeature::maxPlaneLonePairAngle = 50.0 * M_PI / 180.0;
-    thread_local double AcceptorAtomFeature::minPlaneLonePairAngle = 20.0 * M_PI / 180.0;
-    thread_local double AcceptorAtomFeature::hBondLen = 2.9;
-    thread_local double AcceptorAtomFeature::chargeFactor = 2.0;
-    thread_local double AcceptorAtomFeature::matchFactor = 1.0;
+    const double AcceptorAtomFeature::maxLonePairLonePairAngle = 50.0 * M_PI / 180.0;
+    const double AcceptorAtomFeature::minLonePairLonePairAngle = 20.0 * M_PI / 180.0;
+    const double AcceptorAtomFeature::maxForwardAcceptorAngle = 80.0 * M_PI / 180.0;
+    const double AcceptorAtomFeature::minForwardAcceptorAngle = 50.0 * M_PI / 180.0;
+    const double AcceptorAtomFeature::maxPlanePlaneAngle = 50.0 * M_PI / 180.0;
+    const double AcceptorAtomFeature::minPlanePlaneAngle = 20.0 * M_PI / 180.0;
+    const double AcceptorAtomFeature::maxPlaneLonePairAngle = 50.0 * M_PI / 180.0;
+    const double AcceptorAtomFeature::minPlaneLonePairAngle = 20.0 * M_PI / 180.0;
+    const double AcceptorAtomFeature::hBondLen = 2.9;
+    const double AcceptorAtomFeature::chargeFactor = 2.0;
+    const double AcceptorAtomFeature::matchFactor = 1.0;
     double AcceptorAtomFeature::maxAcceptorPartialCharge = -0.2;
 
     namespace Detail {

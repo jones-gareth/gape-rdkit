@@ -13,6 +13,6 @@ update_rdkit.sh
 .idea
 out
 .settings
-eigen_include
+External
 .cache
 Folder.DotSettings.user

@@ -52,7 +52,8 @@ int main(int argc, char *argv[]) {
     std::string inputFile;
     std::string reportingLevel;
     std::string configFile;
-    options_description desc("Allowed options");
+    // options_description desc("Allowed options");
+    options_description desc;
     desc.add_options()
             ("help", "Help message")
             ("inputFile", options::value<std::string>(&inputFile)->default_value("../../../resources/5ht3.smi"), "input structures")
@@ -132,6 +133,5 @@ int main(int argc, char *argv[]) {
     sdWriter.close();
 
     Superposition superposition(molecules, settings);
-    SuperpositionGa ga(superposition);
-    ga.run();
+    SuperpositionGa::batchRun(superposition);
 }

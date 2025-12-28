@@ -12,6 +12,7 @@
 namespace Gape {
     template<typename Chromosome, typename PopulationPolicy>
     class IslandModel {
+        const size_t runNumber;
         PopulationPolicy &populationPolicy;
         RandomUtil &rng;
         const size_t numberIslands;
@@ -27,7 +28,7 @@ namespace Gape {
         std::shared_ptr<Chromosome> bestChromosome;
 
     public:
-        explicit IslandModel(PopulationPolicy &populationPolicy);
+        explicit IslandModel(size_t runNumber, PopulationPolicy &populationPolicy);
 
         ~IslandModel() = default;
 
@@ -44,17 +45,20 @@ namespace Gape {
         [[nodiscard]] double getBestScore() const { return bestScore; }
 
         std::shared_ptr<Chromosome> getBestChromosome() const { return bestChromosome; }
+
         std::shared_ptr<Chromosome> getBest();
     };
 
     template<typename Chromosome, typename PopulationPolicy>
     IslandModel<Chromosome,
-        PopulationPolicy>::IslandModel(PopulationPolicy &populationPolicy): populationPolicy(populationPolicy),
-                                                                            rng(populationPolicy.getRng()),
-                                                                            numberIslands(
-                                                                                populationPolicy.getNumberIslands()),
-                                                                            operations(
-                                                                                populationPolicy.getOperations()) {
+        PopulationPolicy>::IslandModel(const size_t runNumber,
+                                       PopulationPolicy &populationPolicy) : runNumber(runNumber),
+                                                                             populationPolicy(populationPolicy),
+                                                                             rng(populationPolicy.getRng()),
+                                                                             numberIslands(
+                                                                                 populationPolicy.getNumberIslands()),
+                                                                             operations(
+                                                                                 populationPolicy.getOperations()) {
         populations.reserve(populationPolicy.getNumberIslands());
         for (size_t i = 0; i < numberIslands; i++) {
             populations.
@@ -89,10 +93,10 @@ namespace Gape {
         double val = rng.normalRand() * totalOperatorWeights;
         auto &pop = populations[currentPopulationNumber];
         if (val < migrationWeight) {
-            auto otherPopulationNumber = rng.randomInt(0, numberIslands-1);
+            auto otherPopulationNumber = rng.randomInt(0, numberIslands - 1);
             if (otherPopulationNumber == currentPopulationNumber)
                 otherPopulationNumber++;
-            auto& parent = populations[otherPopulationNumber]->selectParent();
+            auto &parent = populations[otherPopulationNumber]->selectParent();
             auto child = pop->fetchChild();
 
             child->copyGene(*parent);
@@ -111,7 +115,8 @@ namespace Gape {
         if (testFitness > bestScore) {
             testFitness = bestScore;
             bestChromosome = pop->getBest();
-            const auto format = boost::format("Island Pop %2d Op %5d Mig %5d new best: ") % (currentPopulationNumber+1) % numberOperations % numberMigrations;
+            const auto format = boost::format("Island Pop %2d Op %5d Mig %5d new best: ") % (
+                                    currentPopulationNumber + 1) % numberOperations % numberMigrations;
             REPORT(Reporter::DEBUG) << format << bestChromosome->info();
         }
         currentPopulationNumber++;
@@ -143,7 +148,8 @@ namespace Gape {
     std::string IslandModel<Chromosome, PopulationPolicy>::info() const {
         std::stringstream ss;
 
-        const auto format = boost::format("Op %5d Mig %5d \nBest: ")  % numberOperations % numberMigrations;
+        const auto format = boost::format("Run %2d, Op %5d Mig %5d \nBest: ") % runNumber % numberOperations %
+                            numberMigrations;
         ss << format << bestChromosome->info() << std::endl;
         for (size_t i = 0; i < numberIslands; i++) {
             ss << "Island " << i + 1 << " " << populations.at(i)->info() << std::endl;

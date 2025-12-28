@@ -39,10 +39,10 @@ namespace Gape {
         explicit FeatureOverlay(const SuperpositionChromosome &superpositionChromosome);
 
         int numberMolecules() const {
-            return superpositionChromosome.superpositionGa.numberMolecules();
+            return superpositionChromosome.superposition.numberMolecules();
         }
 
-        const SuperpositionGa &getSuperpositionGa() const { return superpositionChromosome.superpositionGa; }
+        const Superposition &getSuperposition() const { return superpositionChromosome.superposition; }
 
         double scoreOverlay();
 

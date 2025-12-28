@@ -20,19 +20,19 @@ namespace Gape
 		/**
 		 * Length of a hydrogen bond. May be changed.
 		 */
-		thread_local static double hBondLen;
+		const static double hBondLen;
 
 		/**
 		 * Pairwise feature score is scaled by this if both features have negative
 		 * charge. May be changed.
 		 */
-		thread_local static double chargeFactor;
+		const static double chargeFactor;
 
 		/**
 		 * Pairwise feature score is scaled by this if both features have the same
 		 * type. May be changed.
 		 */
-		thread_local static double matchFactor;
+		const static double matchFactor;
 
 		// Now stored in SuperpositionCoordinates
 		// std::vector<RDGeom::Point3D> lonePairCoords;
@@ -70,14 +70,14 @@ namespace Gape
 
 	public:
 
-		thread_local static double maxLonePairLonePairAngle;
-		thread_local static double minLonePairLonePairAngle;
-		thread_local static double maxForwardAcceptorAngle;
-		thread_local static double minForwardAcceptorAngle;
-		thread_local static double maxPlanePlaneAngle;
-		thread_local static double minPlanePlaneAngle;
-		thread_local static double maxPlaneLonePairAngle;
-		thread_local static double minPlaneLonePairAngle;
+		const static double maxLonePairLonePairAngle;
+		const static double minLonePairLonePairAngle;
+		const static double maxForwardAcceptorAngle;
+		const static double minForwardAcceptorAngle;
+		const static double maxPlanePlaneAngle;
+		const static double minPlanePlaneAngle;
+		const static double maxPlaneLonePairAngle;
+		const static double minPlaneLonePairAngle;
 
 		// minimum partial charge for a acceptor to be marked as charged
 		static double maxAcceptorPartialCharge;

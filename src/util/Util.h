@@ -21,6 +21,7 @@
 #include <boost/optional.hpp>
 #include "export.h"
 #include <Geometry/point.h>
+#include <functional>
 
 /*
  * Utility methods
@@ -266,7 +267,7 @@ namespace Gape
 	std::vector<T>& filterList(std::vector<T>& values,
 	                           const function<bool(T&)>& filter)
 	{
-		auto iter = remove_if(values.begin(), values.end(), not1(filter));
+		auto iter = remove_if(values.begin(), values.end(), not_fn(filter));
 		values.erase(iter, values.end());
 		return values;
 	}

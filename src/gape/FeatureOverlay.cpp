@@ -123,7 +123,7 @@ namespace Gape {
         testMatched = 0;
 
         auto testMolecule = testFeature.feature->getMolecule();
-        const auto &settings = featureOverlay.getSuperpositionGa().getSuperposition().settings.getGapeParameters();
+        const auto &settings = featureOverlay.getSuperposition().settings.getGapeParameters();
 
         // sum pair-wise score with all other features
         for (auto otherFeature: features) {
@@ -364,7 +364,7 @@ namespace Gape {
     FeatureOverlay::FeatureOverlay(const SuperpositionChromosome &superpositionChromosome): superpositionChromosome(
         superpositionChromosome) {
         assert(numberMolecules() > 2);
-        const auto &settings = superpositionChromosome.superpositionGa.getSuperposition().settings.getGapeParameters();
+        const auto &settings = superpositionChromosome.superposition.settings.getGapeParameters();
 
         if (settings.donorHydrogenWeight > 0) {
             setupFeaturePointSet(FeatureType::DonorInteractionPoint);
@@ -386,7 +386,7 @@ namespace Gape {
         std::vector<std::shared_ptr<FeatureInformation> > setFeatures;
         auto moleculeNumber = 0;
         const auto &superpositionCoordinates = superpositionChromosome.getFittedCoordinates();
-        for (const auto &molecule: superpositionChromosome.superpositionGa.getSuperposition().getMolecules()) {
+        for (const auto &molecule: superpositionChromosome.superposition.getMolecules()) {
             const auto &coordinates = superpositionCoordinates[moleculeNumber];
             const auto &features = molecule->getFeatures().at(featureType);
             for (const auto &feature: features) {
@@ -407,7 +407,7 @@ namespace Gape {
      */
     double FeatureOverlay::scoreOverlay() {
         score = .0;
-        const auto &settings = superpositionChromosome.superpositionGa.getSuperposition().settings.getGapeParameters();
+        const auto &settings = superpositionChromosome.superposition.settings.getGapeParameters();
 
         if (settings.donorHydrogenWeight > 0) {
             donorHydrogenScore = groupFeatures(FeatureType::DonorInteractionPoint);

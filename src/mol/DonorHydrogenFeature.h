@@ -17,22 +17,22 @@ namespace Gape
 		/**
 		 * Length of a hydrogen bond. May be changed.
 		 */
-		thread_local static double hBondLen;
+		const static double hBondLen;
 
 		/**
 		 * Pairwise feature score is scaled by this if both features have negative
 		 * charge. May be changed.
 		 */
-		thread_local static double chargeFactor;
+		const static double chargeFactor;
 		/**
 		 * Pairwise feature score is scaled by this if both features have the same
 		 * type. May be changed.
 		 */
-		thread_local static double matchFactor;
+		const static double matchFactor;
 
-		thread_local static double maxDonorDonorAngle;
-		thread_local static double minDonorDonorAngle;
-		thread_local static bool scoreDonorAtoms;
+		const static double maxDonorDonorAngle;
+		const static double minDonorDonorAngle;
+		const static bool scoreDonorAtoms;
 
 		bool charged = false;
 

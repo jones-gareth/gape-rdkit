@@ -26,8 +26,12 @@ namespace Gape {
         int fittingMoleculeNumber = -1;
 
     public:
-        Superposition(const std::vector<std::shared_ptr<SuperpositionMolecule>>& m,
+        explicit Superposition(const std::vector<std::shared_ptr<SuperpositionMolecule>>& m,
                       const GapeSettings& s);
+
+        Superposition(const Superposition&) = delete;
+
+        Superposition& operator=(const Superposition&) = delete;
 
         void setupMolecules();
 
@@ -38,6 +42,9 @@ namespace Gape {
         [[nodiscard]] std::vector<int> getIntegerStringRanges() const { return integerStringRanges; }
         [[nodiscard]] const std::vector<std::shared_ptr<SuperpositionMolecule>>& getMolecules() const {
             return molecules;
+        }
+        int numberMolecules() const {
+            return static_cast<int>(molecules.size());
         }
         [[nodiscard]] const std::vector<int>& getBinaryEntryPoints() const { return binaryEntryPoints; }
         [[nodiscard]] const std::vector<int>& getIntegerEntryPoints() const { return integerEntryPoints; }

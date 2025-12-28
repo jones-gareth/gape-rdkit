@@ -10,8 +10,8 @@
 
 namespace Gape
 {
-	thread_local double Feature::maximumGaussianScore = 2.0;
-	thread_local double Feature::solventVolOk = .025;
+	const double Feature::maximumGaussianScore = 2.0;
+	const double Feature::solventVolOk = .025;
 	thread_local double Feature::radius = NAN;
 	thread_local double Feature::gaussianN = NAN;
 	thread_local double Feature::alpha = NAN;

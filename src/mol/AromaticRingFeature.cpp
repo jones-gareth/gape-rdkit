@@ -18,7 +18,7 @@ namespace Gape
 		}
 	}
 
-	thread_local double AromaticRingFeature::normalLength = 3.0;
+	const double AromaticRingFeature::normalLength = 3.0;
 
 	std::vector<std::shared_ptr<Feature>> AromaticRingFeature::findAromaticRings(
 		const SuperpositionMolecule* superpositionMolecule)

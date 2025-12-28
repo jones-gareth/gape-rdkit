@@ -56,7 +56,7 @@ namespace Gape {
 
     public:
         int solutionNumber = 0;
-        const SuperpositionGa &superpositionGa;
+        const Superposition &superposition;
         BinaryStringChromosome binaryStringChromosome;
         IntegerStringChromosome integerStringChromosome;
 

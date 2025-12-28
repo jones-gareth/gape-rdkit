@@ -44,8 +44,8 @@ namespace Gape {
     const double SuperpositionChromosome::passOneDistance = 2.0;
     const double SuperpositionChromosome::maxPassDistance = 5.0;
 
-    SuperpositionChromosome::SuperpositionChromosome(const SuperpositionGa &superpositionGa) : superpositionGa(
-            superpositionGa),
+    SuperpositionChromosome::SuperpositionChromosome(const SuperpositionGa &superpositionGa) : superposition(
+            superpositionGa.getSuperposition()),
         binaryStringChromosome(
             superpositionGa.getSuperposition().getBinaryStringLength(),
             superpositionGa.getRng(),
@@ -69,7 +69,6 @@ namespace Gape {
     void SuperpositionChromosome::fitMolecules(bool remap) {
         fitted = false;
 
-        const auto &superposition = superpositionGa.getSuperposition();
         const auto &molecules = superposition.getMolecules();
         conformerCoordinates.reserve(molecules.size());\
 
@@ -333,7 +332,7 @@ namespace Gape {
         assert(ok && fitted);
 
         fitness = .0;
-        const auto &settings = superpositionGa.getSuperposition().settings.getGapeParameters();
+        const auto &settings = superposition.settings.getGapeParameters();
         // Conformational Energies
         if (settings.conformationalWeight > .0) {
             calculateConformationalEnergy();
@@ -382,7 +381,7 @@ namespace Gape {
 
     double SuperpositionChromosome::calculateConformationalEnergy() {
         conformationalEnergy = .0;
-        const auto &molecules = superpositionGa.getSuperposition().getMolecules();
+        const auto &molecules = superposition.getMolecules();
         conformationalEnergies.clear();
         conformationalEnergies.reserve(molecules.size());
         for (size_t i = 0; i < molecules.size(); i++) {
@@ -401,7 +400,7 @@ namespace Gape {
     }
 
     double SuperpositionChromosome::calculateVolumeIntegral() {
-        const auto &molecules = superpositionGa.getSuperposition().getMolecules();
+        const auto &molecules = superposition.getMolecules();
         auto numberMolecules = molecules.size();
         volumeIntegrals = std::make_shared<Array2D<double> >(numberMolecules, numberMolecules);
         volumeIntegral = 0.0;
@@ -434,7 +433,7 @@ namespace Gape {
      *
      */
     bool SuperpositionChromosome::sameNiche(const SuperpositionChromosome &other) const {
-        const auto &settings = superpositionGa.getSuperposition().settings.getGapeParameters();
+        const auto &settings = superposition.settings.getGapeParameters();
         if (!settings.useNiches) {
             return false;
         }
@@ -476,9 +475,8 @@ namespace Gape {
         SDWriter writer(&outStream);
         std::vector<std::string> props{"CONFORMATIONAL_ENERGY"};
         writer.setProps(props);
-        const auto &superposition = superpositionGa.getSuperposition();
-        for (int i = 0; i < superpositionGa.numberMolecules(); i++) {
-            const auto &mol = superpositionGa.getSuperposition().getMolecules()[i];
+        for (int i = 0; i < superposition.numberMolecules(); i++) {
+            const auto &mol = superposition.getMolecules()[i];
             RWMol rdMol = mol->getMol();
 
             rdMol.clearConformers();

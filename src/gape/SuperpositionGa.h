@@ -23,7 +23,6 @@ namespace Gape {
         BinaryStringChromosomePolicy binaryStringChromosomePolicy;
         int numberOperations = 0;
         bool nichesOn = false;
-        std::vector<std::shared_ptr<SuperpositionChromosome>> solutions;
 
         std::shared_ptr<SuperpositionChromosome> run(int runNumber);
 
@@ -66,7 +65,9 @@ namespace Gape {
             return static_cast<int>(superposition.getMolecules().size());
         }
 
-        void run();
+        static std::vector<std::shared_ptr<SuperpositionChromosome>> batchRun(const Superposition& superposition);
+
+        static std::shared_ptr<SuperpositionChromosome> singleRun(const Superposition &superposition, const int runNumber);
 
         std::shared_ptr<SuperpositionChromosome> createChromosome();
 

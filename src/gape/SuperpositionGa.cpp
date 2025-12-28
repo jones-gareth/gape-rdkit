@@ -1,6 +1,7 @@
 #include "SuperpositionGa.h"
 
 #include <chrono>
+#include <future>
 
 #include "util/Reporter.h"
 #include "SuperpositionChromosome.h"
@@ -39,6 +40,8 @@ namespace Gape {
     }
 
     std::shared_ptr<SuperpositionChromosome> SuperpositionGa::run(int runNumber) {
+            const auto runStart = std::chrono::high_resolution_clock::now();
+
         const auto &gapeParameters = superposition.settings.getGapeParameters();
 
         double startFittingRadius = gapeParameters.startFittingRadius;
@@ -49,7 +52,7 @@ namespace Gape {
         else
             Feature::setRadius(finishFittingRadius);
 
-        SuperpositionGaPopulation population(*this);
+        SuperpositionGaPopulation population(runNumber, *this);
         auto format =
                 boost::format(
                     "Running GA run %2d number operations %5d population size %5d ") %
@@ -65,7 +68,7 @@ namespace Gape {
         int reportInterval = 1000;
         double d = numberOperations * nichingOff;
         int opOff = static_cast<int>(std::ceil(d));
-        REPORT(Reporter::INFO) << "Turning off niching and fitting radius scaling at " << opOff;
+        REPORT(Reporter::INFO) << "Run " << runNumber << "Turning off niching and fitting radius scaling at " << opOff;
         int rebuildInterval = opOff / numberRebuilds;
 
         REPORT(Reporter::INFO) << population.info() << endl;
@@ -73,7 +76,7 @@ namespace Gape {
         for (int i = 0; i < numberOperations; i++) {
             // Turn off niching after 80% to allow convergence
             if (nichesOn && i >= opOff) {
-                REPORT(Reporter::INFO) << "OP " << i << ": turning off niching";
+                REPORT(Reporter::INFO) << "Run " <<runNumber << "OP " << i << ": turning off niching";
                 nichesOn = false;
             }
 
@@ -88,7 +91,7 @@ namespace Gape {
                                           + (startFittingRadius - finishFittingRadius) * frac;
                     Feature::setRadius(radius);
                 }
-                REPORT(Reporter::INFO) << "Setting fitting radius to " << Feature::getRadius();
+                REPORT(Reporter::INFO) << "Run " << runNumber << " setting fitting radius to " << Feature::getRadius();
                 population.rebuild();
             }
 
@@ -99,6 +102,19 @@ namespace Gape {
         }
 
         const auto best = population.getBest();
+        best->solutionNumber = runNumber;
+
+        const auto n = runNumber + 1;
+        REPORT(Reporter::INFO) << "Best solution for run number " << n << ":" << best->info();
+        const auto fileName = boost::format("GA_solution_%d.sdf") % n;
+        const auto prefix = boost::format("Solution number %d") % n;
+        std::fstream out{fileName.str(), std::fstream::out};
+        best->outputSolution(out, prefix.str());
+        out.close();
+        const auto runEnd = std::chrono::high_resolution_clock::now();
+        const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(runEnd - runStart);
+        const auto timeString = boost::format("Run time %5.2f") % (duration.count() / 1000.0);
+        REPORT(Reporter::INFO) << timeString.str();
         return best;
     }
 
@@ -161,7 +177,7 @@ namespace Gape {
     }
 
     void SuperpositionGa::superpositionMigrationOperation(
-        // this function is never called migraton is handled in IslandModel::iterate
+        // this function is never called migration is handled in IslandModel::iterate
         const std::vector<std::shared_ptr<SuperpositionChromosome> > &parents,
         std::vector<std::shared_ptr<SuperpositionChromosome> > &children) {
         assert(parents.size() == 1);
@@ -170,27 +186,34 @@ namespace Gape {
         children[0]->setOperationName(OperationName::Migrate);
     }
 
-    void SuperpositionGa::run() {
+    std::shared_ptr<SuperpositionChromosome> SuperpositionGa::singleRun(const Superposition &superposition, const int runNumber) {
+        SuperpositionGa ga(superposition);
+        return ga.run(runNumber);
+    }
+
+    std::vector<std::shared_ptr<SuperpositionChromosome>> SuperpositionGa::batchRun(const Superposition &superposition) {
+        std::vector<std::shared_ptr<SuperpositionChromosome>> solutions;
         const auto batchStart = std::chrono::high_resolution_clock::now();
         const auto numberRuns = superposition.settings.getGapeParameters().numberRuns;
         solutions.clear();
         solutions.reserve(numberRuns);
-        for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
-            const auto runStart = std::chrono::high_resolution_clock::now();
-            const auto best = run(runNumber);
-            best->solutionNumber = runNumber;
-            const auto n = runNumber + 1;
-            REPORT(Reporter::INFO) << "Best solution for run number " << n << best->info();
-            const auto fileName = boost::format("GA_solution_%d.sdf") % n;
-            const auto prefix = boost::format("Solution number %d") % n;
-            std::fstream out{fileName.str(), std::fstream::out};
-            best->outputSolution(out, prefix.str());
-            out.close();
-            solutions.push_back(best);
-            const auto runEnd = std::chrono::high_resolution_clock::now();
-            const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(runEnd - runStart);
-            const auto timeString = boost::format("Run time %5.2f") % (duration.count() / 1000.0);
-            REPORT(Reporter::INFO) << timeString.str();
+        // bool parallelRuns = superposition.settings.getGapeParameters().parallelRuns;
+        bool parallelRuns = true;
+        if (parallelRuns) {
+            std::vector<future<std::shared_ptr<SuperpositionChromosome>>> tasks;
+            tasks.reserve(numberRuns);
+            for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
+                auto future = std::async(std::launch::async, &Gape::SuperpositionGa::singleRun, std::ref(superposition), runNumber);
+                tasks.push_back(std::move(future));
+            }
+            std::transform(tasks.begin(), tasks.end(), back_inserter(solutions),
+               [](future<std::shared_ptr<SuperpositionChromosome>> &f) { return f.get(); });
+
+        } else {
+            for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
+                const auto best = singleRun(superposition, runNumber);
+                solutions.push_back(best);
+            }
         }
 
         const auto batchEnd = std::chrono::high_resolution_clock::now();
@@ -218,6 +241,8 @@ namespace Gape {
                 out.close();
             }
         }
+
+        return solutions;
     }
 
     std::shared_ptr<SuperpositionChromosome> SuperpositionGa::createChromosome() {
