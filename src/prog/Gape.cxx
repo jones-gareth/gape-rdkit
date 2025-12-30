@@ -112,6 +112,7 @@ int main(int argc, char *argv[]) {
         if (!mol->hasProp("_Name")) {
             mol->setProp("_Name", (boost::format("Ligand %d") % ligandNum).str());
         }
+        REPORT(Reporter::DETAIL) << "Preparing molecule " << mol->getProp<std::string>("_Name");
         auto superpositionMolecule = std::make_shared<Gape::SuperpositionMolecule>(*mol, settings);
         delete mol;
         superpositionMolecule->solvate();

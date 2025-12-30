@@ -7,6 +7,8 @@
 #include <GraphMol/Substruct/SubstructMatch.h>
 #include <GraphMol/SmilesParse/SmilesParse.h>
 
+#include "gape/SuperpositionMolecule.h"
+
 namespace Gape {
     using namespace RDKit;
 
@@ -116,6 +118,16 @@ namespace Gape {
                         continue;
                     }
                     auto firstAtom = mol.getAtomWithIdx(match.front().second);
+                    if (bondType == HydrogenBondType::Acceptor) {
+                        // check for planar atoms or partially conjugated nitrogens
+                        if (SuperpositionMolecule::isNpl3Atom(*firstAtom)) {
+                            continue;
+                        }
+                        if (SuperpositionMolecule::isAmideNitrogen(*firstAtom)) {
+                            continue;
+                        }
+
+                    }
                     if (features.count(firstAtom)) {
                         if (features[firstAtom]->weight < bondingType->weight) {
                             features[firstAtom] = bondingType;
@@ -129,7 +141,7 @@ namespace Gape {
 
         for (const auto &[atom, bondingType]: features) {
             std::string typeStr(bondingType->hydrogenBondType == HydrogenBondType::Donor ? "Donor" : "Acceptor");
-            REPORT(Reporter::DETAIL) << "Atom " << atom->getIdx() << " matches " << typeStr
+            REPORT(Reporter::DETAIL) << "Atom " << atom->getIdx()+1 << " matches " << typeStr
                                      << " definition for " << bondingType->name;
         }
 

@@ -65,7 +65,7 @@ namespace Gape {
         nichesOn = gapeParameters.useNiches;
         double nichingOff = gapeParameters.nichingOff;
         int numberRebuilds = gapeParameters.numberRebuilds;
-        int reportInterval = 1000;
+        int reportInterval = 5000;
         double d = numberOperations * nichingOff;
         int opOff = static_cast<int>(std::ceil(d));
         REPORT(Reporter::INFO) << "Run " << runNumber << "Turning off niching and fitting radius scaling at " << opOff;
@@ -76,7 +76,7 @@ namespace Gape {
         for (int i = 0; i < numberOperations; i++) {
             // Turn off niching after 80% to allow convergence
             if (nichesOn && i >= opOff) {
-                REPORT(Reporter::INFO) << "Run " <<runNumber << "OP " << i << ": turning off niching";
+                REPORT(Reporter::INFO) << "Run " << runNumber << " OP " << i << ": turning off niching";
                 nichesOn = false;
             }
 
@@ -198,8 +198,9 @@ namespace Gape {
         solutions.clear();
         solutions.reserve(numberRuns);
         // bool parallelRuns = superposition.settings.getGapeParameters().parallelRuns;
-        bool parallelRuns = true;
+        bool parallelRuns = false;
         if (parallelRuns) {
+            /*
             std::vector<future<std::shared_ptr<SuperpositionChromosome>>> tasks;
             tasks.reserve(numberRuns);
             for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
@@ -208,6 +209,21 @@ namespace Gape {
             }
             std::transform(tasks.begin(), tasks.end(), back_inserter(solutions),
                [](future<std::shared_ptr<SuperpositionChromosome>> &f) { return f.get(); });
+               */
+            solutions.resize(numberRuns);
+            vector<std::unique_ptr<std::thread>> threads;
+            threads.reserve(numberRuns);
+            for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
+                auto lambda = [&superposition, runNumber, &solutions]() {
+                    const auto best = singleRun(superposition, runNumber);
+                    solutions[runNumber] = best;
+                };
+                auto t = std::make_unique<std::thread>(lambda);
+                threads.push_back(std::move(t));
+            }
+            for (auto &t: threads) {
+                t->join();
+            }
 
         } else {
             for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
@@ -231,9 +247,8 @@ namespace Gape {
             for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
                 const auto &c = solutions[runNumber];
                 const auto n = runNumber + 1;
-                const auto msg = boost::format("Rank %2d solution %2d fitness %5.2f") % n % (c->solutionNumber + 1) % c
-                                 ->getFitness();
-                REPORT(Reporter::INFO) << msg.str();
+                const auto msg = boost::format("Rank %2d solution %2d ") % n % (c->solutionNumber + 1);
+                REPORT(Reporter::INFO) << msg.str() << c->info();
                 const auto fileName = boost::format("GA_rank_%d.sdf") % n;
                 const auto prefix = boost::format("Solution rank %d") % n;
                 std::fstream out{fileName.str(), std::fstream::out};

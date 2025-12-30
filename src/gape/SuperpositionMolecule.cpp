@@ -127,11 +127,12 @@ namespace Gape {
         return MolToMolBlock(mol);
     }
 
-    bool SuperpositionMolecule::isO2(const Atom &atom) const {
+    bool SuperpositionMolecule::isO2(const Atom &atom) {
         if (atom.getAtomicNum() != 8 || atom.getDegree() != 1 || atom.getHybridization() != Atom::SP2) {
             return false;
         }
         // Don't think this is needed
+        const auto &mol = atom.getOwningMol();
         const auto bond = *mol.atomBonds(&atom).begin();
         if (bond->getBondType() == Bond::BondType::DOUBLE) {
             return true;
@@ -139,12 +140,13 @@ namespace Gape {
         return false;
     }
 
-    bool SuperpositionMolecule::isO3(const RDKit::Atom &atom) const {
+    bool SuperpositionMolecule::isO3(const RDKit::Atom &atom) {
         // RDKit will set the hybridization of the OH atom in COOH to SP2- so don't check hybridization here
         if (atom.getAtomicNum() != 8 || atom.getTotalDegree() != 2) {
             return false;
         }
         // Don't think this is needed
+        const auto &mol = atom.getOwningMol();
         for (const auto bond: mol.atomBonds(&atom)) {
             if (bond->getBondType() != Bond::BondType::SINGLE) {
                 return false;
@@ -153,7 +155,20 @@ namespace Gape {
         return true;
     }
 
-    bool SuperpositionMolecule::isAmideBond(const RDKit::Bond &bond) const {
+    bool SuperpositionMolecule::isAmideNitrogen(const RDKit::Atom &atom) {
+        if (atom.getAtomicNum() != 7) {
+            return false;
+        }
+        const auto &mol = atom.getOwningMol();
+        for (const auto bond: mol.atomBonds(&atom)) {
+            if (isAmideBond(*bond)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool SuperpositionMolecule::isAmideBond(const RDKit::Bond &bond) {
         if (bond.getBondType() != Bond::BondType::SINGLE) {
             return false;
         }
@@ -173,7 +188,7 @@ namespace Gape {
         if (carbon->getIsAromatic() || nitrogen->getIsAromatic()) {
             return false;
         }
-        for (const auto neighbor: mol.atomNeighbors(carbon)) {
+        for (const auto neighbor: bond.getOwningMol().atomNeighbors(carbon)) {
             if (isO2(*neighbor)) {
                 return true;
             }
@@ -185,11 +200,11 @@ namespace Gape {
         return (bond.getBeginAtom()->getTotalDegree() == 1 || bond.getEndAtom()->getTotalDegree() == 1);
     }
 
-    bool SuperpositionMolecule::isNpl3Atom(const RDKit::Atom &atom) const {
+    bool SuperpositionMolecule::isNpl3Atom(const RDKit::Atom &atom) {
         if (atom.getAtomicNum() != 7 || atom.getTotalDegree() != 3) {
             return false;
         }
-        for (const auto neighbor: mol.atomNeighbors(&atom)) {
+        for (const auto neighbor: atom.getOwningMol().atomNeighbors(&atom)) {
             if (isSp2Carbon(*neighbor)) {
                 return true;
             }
@@ -197,11 +212,11 @@ namespace Gape {
         return false;
     }
 
-    bool SuperpositionMolecule::isArginineCarbon(const RDKit::Atom &atom) const {
+    bool SuperpositionMolecule::isArginineCarbon(const RDKit::Atom &atom) {
         if (atom.getAtomicNum() != 6 || atom.getHybridization() != Atom::SP2 || atom.getTotalDegree() != 3) {
             return false;
         }
-        for (const auto neighbor: mol.atomNeighbors(&atom)) {
+        for (const auto neighbor: atom.getOwningMol().atomNeighbors(&atom)) {
             if (neighbor->getAtomicNum() != 7) {
                 return false;
             }
@@ -213,17 +228,17 @@ namespace Gape {
         return atom.getAtomicNum() == 6 && atom.getHybridization() == Atom::SP2;
     }
 
-    bool SuperpositionMolecule::atomIsInRing(const RDKit::Atom &atom) const {
-        return mol.getRingInfo()->numAtomRings(atom.getIdx());
+    bool SuperpositionMolecule::atomIsInRing(const RDKit::Atom &atom) {
+        return atom.getOwningMol().getRingInfo()->numAtomRings(atom.getIdx());
     }
 
-    bool SuperpositionMolecule::isCOOHCarbon(const RDKit::Atom &atom, Atom *&o2Atom, Atom *&o3Atom) const {
+    bool SuperpositionMolecule::isCOOHCarbon(const RDKit::Atom &atom, Atom *&o2Atom, Atom *&o3Atom) {
         if (atom.getAtomicNum() != 6 || atom.getHybridization() != Atom::SP2 || atomIsInRing(atom) ||
             atom.getDegree() != 3) {
             return false;
         }
         o3Atom = nullptr, o2Atom = nullptr;
-        for (const auto neighbor: mol.atomNeighbors(&atom)) {
+        for (const auto neighbor: atom.getOwningMol().atomNeighbors(&atom)) {
             if (isO2(*neighbor)) {
                 o2Atom = neighbor;
             } else if (isO3(*neighbor)) {
@@ -310,16 +325,17 @@ namespace Gape {
         assert(mol.getNumConformers() == 1);
     }
 
-    bool SuperpositionMolecule::isNitroOxygen(const Atom &atom) const {
+    bool SuperpositionMolecule::isNitroOxygen(const Atom &atom) {
         if (atom.getAtomicNum() != 8 || atom.getDegree() != 1) {
             return false;
         }
 
+        auto &mol = atom.getOwningMol();
         const auto neighbor = *mol.atomNeighbors(&atom).begin();
         return isNitroNitrogen(*neighbor);
     }
 
-    bool SuperpositionMolecule::isEtherOxygen(const Atom &atom) const {
+    bool SuperpositionMolecule::isEtherOxygen(const Atom &atom) {
         if (atom.getAtomicNum() != 8 || atom.getDegree() != 2) {
             return false;
         }
@@ -338,12 +354,13 @@ namespace Gape {
         return singleBondCount == 2;
     }
 
-    bool SuperpositionMolecule::isNitroNitrogen(const Atom &atom) const {
+    bool SuperpositionMolecule::isNitroNitrogen(const Atom &atom) {
         if (atom.getAtomicNum() != 7 || atom.getDegree() != 3) {
             return false;
         }
 
         int numOxy = 0;
+        const auto &mol = atom.getOwningMol();
         for (const auto &neighbor: mol.atomNeighbors(&atom)) {
             if (neighbor->getAtomicNum() == 8 && neighbor->getDegree() == 1) {
                 numOxy++;
@@ -353,20 +370,22 @@ namespace Gape {
         return numOxy == 2;
     }
 
-    bool SuperpositionMolecule::isCarboxylateOxygen(const Atom &atom) const {
+    bool SuperpositionMolecule::isCarboxylateOxygen(const Atom &atom) {
         if (atom.getAtomicNum() != 8 || atom.getDegree() != 1) {
             return false;
         }
+        const auto &mol = atom.getOwningMol();
         const auto neighbor = *mol.atomNeighbors(&atom).begin();
         return isCarboxylateCarbon(*neighbor);
     }
 
-    bool SuperpositionMolecule::isCarboxylateCarbon(const Atom &atom) const {
+    bool SuperpositionMolecule::isCarboxylateCarbon(const Atom &atom) {
         if (atom.getAtomicNum() != 6 || atom.getDegree() != 3) {
             return false;
         }
 
         int numOxy = 0;
+        const auto &mol = atom.getOwningMol();
         for (const auto &neighbor: mol.atomNeighbors(&atom)) {
             if (neighbor->getAtomicNum() == 8 && neighbor->getDegree() == 1) {
                 numOxy++;

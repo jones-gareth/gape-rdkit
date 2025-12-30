@@ -98,21 +98,25 @@ namespace Gape {
             return acceptors;
         }
 
+        static bool isNpl3Atom(const Atom& atom);
+
+        static bool isAmideNitrogen(const Atom &atom);
+
         /**
          * Check to see if this carbon is in a nitro group.
          *
          * @return
          */
-        bool isNitroOxygen(const Atom& atom) const;
+        static bool isNitroOxygen(const Atom& atom);
 
-        bool isEtherOxygen(const Atom &atom) const;
+        static bool isEtherOxygen(const Atom &atom);
 
         /**
          * Checks to see if this oxygen is in a carboxylate group
          *
          * @return
          */
-        bool isCarboxylateOxygen(const Atom& atom) const;
+        static bool isCarboxylateOxygen(const Atom& atom);
 
         std::string getName() const;
         size_t numberFeatures() const;
@@ -148,23 +152,21 @@ namespace Gape {
         bool fixed = false;
         double weight = 1.0;
 
-        bool isO2(const Atom& atom) const;
+        static bool isO2(const Atom& atom);
 
-        bool isO3(const Atom& atom) const;
+        static bool isO3(const Atom& atom);
 
-        bool isAmideBond(const Bond& bond) const;
-
-        bool isNpl3Atom(const Atom& atom) const;
+        static bool isAmideBond(const Bond& bond);
 
         static bool isTerminalBond(const Bond& bond);
 
-        bool isArginineCarbon(const Atom& atom) const;
+        static bool isArginineCarbon(const Atom& atom);
 
         static bool isSp2Carbon(const Atom& atom);
 
-        bool atomIsInRing(const Atom& atom) const;
+        static bool atomIsInRing(const Atom& atom);
 
-        bool isCOOHCarbon(const Atom& atom, Atom*& o2Atom, Atom*& o3Atom) const;
+        static bool isCOOHCarbon(const Atom& atom, Atom*& o2Atom, Atom*& o3Atom);
 
         RotatableBondType isRotatableBond(const Bond& bond, bool& canFlatten) const;
 
@@ -173,14 +175,14 @@ namespace Gape {
          *
          * @return
          */
-        bool isNitroNitrogen(const Atom& atom) const;
+        static bool isNitroNitrogen(const Atom& atom);
 
         /**
          * Checks to see if this carbon is a carboxylate
          *
          * @return
          */
-        bool isCarboxylateCarbon(const Atom& atom) const;
+        static bool isCarboxylateCarbon(const Atom& atom);
 
         void buildSuperpositionCoordinates();
 

@@ -487,11 +487,11 @@ namespace Gape {
             rdMol.setProp("CONFORMATIONAL_ENERGY", conformationalEnergies[i]);
             auto name = rdMol.getProp<std::string>(common_properties::_Name);
             if (mol.get() == superposition.getBaseMolecule()) {
-                name = prefix + name + " Base Molecule";
+                name = prefix + " " + name + " Base Molecule";
             } else if (mol.get() == superposition.getFittingMolecule()) {
-                name = prefix + name + " Fitting Molecule";
+                name = prefix + " " + name + " Fitting Molecule";
             } else {
-                name = prefix + name;
+                name = prefix + " " + name;
             }
             rdMol.setProp(common_properties::_Name, name);
             rdMol.setProp("CONFORMATIONAL_ENERGY", conformationalEnergies[i]);
