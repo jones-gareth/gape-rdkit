@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <future>
+#include <GraphMol/FileParsers/MolSupplier.h>
 
 #include "util/Reporter.h"
 #include "SuperpositionChromosome.h"
@@ -31,7 +32,7 @@ namespace Gape {
             numberIslands = numberMolecules + 1;
             numberOperations = numberMolecules * 15000;
             popsize = 100;
-            REPORT(Reporter::INFO) << "Number islands " << numberIslands << " popsize " << popsize +
+            REPORT(Reporter::INFO) << "Number islands " << numberIslands << " popsize " << popsize <<
  " number iterations" << numberOperations;
         }
 
@@ -40,7 +41,7 @@ namespace Gape {
     }
 
     std::shared_ptr<SuperpositionChromosome> SuperpositionGa::run(int runNumber) {
-            const auto runStart = std::chrono::high_resolution_clock::now();
+        const auto runStart = std::chrono::high_resolution_clock::now();
 
         const auto &gapeParameters = superposition.settings.getGapeParameters();
 
@@ -68,7 +69,7 @@ namespace Gape {
         int reportInterval = 5000;
         double d = numberOperations * nichingOff;
         int opOff = static_cast<int>(std::ceil(d));
-        REPORT(Reporter::INFO) << "Run " << runNumber << "Turning off niching and fitting radius scaling at " << opOff;
+        REPORT(Reporter::INFO) << "Run " << runNumber << " Turning off niching and fitting radius scaling at " << opOff;
         int rebuildInterval = opOff / numberRebuilds;
 
         REPORT(Reporter::INFO) << population.info() << endl;
@@ -91,7 +92,7 @@ namespace Gape {
                                           + (startFittingRadius - finishFittingRadius) * frac;
                     Feature::setRadius(radius);
                 }
-                REPORT(Reporter::INFO) << "Run " << runNumber << " setting fitting radius to " << Feature::getRadius();
+                REPORT(Reporter::DEBUG) << "Run " << runNumber << " setting fitting radius to " << Feature::getRadius();
                 population.rebuild();
             }
 
@@ -186,13 +187,15 @@ namespace Gape {
         children[0]->setOperationName(OperationName::Migrate);
     }
 
-    std::shared_ptr<SuperpositionChromosome> SuperpositionGa::singleRun(const Superposition &superposition, const int runNumber) {
+    std::shared_ptr<SuperpositionChromosome> SuperpositionGa::singleRun(const Superposition &superposition,
+                                                                        const int runNumber) {
         SuperpositionGa ga(superposition);
         return ga.run(runNumber);
     }
 
-    std::vector<std::shared_ptr<SuperpositionChromosome>> SuperpositionGa::batchRun(const Superposition &superposition) {
-        std::vector<std::shared_ptr<SuperpositionChromosome>> solutions;
+    std::vector<std::shared_ptr<SuperpositionChromosome> >
+    SuperpositionGa::batchRun(const Superposition &superposition) {
+        std::vector<std::shared_ptr<SuperpositionChromosome> > solutions;
         const auto batchStart = std::chrono::high_resolution_clock::now();
         const auto numberRuns = superposition.settings.getGapeParameters().numberRuns;
         solutions.clear();
@@ -200,6 +203,7 @@ namespace Gape {
         // bool parallelRuns = superposition.settings.getGapeParameters().parallelRuns;
         bool parallelRuns = false;
         if (parallelRuns) {
+            Eigen::initParallel();
             /*
             std::vector<future<std::shared_ptr<SuperpositionChromosome>>> tasks;
             tasks.reserve(numberRuns);
@@ -211,7 +215,7 @@ namespace Gape {
                [](future<std::shared_ptr<SuperpositionChromosome>> &f) { return f.get(); });
                */
             solutions.resize(numberRuns);
-            vector<std::unique_ptr<std::thread>> threads;
+            vector<std::unique_ptr<std::thread> > threads;
             threads.reserve(numberRuns);
             for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
                 auto lambda = [&superposition, runNumber, &solutions]() {
@@ -224,12 +228,65 @@ namespace Gape {
             for (auto &t: threads) {
                 t->join();
             }
-
         } else {
             for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
                 const auto best = singleRun(superposition, runNumber);
                 solutions.push_back(best);
             }
+        }
+
+        const auto batchEnd = std::chrono::high_resolution_clock::now();
+        const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(batchEnd - batchStart);
+        const auto timeString = boost::format("Batch time %5.2f") % (duration.count() / 1000.0);
+        REPORT(Reporter::INFO) << timeString.str();
+
+        if (numberRuns > 0) {
+            std::sort(solutions.begin(), solutions.end(),
+                      [](const auto &a, const auto &b) {
+                          return a->getFitness() > b->getFitness();
+                      });
+
+
+            for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
+                const auto &c = solutions[runNumber];
+                const auto n = runNumber + 1;
+                const auto msg = boost::format("Rank %2d solution %2d ") % n % (c->solutionNumber + 1);
+                REPORT(Reporter::INFO) << msg.str() << c->info();
+                const auto fileName = boost::format("GA_rank_%d.sdf") % n;
+                const auto prefix = boost::format("Solution rank %d") % n;
+                std::fstream out{fileName.str(), std::fstream::out};
+                c->outputSolution(out, prefix.str());
+                out.close();
+            }
+        }
+
+        return solutions;
+    }
+
+    std::vector<std::shared_ptr<SuperpositionChromosome> >
+    SuperpositionGa::testBatchRun(const std::string &inputFile, const GapeSettings &settings) {
+        std::vector<std::shared_ptr<SuperpositionChromosome> > solutions;
+        const auto batchStart = std::chrono::high_resolution_clock::now();
+        const auto numberRuns = settings.getGapeParameters().numberRuns;
+        solutions.clear();
+        solutions.reserve(numberRuns);
+
+        solutions.resize(numberRuns);
+        vector<std::unique_ptr<std::thread> > threads;
+        threads.reserve(numberRuns);
+        for (int runNumber = 0; runNumber < numberRuns; runNumber++) {
+            auto lambda = [&inputFile, &settings, &solutions, runNumber]() {
+                RDKit::SmilesMolSupplier smilesMolSupplier(inputFile, " ", 0, 1, false, true);
+                auto molecules = SuperpositionMolecule::loadMolecules(smilesMolSupplier, settings);
+                Superposition superposition(molecules, settings);
+                const auto best = singleRun(superposition, runNumber);
+                solutions[runNumber] = best;
+            };
+            auto t = std::make_unique<std::thread>(lambda);
+            threads.push_back(std::move(t));
+        }
+        for (auto &t: threads) {
+            t->join();
         }
 
         const auto batchEnd = std::chrono::high_resolution_clock::now();

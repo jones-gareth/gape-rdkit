@@ -18,7 +18,7 @@ namespace Gape {
 
 
     class SuperpositionGa : public GaBase {
-        const Superposition& superposition;
+        const Superposition &superposition;
         IntegerStringChromosomePolicy integerStringChromosomePolicy;
         BinaryStringChromosomePolicy binaryStringChromosomePolicy;
         int numberOperations = 0;
@@ -27,37 +27,37 @@ namespace Gape {
         std::shared_ptr<SuperpositionChromosome> run(int runNumber);
 
     public:
-        explicit SuperpositionGa(const Superposition& superposition);
+        explicit SuperpositionGa(const Superposition &superposition);
 
-        SuperpositionGa(const SuperpositionGa&) = delete;
+        SuperpositionGa(const SuperpositionGa &) = delete;
 
-        SuperpositionGa& operator=(const SuperpositionGa&) = delete;
+        SuperpositionGa &operator=(const SuperpositionGa &) = delete;
 
-        [[nodiscard]] std::vector<std::shared_ptr<GaOperation<SuperpositionChromosome>>>
+        [[nodiscard]] std::vector<std::shared_ptr<GaOperation<SuperpositionChromosome> > >
         getOperations() const;
 
         static void superpositionMutateOperation(
-            const std::vector<std::shared_ptr<SuperpositionChromosome>>&
+            const std::vector<std::shared_ptr<SuperpositionChromosome> > &
             parents,
-            std::vector<std::shared_ptr<SuperpositionChromosome>>& children);
+            std::vector<std::shared_ptr<SuperpositionChromosome> > &children);
 
         static void superpositionCrossoverOperation(
-            const std::vector<std::shared_ptr<SuperpositionChromosome>>&
+            const std::vector<std::shared_ptr<SuperpositionChromosome> > &
             parents,
-            std::vector<std::shared_ptr<SuperpositionChromosome>>& children);
+            std::vector<std::shared_ptr<SuperpositionChromosome> > &children);
 
         static void superpositionMigrationOperation(
-               const std::vector<std::shared_ptr<SuperpositionChromosome>>&
-               parents,
-               std::vector<std::shared_ptr<SuperpositionChromosome>>& children);
+            const std::vector<std::shared_ptr<SuperpositionChromosome> > &
+            parents,
+            std::vector<std::shared_ptr<SuperpositionChromosome> > &children);
 
-        [[nodiscard]] const Superposition& getSuperposition() const { return superposition; }
+        [[nodiscard]] const Superposition &getSuperposition() const { return superposition; }
 
-        [[nodiscard]] const IntegerStringChromosomePolicy& getIntegerStringChromosomePolicy() const {
+        [[nodiscard]] const IntegerStringChromosomePolicy &getIntegerStringChromosomePolicy() const {
             return integerStringChromosomePolicy;
         }
 
-        [[nodiscard]] const BinaryStringChromosomePolicy& getBinaryStringChromosomePolicy() const {
+        [[nodiscard]] const BinaryStringChromosomePolicy &getBinaryStringChromosomePolicy() const {
             return binaryStringChromosomePolicy;
         }
 
@@ -65,9 +65,13 @@ namespace Gape {
             return static_cast<int>(superposition.getMolecules().size());
         }
 
-        static std::vector<std::shared_ptr<SuperpositionChromosome>> batchRun(const Superposition& superposition);
+        static std::vector<std::shared_ptr<SuperpositionChromosome> > batchRun(const Superposition &superposition);
 
-        static std::shared_ptr<SuperpositionChromosome> singleRun(const Superposition &superposition, const int runNumber);
+        static std::vector<std::shared_ptr<SuperpositionChromosome> > testBatchRun(const std::string &inputFile,
+            const GapeSettings &settings);
+
+        static std::shared_ptr<SuperpositionChromosome> singleRun(const Superposition &superposition,
+                                                                  const int runNumber);
 
         std::shared_ptr<SuperpositionChromosome> createChromosome();
 

@@ -48,7 +48,7 @@ namespace Gape
 		alpha = getAlpha(r);
 		gaussianN = pow((2.0 * alpha) / M_PI, 0.75);
 		radius = r;
-		REPORT(Reporter::DETAIL) << "Setting alpha " << alpha << " gaussianN " << gaussianN
+		REPORT(Reporter::DEBUG) << "Setting alpha " << alpha << " gaussianN " << gaussianN
                                  << " radius " << r;
 	}
 

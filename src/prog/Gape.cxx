@@ -101,38 +101,22 @@ int main(int argc, char *argv[]) {
         Reporter::setMinReportingLevel(Reporter::FATAL);
     }
 
-    RDKit::SmilesMolSupplier smilesMolSupplier(inputFile, " ", 0, 1, false, true);
     GapeSettings settings(configFile);
-    std::vector<std::shared_ptr<Gape::SuperpositionMolecule>> molecules;
+    if (false) {
+        // show that RDKIt is not responsible for the parallel slowness
+        SuperpositionGa::testBatchRun(inputFile, settings);
+    } else {
+        RDKit::SmilesMolSupplier smilesMolSupplier(inputFile, " ", 0, 1, false, true);
+        auto molecules = SuperpositionMolecule::loadMolecules(smilesMolSupplier, settings);
 
-    int ligandNum = 0;
-    while (!smilesMolSupplier.atEnd()) {
-        auto mol = smilesMolSupplier.next();
-        ligandNum++;
-        if (!mol->hasProp("_Name")) {
-            mol->setProp("_Name", (boost::format("Ligand %d") % ligandNum).str());
+        GzipWriter gzipWriter("preparedMols.sdf.gz");
+        SDWriter sdWriter(&gzipWriter.getOut());
+        for (auto &superpositionMolecule: molecules) {
+            sdWriter.write(superpositionMolecule->getMol());
         }
-        REPORT(Reporter::DETAIL) << "Preparing molecule " << mol->getProp<std::string>("_Name");
-        auto superpositionMolecule = std::make_shared<Gape::SuperpositionMolecule>(*mol, settings);
-        delete mol;
-        superpositionMolecule->solvate();
-        superpositionMolecule->generate3D();
-        superpositionMolecule->findFreelyRotatableBonds();
-        superpositionMolecule->findPairsToCheck();
-        superpositionMolecule->findCharges();
-        superpositionMolecule->findDonorsAndAcceptors();
-        superpositionMolecule->findFeatures();
+        sdWriter.close();
 
-        molecules.push_back(superpositionMolecule);
+        Superposition superposition(molecules, settings);
+        SuperpositionGa::batchRun(superposition);
     }
-
-    GzipWriter gzipWriter("preparedMols.sdf.gz");
-    SDWriter sdWriter(&gzipWriter.getOut());
-    for (auto &superpositionMolecule: molecules) {
-        sdWriter.write(superpositionMolecule->getMol());
-    }
-    sdWriter.close();
-
-    Superposition superposition(molecules, settings);
-    SuperpositionGa::batchRun(superposition);
 }

@@ -12,6 +12,12 @@
 #include "SuperpositionCoordinates.h"
 
 
+namespace RDKit {
+    inline namespace v1 {
+        class MolSupplier;
+    }
+}
+
 using namespace RDKit;
 
 namespace ForceFields {
@@ -110,6 +116,8 @@ namespace Gape {
         static bool isNitroOxygen(const Atom& atom);
 
         static bool isEtherOxygen(const Atom &atom);
+
+        static std::vector<std::shared_ptr<SuperpositionMolecule>> loadMolecules(v1::MolSupplier& molSupplier, const GapeSettings& settings);
 
         /**
          * Checks to see if this oxygen is in a carboxylate group

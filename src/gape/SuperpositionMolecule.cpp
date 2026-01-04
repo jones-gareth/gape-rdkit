@@ -9,9 +9,11 @@
 #include "mol/Solvate.h"
 #include "RotatableBond.h"
 #include <GraphMol/MolOps.h>
+#include <boost/format.hpp>
 #include <GraphMol/DistGeomHelpers/Embedder.h>
 #include <GraphMol/ForceFieldHelpers/MMFF/MMFF.h>
 #include <GraphMol/FileParsers/FileParsers.h>
+#include <GraphMol/FileParsers/MolSupplier.h>
 #include <util/GaussianList.h>
 
 #include "mol/HydrogenBondingType.h"
@@ -352,6 +354,35 @@ namespace Gape {
         }
 
         return singleBondCount == 2;
+    }
+
+    std::vector<std::shared_ptr<SuperpositionMolecule>> SuperpositionMolecule::loadMolecules(
+        MolSupplier& molSupplier, const GapeSettings &settings) {
+
+        std::vector<std::shared_ptr<SuperpositionMolecule>> molecules;
+
+        int ligandNum = 0;
+        while (!molSupplier.atEnd()) {
+            auto mol = molSupplier.next();
+            ligandNum++;
+            if (!mol->hasProp("_Name")) {
+                mol->setProp("_Name", (boost::format("Ligand %d") % ligandNum).str());
+            }
+            REPORT(Reporter::DETAIL) << "Preparing molecule " << mol->getProp<std::string>("_Name");
+            auto superpositionMolecule = std::make_shared<Gape::SuperpositionMolecule>(*mol, settings);
+            delete mol;
+            superpositionMolecule->solvate();
+            superpositionMolecule->generate3D();
+            superpositionMolecule->findFreelyRotatableBonds();
+            superpositionMolecule->findPairsToCheck();
+            superpositionMolecule->findCharges();
+            superpositionMolecule->findDonorsAndAcceptors();
+            superpositionMolecule->findFeatures();
+
+            molecules.push_back(superpositionMolecule);
+        }
+
+        return molecules;
     }
 
     bool SuperpositionMolecule::isNitroNitrogen(const Atom &atom) {
