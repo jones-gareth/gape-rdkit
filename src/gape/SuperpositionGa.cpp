@@ -201,7 +201,7 @@ namespace Gape {
         solutions.clear();
         solutions.reserve(numberRuns);
         // bool parallelRuns = superposition.settings.getGapeParameters().parallelRuns;
-        bool parallelRuns = false;
+        bool parallelRuns = true;
         if (parallelRuns) {
             Eigen::initParallel();
             /*
