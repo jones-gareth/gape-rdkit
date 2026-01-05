@@ -56,8 +56,8 @@ namespace Gape {
         SuperpositionGaPopulation population(runNumber, *this);
         auto format =
                 boost::format(
-                    "Running GA run %2d number operations %5d population size %5d ") %
-                runNumber % numberOperations % getPopsize();
+                    "Running GA run %2d number operations %5d number islands 5d population size %5d ") %
+                runNumber % numberOperations % getNumberIslands() % getPopsize();
         REPORT(Reporter::INFO) << format.str();
         population.create();
         REPORT(Reporter::DEBUG) << population.populationInfo();
@@ -203,7 +203,6 @@ namespace Gape {
         // bool parallelRuns = superposition.settings.getGapeParameters().parallelRuns;
         bool parallelRuns = true;
         if (parallelRuns) {
-            Eigen::initParallel();
             /*
             std::vector<future<std::shared_ptr<SuperpositionChromosome>>> tasks;
             tasks.reserve(numberRuns);

@@ -279,9 +279,9 @@ namespace Gape {
             for (size_t i = 0; i < fittingFeatures.size(); i++) {
                 auto _pos = start + i;
                 if (closeFeatures.find(fittingFeatures[i].get()) == closeFeatures.end()) {
-                    integerStringChromosome.setValue(_pos, -1);
+                    integerStringChromosome.setValue(static_cast<int>(_pos), -1);
                 }
-                REPORT(Reporter::DEBUG) << "V " << integerStringChromosome.getValue(_pos);
+                REPORT(Reporter::DEBUG) << "V " << integerStringChromosome.getValue(static_cast<int>(_pos));
             }
         }
 
@@ -326,8 +326,7 @@ namespace Gape {
         hasFitness = false;
 
         if (!(ok && fitted)) {
-        std:
-            cout << "oops" << endl;
+            std::cout << "oops" << endl;
         }
         assert(ok && fitted);
 
@@ -409,7 +408,7 @@ namespace Gape {
         for (size_t i = 0; i < numberMolecules; i++) {
             const auto &moleculeA = molecules[i];
             const auto &conformerA = fittedCoordinates[i]->getConformer();
-            for (int j = i + 1; j < numberMolecules; j++) {
+            for (size_t j = i + 1; j < numberMolecules; j++) {
                 const auto &moleculeB = molecules[j];
                 const auto &conformerB = fittedCoordinates[j]->getConformer();
                 // we get a cleaner overlay if we compare against everything- at
@@ -540,7 +539,7 @@ namespace Gape {
         pharmMol.setProp("PHARMACOPHORE", pharmLabel);
         pharmMol.setProp("PHARMACOPHORE_FEATURES", featureLabel);
         pharmMol.setProp(common_properties::_Name, prefix + " Pharmacophore");
-        auto conformer = new Conformer(points.size());
+        auto conformer = new Conformer(static_cast<unsigned int>(points.size()));
         for (int i = 0; i < points.size(); i++) {
             conformer->setAtomPos(i, points[i]);
         }
@@ -577,7 +576,7 @@ namespace Gape {
         pharmGeometryMol.setProp("PHARMACOPHORE", pharmLabel);
         pharmGeometryMol.setProp("PHARMACOPHORE_FEATURES", featureLabel);
         pharmGeometryMol.setProp(common_properties::_Name, prefix + " Pharmacophore Geometry");
-        conformer = new Conformer(points.size());
+        conformer = new Conformer(static_cast<unsigned int>(points.size()));
         for (int i = 0; i < points.size(); i++) {
             conformer->setAtomPos(i, points[i]);
         }

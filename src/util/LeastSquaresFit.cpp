@@ -93,7 +93,7 @@ const Transform<double, 3, Affine> leastSquaresFit(const MatrixXd & xCoords,
 		// (they are not ordered) and change the sign of the row
 		// in U' that corresponds to the smallest singular value.
 
-		// in Eigen SVD the singular values are always in descreasing order
+		// in Eigen SVD the singular values are always in decreasing order
 		uPrime.row(2) *= -1;
 		rotMatrix = svd.matrixV() * uPrime;
 		det = rotMatrix.determinant();

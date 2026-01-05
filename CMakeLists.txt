@@ -46,9 +46,10 @@ include(ExternalProject)
 set(EIGEN_BUILD_DIR   ${CMAKE_BINARY_DIR}/External/eigen)
 set(EIGEN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/External/eigen_include)
 set(EIGEN_INCLUDE_DIR ${EIGEN_INSTALL_DIR})
+# URL https://gitlab.com/libeigen/eigen/-/archive/3.3.9/eigen-3.3.9.tar.gz
 ExternalProject_Add(
         eigen
-        URL https://gitlab.com/libeigen/eigen/-/archive/3.3.9/eigen-3.3.9.tar.gz
+        URL https://gitlab.com/libeigen/eigen/-/archive/5.0.0/eigen-5.0.0.tar.gz
         PREFIX ${EIGEN_BUILD_DIR}
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
@@ -66,7 +67,7 @@ ExternalProject_Add(
         rapidjson
         PREFIX ${RAPIDJSON_BUILD_DIR}
         GIT_REPOSITORY "https://github.com/Tencent/rapidjson.git"
-        GIT_TAG v1.1.0
+        # GIT_TAG v1.1.0
         TIMEOUT 10
         CMAKE_ARGS
         -DRAPIDJSON_BUILD_TESTS=OFF

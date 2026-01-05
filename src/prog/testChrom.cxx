@@ -37,7 +37,7 @@ void testIntegerChrom(RandomUtil & rng);
  */
 int main(int argc, char** argv) {
 
-	uint32_t seed = time(nullptr);
+	uint32_t seed = static_cast<uint32_t>(time(nullptr));
 	auto & rng = RandomUtil::getInstance();
 	rng.seed(seed);
 

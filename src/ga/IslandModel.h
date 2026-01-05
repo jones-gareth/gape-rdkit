@@ -93,7 +93,7 @@ namespace Gape {
         double val = rng.normalRand() * totalOperatorWeights;
         auto &pop = populations[currentPopulationNumber];
         if (val < migrationWeight) {
-            auto otherPopulationNumber = rng.randomInt(0, numberIslands - 1);
+            auto otherPopulationNumber = rng.randomInt(0, static_cast<int>(numberIslands) - 1);
             if (otherPopulationNumber == currentPopulationNumber)
                 otherPopulationNumber++;
             auto &parent = populations[otherPopulationNumber]->selectParent();

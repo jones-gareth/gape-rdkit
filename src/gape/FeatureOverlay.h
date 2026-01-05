@@ -113,7 +113,7 @@ namespace Gape {
         /**
          * @return the number of features in this point.
          */
-        int numberFeatures() const {
+        size_t numberFeatures() const {
             return features.size();
         }
     };

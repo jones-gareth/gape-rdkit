@@ -169,7 +169,7 @@ void transformToZXplane(const CoordVector & point1, const CoordVector & point2,
 }
 
 CoordMatrix centerCoordMatrix(const CoordMatrix &in) {
-    double size = in.cols();
+    double size = static_cast<double>(in.cols());
     CoordMatrix out;
     out.resize(4, in.cols());
     for (auto i = 0; i < 3; i++) {
@@ -181,7 +181,7 @@ CoordMatrix centerCoordMatrix(const CoordMatrix &in) {
 }
 
 CoordVector centroid(const CoordMatrix &in) {
-    double size = in.cols();
+    double size = static_cast<double>(in.cols());
     CoordVector out;
     for (auto i = 0; i < 3; i++) {
         auto c = in.row(i).sum() / size;

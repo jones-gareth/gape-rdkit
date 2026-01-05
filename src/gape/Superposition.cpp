@@ -207,7 +207,7 @@ namespace Gape {
     }
 
     SuperpositionMolecule* Superposition::leastFlexibleMolecule() const {
-        const std::function score = [](const SuperpositionMolPtr& mol) { return -mol->getRotatableBonds().size(); };
+        const std::function score = [](const SuperpositionMolPtr& mol) { return -1.0 * static_cast<int>(mol->getRotatableBonds().size()); };
         const auto& leastFlexible = findMaxBy(molecules, score);
         return leastFlexible.get();
     }

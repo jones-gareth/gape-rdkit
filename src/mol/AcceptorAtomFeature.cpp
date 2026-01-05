@@ -185,7 +185,7 @@ namespace Gape {
         std::vector<RDGeom::Point3D> lonePairs;
         const auto &conformer = superpositionCoordinates.getConformer();
         acceptorAtom->addLonePairs(conformer, lonePairs);
-        int nLonePairs = lonePairs.size();
+        auto nLonePairs = lonePairs.size();
         REPORT(Reporter::DEBUG) << "Added " << nLonePairs << " lone pairs to " << info();
         assert(nLonePairs > 0);
         assert(acceptorAtom->getNumberLonePairs() == nLonePairs);
