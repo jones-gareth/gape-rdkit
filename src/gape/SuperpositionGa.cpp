@@ -56,7 +56,7 @@ namespace Gape {
         SuperpositionGaPopulation population(runNumber, *this);
         auto format =
                 boost::format(
-                    "Running GA run %2d number operations %5d number islands 5d population size %5d ") %
+                    "Running GA run %2d number operations %5d number islands %5d population size %5d ") %
                 runNumber % numberOperations % getNumberIslands() % getPopsize();
         REPORT(Reporter::INFO) << format.str();
         population.create();
