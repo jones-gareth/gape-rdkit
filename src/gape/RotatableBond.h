@@ -65,6 +65,8 @@ namespace Gape
 		const std::vector<const Atom*>& getAtom2List() const { return atom2List; }
 
 		~RotatableBond();
+
+		void flattenBond(Conformer &conformer) const;
 	};
 }
 

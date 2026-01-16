@@ -2,8 +2,7 @@
 // Created by Gareth Jones on 12/27/2022.
 //
 
-#ifndef GAPE_HYDROGENBONDINGTYPE_H
-#define GAPE_HYDROGENBONDINGTYPE_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -61,4 +60,3 @@ namespace Gape {
 
 } // Gape
 
-#endif //GAPE_HYDROGENBONDINGTYPE_H

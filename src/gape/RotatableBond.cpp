@@ -7,6 +7,7 @@
 #include <ForceField/MMFF/TorsionAngle.h>
 #include <Geometry/Transform3D.h>
 #include "mol/MolUtil.h"
+#include "util/Reporter.h"
 #include "util/TransformOps.h"
 
 namespace Gape {
@@ -81,6 +82,52 @@ namespace Gape {
     }
 
     RotatableBond::~RotatableBond() {
+    }
+
+    void RotatableBond::flattenBond(Conformer &conformer) const {
+        const auto index1 = atom1->getIdx();
+        const auto index2 = atom2->getIdx();
+        int index0 = -1;
+        int index3 = -1;
+        for (const auto atom1Neighbor: molecule->getMol().atomNeighbors(atom1)) {
+            if (atom1Neighbor != atom2) {
+                index0 = atom1Neighbor->getIdx();
+                break;
+            }
+        }
+        for (const auto atom2Neighbor: molecule->getMol().atomNeighbors(atom2)) {
+            if (atom2Neighbor != atom1) {
+                index3 = atom2Neighbor->getIdx();
+                break;
+            }
+        }
+        assert(index0 != -1);
+        assert(index3 != -1);
+
+        const auto &iPoint = conformer.getAtomPos(index0);
+        const auto &jPoint = conformer.getAtomPos(index1);
+        const auto &kPoint = conformer.getAtomPos(index2);
+        const auto &lPoint = conformer.getAtomPos(index3);
+
+        auto angle = torsionAngle(iPoint, jPoint, kPoint, lPoint);
+        REPORT(Reporter::DEBUG) << "Flattening bond between atoms " << index1 << " and " << index2 << " angle is " << angle;
+
+        // Keep trans/cis geometry
+        if (angle > M_PI - M_PI / 3.0)
+            angle -= M_PI;
+        if (angle < -M_PI + M_PI / 3.0)
+            angle -= M_PI;
+
+        angle *= -1;
+        rotateBond(angle, conformer);
+
+        auto testTorsion = torsionAngle(iPoint, jPoint, kPoint, lPoint);
+        REPORT(Reporter::DEBUG) <<"torsion after flattening is " << testTorsion;
+#ifndef NDEBUG
+        testTorsion = abs(testTorsion);
+        assert(abs(testTorsion) < 1e-5 || abs(testTorsion - M_PI) < 1e-5);
+#endif
+
     }
 
     bool RotatableBond::isSeparatedByBond(const Atom *const a1, const Atom *const a2) const {

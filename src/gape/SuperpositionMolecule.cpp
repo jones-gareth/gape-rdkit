@@ -83,12 +83,13 @@ namespace Gape {
         rotatableBonds.clear();
         for (const auto bond: mol.bonds()) {
             bool canFlatten = false;
-            if (const auto rotatableBondType = isRotatableBond(*bond, canFlatten); rotatableBondType !=
-                RotatableBondType::None) {
+            const auto rotatableBondType = isRotatableBond(*bond, canFlatten);
+            if (canFlatten && settings.getGapeParameters().flattenBonds) {
+                const RotatableBond rotatableBond(rotatableBondType, bond, this);
+                rotatableBond.flattenBond(mol.getConformer());
+            }
+            if (rotatableBondType != RotatableBondType::None) {
                 const auto rotatableBond = std::make_shared<RotatableBond>(rotatableBondType, bond, this);
-                if (canFlatten && settings.getGapeParameters().flattenBonds) {
-                    // TODO flatten bond
-                }
                 rotatableBonds.push_back(rotatableBond);
             }
         }

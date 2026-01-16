@@ -109,12 +109,15 @@ int main(int argc, char *argv[]) {
         RDKit::SmilesMolSupplier smilesMolSupplier(inputFile, " ", 0, 1, false, true);
         auto molecules = SuperpositionMolecule::loadMolecules(smilesMolSupplier, settings);
 
-        GzipWriter gzipWriter("preparedMols.sdf.gz");
-        SDWriter sdWriter(&gzipWriter.getOut());
-        for (auto &superpositionMolecule: molecules) {
-            sdWriter.write(superpositionMolecule->getMol());
+        {
+            GzipWriter gzipWriter("preparedMols.sdf.gz");
+            SDWriter sdWriter(&gzipWriter.getOut());
+            for (auto &superpositionMolecule: molecules) {
+                sdWriter.write(superpositionMolecule->getMol());
+            }
+            sdWriter.close();
         }
-        sdWriter.close();
+
 
         Superposition superposition(molecules, settings);
         SuperpositionGa::batchRun(superposition);
