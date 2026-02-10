@@ -14,6 +14,7 @@ namespace Gape
 	using namespace RDKit;
 
 	class SuperpositionMolecule;
+	class CornerRotation;
 
 	class TorsionInfo
 	{
@@ -36,17 +37,18 @@ namespace Gape
 	private:
 		const Atom *atom1, *atom2;
 		RotatableBondType rotatableBondType;
-		SuperpositionMolecule* molecule;
+		const SuperpositionMolecule* molecule;
 		std::vector<const Atom*> atom1List, atom2List;
 		std::vector<TorsionInfo> torsions;
 
 		void setTorsionAngles();
 
 		friend SuperpositionMolecule;
+		friend CornerRotation;
 
 	public:
 		RotatableBond(RotatableBondType rotatableBondType, const Bond* bond,
-		              SuperpositionMolecule* superpositionMolecule);
+		              const SuperpositionMolecule* superpositionMolecule);
 
 		bool isSeparatedByBond(const Atom* a1, const Atom* a2) const;
 

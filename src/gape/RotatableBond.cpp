@@ -27,7 +27,7 @@ namespace Gape {
     }
 
     RotatableBond::RotatableBond(RotatableBondType rotatableBondType, const Bond *const bond,
-                                 SuperpositionMolecule *superpositionMolecule) :
+                                 const SuperpositionMolecule *superpositionMolecule) :
             rotatableBondType(rotatableBondType), molecule(superpositionMolecule) {
         std::set<const Atom *> atoms1, atoms2;
         const auto &mol = molecule->getMol();
