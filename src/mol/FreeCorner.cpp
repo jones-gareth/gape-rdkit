@@ -250,4 +250,89 @@ namespace Gape {
 
         REPORT(Reporter::DEBUG) << "Other corner " << altPoint;
     }
+
+    	/**
+	 * Flips the free corner. See Payne and Glen for all the gory details
+	 *
+	 * @throws GaException
+	 */
+        void FreeCorner::flipFreeCorner(Conformer &conformer) const{
+
+			REPORT(Reporter::DEBUG) << "Fliping corner");
+			REPORT(Reporter::DEBUG) << "Atom A " + atomA->getIdx();
+			REPORT(Reporter::DEBUG) << "Atom B " + atomB->getIdx();
+			REPORT(Reporter::DEBUG) << "Atom X " + atomX->getIdx();
+			REPORT(Reporter::DEBUG) << "Atom C " + atomC->getIdx();
+			REPORT(Reporter::DEBUG) << "Atom D " + atomD->getIdx();
+
+		auto altPoint = findOtherCorner(conformer);
+
+		for (int i = 0; i < 4; i++) {
+			const Atom* otherAtom = nullptr;
+			if (i == 0)
+				otherAtom = atomA;
+			else if (i == 1)
+				otherAtom = atomB;
+			else if (i == 2)
+				otherAtom = atomC;
+			else if (i == 3)
+				otherAtom = atomD;
+
+			auto d1 = squareDistance(altPoint, conformer.getAtomPos(otherAtom->getIdx()));
+			auto d2 = squareDistance(conformer.getAtomPos(atomX->getIdx()), conformer.getAtomPos(otherAtom->getIdx()));
+			double diff = d1 - d2;
+			REPORT(Reporter::DEBUG) << "Point distance check " <<  diff;
+			if (abs(diff) > CORNER_FLAP_TOL) {
+				REPORT(Reporter::DEBUG) << "corner not flipped (" << i << ")";
+				return;
+			}
+		}
+
+    	auto yVec = conformer.getAtomPos(atomX->getIdx());
+    	auto zVec = conformer.getAtomPos(atomB->getIdx());
+
+		double rot1 = torsionAngle(altPoint, conformer.getAtomPos(atomA->getIdx()),
+				conformer.getAtomPos(atomB->getIdx()), yVec);
+		REPORT(Reporter::DEBUG) << "rotationAB " <<  rot1;
+    	rotationAB->rotateBond(rot1, conformer);
+		Coord.transPointInPlace(rotationAB.getTransMatrix(), yVec);
+
+		if (logger.isDebugEnabled()) {
+			double dist = Coord.distance(altPoint, yVec);
+			if (dist > CORNER_FLAP_TOL)
+				REPORT(Reporter::DEBUG) << "flipCorner: (1) point mismatch, distance " + dist);
+			else
+				REPORT(Reporter::DEBUG) << "flipCorner: (1) distance check " + dist);
+		}
+
+		double rot2 = Coord.torsion(altPoint, coords.get(atomC.getNo()),
+				coords.get(atomD.getNo()), coords.get(atomX.getNo()));
+		REPORT(Reporter::DEBUG) << "rotationCD " + rot2);
+		rotationCD.rotateBond(rot2);
+		Coord.transPointInPlace(rotationCD.getTransMatrix(), zVec);
+
+		if (logger.isDebugEnabled()) {
+			double dist = Coord.distance(altPoint, coords.get(atomX.getNo()));
+			if (dist > CORNER_FLAP_TOL)
+				REPORT(Reporter::DEBUG) << "flipCorner: (2) point mismatch, distance " + dist);
+			else
+				REPORT(Reporter::DEBUG) << "flipCorner: (2) distance check " + dist);
+		}
+
+		double rot3 = Coord.torsion(zVec, coords.get(atomX.getNo()),
+				coords.get(atomC.getNo()), coords.get(atomB.getNo()));
+		REPORT(Reporter::DEBUG) << "rotationXC " + rot3);
+		rotationXC.rotateBond(-rot3);
+		Coord.transPointInPlace(rotationXC.getTransMatrix(), zVec);
+
+		if (logger.isDebugEnabled()) {
+			double dist = Coord.distance(coords.get(atomB.getNo()), zVec);
+			if (dist > CORNER_FLAP_TOL)
+				REPORT(Reporter::DEBUG) << "flipCorner: (3) point mismatch, distance " + dist);
+			else
+				REPORT(Reporter::DEBUG) << "flipCorner: (3) distance check " + dist);
+			Coord.copy(zVec, coords.get(atomZ.getNo()));
+			Coord.copy(yVec, coords.get(atomY.getNo()));
+		}
+	}
 } // Gape
