@@ -11,7 +11,7 @@
 namespace Gape {
     using namespace RDKit;
 
-    class CornerRotation : RotatableBond {
+    class CornerRotation : public RotatableBond {
         const Atom *rootAtom;
         const Atom *checkAtom;
 
@@ -63,5 +63,6 @@ namespace Gape {
 
         static std::shared_ptr<FreeCorner>
         isFreeCorner(const SuperpositionMolecule *superpositionMolecule, Atom *atomX);
+        void flipFreeCorner(Conformer &conformer) const;
     };
 } // Gape
