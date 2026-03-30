@@ -437,8 +437,8 @@ namespace Gape {
             return false;
         }
 
-        const auto featurePointSets = featureOverlay->getFeaturePointSets();
-        const auto otherFeaturePointSets = other.featureOverlay->getFeaturePointSets();
+        const auto& featurePointSets = featureOverlay->getFeaturePointSets();
+        const auto& otherFeaturePointSets = other.featureOverlay->getFeaturePointSets();
         const int numberFeatures = std::accumulate(featurePointSets.begin(), featurePointSets.end(), 0,
                                                    [](const auto &sum, const auto &pair) {
                                                        return sum + pair.second->getFeatures().size();

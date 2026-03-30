@@ -77,7 +77,7 @@ namespace Gape {
         score = .0;
 
         REPORT(Reporter::DEBUG) << "Entering FeaturePoint::score()";
-        for (auto testFeature: features) {
+        for (const auto& testFeature: features) {
             int testMatched = 0;
             double test = scoreFeature(*testFeature, testMatched);
             REPORT(Reporter::DEBUG) << "Test score: " << test;
@@ -126,7 +126,7 @@ namespace Gape {
         const auto &settings = featureOverlay.getSuperposition().settings.getGapeParameters();
 
         // sum pair-wise score with all other features
-        for (auto otherFeature: features) {
+        for (const auto& otherFeature: features) {
             if (otherFeature == &testFeature)
                 continue;
             auto otherMolecule = otherFeature->feature->getMolecule();
@@ -198,7 +198,7 @@ namespace Gape {
         }
 
         score = 0;
-        for (auto featurePoint: featurePoints) {
+        for (const auto& featurePoint: featurePoints) {
             score += featurePoint->scorePoint();
             if (featurePoint->isPharmacophorePoint())
                 numberPharmacophorePoints++;
@@ -225,7 +225,7 @@ namespace Gape {
      */
     void FeaturePointSet::groupPoints() {
         // clear out any previous grouping and scoring
-        for (auto featurePoint: featurePoints) {
+        for (const auto& featurePoint: featurePoints) {
             freeFeaturePoints.insert(featurePoint);
         }
         featurePoints.clear();
@@ -240,7 +240,7 @@ namespace Gape {
         double maxSqrDistance = maxDistance * maxDistance;
 
         // initial assignment
-        for (auto feature: features)
+        for (const auto& feature: features)
             addFeature(*feature, maxSqrDistance);
 
         // because features are ordered by molecule at this point there is no need to do relocations
@@ -258,7 +258,7 @@ namespace Gape {
             }
         }
 
-        for (auto featurePoint: featurePoints)
+        for (const auto& featurePoint: featurePoints)
             assert(featurePoint->checkSingleMolecules());
     }
 
@@ -267,13 +267,13 @@ namespace Gape {
 
         assert(featurePoints.size() + freeFeaturePoints.size() == features.size());
 
-        for (auto feature: features) {
+        for (const auto& feature: features) {
             // foreach feature find the closest featurePoint and the point
             // containing that feature.
             std::shared_ptr<FeaturePoint> closestPoint = nullptr;
             std::shared_ptr<FeaturePoint> currentPoint = nullptr;
             double minDistance = std::numeric_limits<double>::max();
-            for (auto featurePoint: featurePoints) {
+            for (const auto& featurePoint: featurePoints) {
                 double distance = featurePoint->squareDistance(*feature);
                 if (distance < minDistance) {
                     minDistance = distance;
@@ -309,7 +309,7 @@ namespace Gape {
         }
 
         // update centers
-        for (auto featurePoint: featurePoints)
+        for (const auto& featurePoint: featurePoints)
             featurePoint->recalculateCenter();
 
         return relocate;
@@ -326,7 +326,7 @@ namespace Gape {
         // loop though any existing points, and add to closest
         shared_ptr<FeaturePoint> closestPoint = nullptr;
         double closestSqrDistance = std::numeric_limits<double>::max();
-        for (auto featurePoint: featurePoints) {
+        for (const auto& featurePoint: featurePoints) {
             double sqrDistance = featurePoint->squareDistance(feature);
             if (featurePoint->containsMoleculeFeature(*molecule))
                 continue;

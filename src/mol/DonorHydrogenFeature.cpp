@@ -95,9 +95,6 @@ namespace Gape {
         const auto vol = Feature::score(sqrDistance);
         // TODO - check for maximum Gaussian score?
         const auto midPoint = (coordinate + otherCoordinate) / 2.0;
-        const auto mol = molecule->getMol();
-        const auto otherMol = other.molecule->getMol();
-
         // Corrections to make sure fitting point is solvent accessible
         auto molVol = solvationPenalty(midPoint, coordinates);
         auto otherMolVol = otherFeature.solvationPenalty(midPoint, otherCoordinates);

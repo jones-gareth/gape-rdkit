@@ -39,7 +39,7 @@ namespace Gape {
 
         [[nodiscard]] int getIntegerStringLength() const { return integerStringLength; }
         [[nodiscard]] int getBinaryStringLength() const { return binaryStringLength; }
-        [[nodiscard]] std::vector<int> getIntegerStringRanges() const { return integerStringRanges; }
+        [[nodiscard]] const std::vector<int>& getIntegerStringRanges() const { return integerStringRanges; }
         [[nodiscard]] const std::vector<std::shared_ptr<SuperpositionMolecule>>& getMolecules() const {
             return molecules;
         }

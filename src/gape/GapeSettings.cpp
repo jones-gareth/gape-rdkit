@@ -739,7 +739,7 @@ namespace Gape {
             std::ifstream ifs(configFile);
             std::string content((std::istreambuf_iterator<char>(ifs)),
                                 (std::istreambuf_iterator<char>()));
-            configJson = content;
+            configJson = std::move(content);
         }
         std::ofstream out("configFileIn.json");
         out << configJson;

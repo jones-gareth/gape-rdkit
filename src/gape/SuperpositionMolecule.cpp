@@ -61,6 +61,7 @@ namespace Gape {
         // DGeomHelpers::EmbedParameters embedParameters;
         // DGeomHelpers::EmbedMolecule(mol, embedParameters);
         DGeomHelpers::EmbedMolecule(mol, 10, 1);
+        delete mmffMolProperties;
         mmffMolProperties = new MMFF::MMFFMolProperties(mol);
         assert(mmffMolProperties->isValid());
         const auto forceField = MMFF::constructForceField(mol, mmffMolProperties, 1000);

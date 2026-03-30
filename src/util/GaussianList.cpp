@@ -122,9 +122,9 @@ namespace Gape {
         std::vector<Gaussian> intersection;
         REPORT(Reporter::DEBUG) << "Max number of self intersections gaussians " << size * (size - 1) / 2;
         for (size_t i = 0; i < size; i++) {
-            const auto g1 = gaussians[i];
+            const auto& g1 = gaussians[i];
             for (size_t j = i + 1; j < size; j++) {
-                const auto g2 = gaussians[j];
+                const auto& g2 = gaussians[j];
                 const auto g3 = g1.intersection(g2);
                 if (g3.has_value()) {
                     intersection.push_back(g3.value());

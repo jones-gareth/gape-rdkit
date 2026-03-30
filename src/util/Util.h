@@ -42,7 +42,7 @@ namespace Gape
 	 * @param prefix
 	 * @return true id str starts with prefix
 	 */
-	GA_EXPORT bool startsWith(string str, string prefix);
+	GA_EXPORT bool startsWith(const string& str, const string& prefix);
 
 	/**
 	 *
@@ -183,7 +183,7 @@ namespace Gape
 	 * @return true if vector contains value
 	 */
 	template <typename T>
-	bool contains(std::vector<T> vector, T value)
+	bool contains(const std::vector<T>& vector, const T& value)
 	{
 		return std::find(vector.begin(), vector.end(), value) != vector.end();
 	}

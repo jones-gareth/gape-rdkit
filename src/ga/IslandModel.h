@@ -78,7 +78,7 @@ namespace Gape {
     template<typename Chromosome, typename PopulationPolicy>
     void IslandModel<Chromosome, PopulationPolicy>::create() {
         bestScore = -std::numeric_limits<double>::max();
-        for (auto population: populations) {
+        for (const auto& population: populations) {
             population->create();
             auto testFitness = population->getBestScore();
             if (testFitness > bestScore) {
@@ -113,7 +113,7 @@ namespace Gape {
         numberOperations++;
         auto testFitness = pop->getBestScore();
         if (testFitness > bestScore) {
-            testFitness = bestScore;
+            bestScore = testFitness;
             bestChromosome = pop->getBest();
             const auto format = boost::format("Island Pop %2d Op %5d Mig %5d new best: ") % (
                                     currentPopulationNumber + 1) % numberOperations % numberMigrations;
@@ -128,7 +128,7 @@ namespace Gape {
     void IslandModel<Chromosome, PopulationPolicy>::rebuild() {
         // TODO: chromosomes created by migrations may be shared between populations and we don't want to
         // score them twice (which we currently do)
-        for (auto population: populations) {
+        for (const auto& population: populations) {
             population->rebuild();
         }
     }

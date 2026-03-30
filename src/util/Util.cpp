@@ -31,7 +31,7 @@ namespace Gape
 		return buffer;
 	}
 
-	bool startsWith(string str, string prefix)
+	bool startsWith(const string& str, const string& prefix)
 	{
 		if (prefix.length() > str.length()) return false;
 		return str.compare(0, prefix.length(), prefix) == 0;
