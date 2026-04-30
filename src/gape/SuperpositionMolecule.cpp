@@ -376,7 +376,7 @@ namespace Gape {
             superpositionMolecule->solvate();
             superpositionMolecule->generate3D();
             superpositionMolecule->findFreelyRotatableBonds();
-            if (settings.) {
+            if (settings.getGapeParameters().useFreeCorners) {
                 superpositionMolecule->findFreeCorners();
             }
             superpositionMolecule->findPairsToCheck();

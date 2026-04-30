@@ -60,6 +60,7 @@ namespace Gape {
     	bool scalePharmacophore = true;
     	double geometricWeightCriterion = 0.5;
     	double pharmacophoreFactor = 0.5;
+    	bool useFreeCorners = true;
 
         GapeParameters() = default;
 

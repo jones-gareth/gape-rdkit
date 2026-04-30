@@ -801,6 +801,7 @@ namespace Gape {
         gapeParameters.scalePharmacophore = d["gapeParameters"]["scalePharmacophore"].GetBool();
         gapeParameters.geometricWeightCriterion = d["gapeParameters"]["geometricWeightCriterion"].GetDouble();
         gapeParameters.pharmacophoreFactor = d["gapeParameters"]["pharmacophoreFactor"].GetDouble();
+        gapeParameters.useFreeCorners = d["gapeParameters"]["useFreeCorners"].GetBool();
 
         auto const& jsonSolvationRules = d["solvationRules"];
         solvationRules.clear();
