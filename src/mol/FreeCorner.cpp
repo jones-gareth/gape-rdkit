@@ -249,90 +249,139 @@ namespace Gape {
         altPoint[1] = beta + pointA[1] + delta * altPoint[2];
 
         REPORT(Reporter::DEBUG) << "Other corner " << altPoint;
+        return altPoint;
     }
 
-    	/**
-	 * Flips the free corner. See Payne and Glen for all the gory details
-	 *
-	 * @throws GaException
-	 */
-        void FreeCorner::flipFreeCorner(Conformer &conformer) const{
+    /**
+     * Flips the free corner. See Payne and Glen for all the gory details
+     */
+    void FreeCorner::flipFreeCorner(SuperpositionCoordinates &superpositionCoordinates) const {
+        REPORT(Reporter::DEBUG) << "Flipping corner";
+        REPORT(Reporter::DEBUG) << "Atom A " << atomA->getIdx();
+        REPORT(Reporter::DEBUG) << "Atom B " << atomB->getIdx();
+        REPORT(Reporter::DEBUG) << "Atom X " << atomX->getIdx();
+        REPORT(Reporter::DEBUG) << "Atom C " << atomC->getIdx();
+        REPORT(Reporter::DEBUG) << "Atom D " << atomD->getIdx();
 
-			REPORT(Reporter::DEBUG) << "Fliping corner");
-			REPORT(Reporter::DEBUG) << "Atom A " + atomA->getIdx();
-			REPORT(Reporter::DEBUG) << "Atom B " + atomB->getIdx();
-			REPORT(Reporter::DEBUG) << "Atom X " + atomX->getIdx();
-			REPORT(Reporter::DEBUG) << "Atom C " + atomC->getIdx();
-			REPORT(Reporter::DEBUG) << "Atom D " + atomD->getIdx();
+        auto conformer = superpositionCoordinates.getConformer();
+        auto altPoint = findOtherCorner(conformer);
 
-		auto altPoint = findOtherCorner(conformer);
+        for (int i = 0; i < 4; i++) {
+            const Atom *otherAtom = nullptr;
+            if (i == 0)
+                otherAtom = atomA;
+            else if (i == 1)
+                otherAtom = atomB;
+            else if (i == 2)
+                otherAtom = atomC;
+            else if (i == 3)
+                otherAtom = atomD;
 
-		for (int i = 0; i < 4; i++) {
-			const Atom* otherAtom = nullptr;
-			if (i == 0)
-				otherAtom = atomA;
-			else if (i == 1)
-				otherAtom = atomB;
-			else if (i == 2)
-				otherAtom = atomC;
-			else if (i == 3)
-				otherAtom = atomD;
+            const auto d1 = squareDistance(altPoint, conformer.getAtomPos(otherAtom->getIdx()));
+            const auto d2 = squareDistance(conformer.getAtomPos(atomX->getIdx()),
+                                           conformer.getAtomPos(otherAtom->getIdx()));
+            const double diff = d1 - d2;
+            REPORT(Reporter::DEBUG) << "Point distance check " << diff;
+            if (abs(diff) > CORNER_FLAP_TOL) {
+                REPORT(Reporter::DEBUG) << "corner not flipped (" << i << ")";
+                return;
+            }
+        }
 
-			auto d1 = squareDistance(altPoint, conformer.getAtomPos(otherAtom->getIdx()));
-			auto d2 = squareDistance(conformer.getAtomPos(atomX->getIdx()), conformer.getAtomPos(otherAtom->getIdx()));
-			double diff = d1 - d2;
-			REPORT(Reporter::DEBUG) << "Point distance check " <<  diff;
-			if (abs(diff) > CORNER_FLAP_TOL) {
-				REPORT(Reporter::DEBUG) << "corner not flipped (" << i << ")";
-				return;
-			}
-		}
+        auto yVec = conformer.getAtomPos(atomX->getIdx());
+        auto zVec = conformer.getAtomPos(atomB->getIdx());
 
-    	auto yVec = conformer.getAtomPos(atomX->getIdx());
-    	auto zVec = conformer.getAtomPos(atomB->getIdx());
+        double rot1 = torsionAngle(altPoint, conformer.getAtomPos(atomA->getIdx()),
+                                   conformer.getAtomPos(atomB->getIdx()), yVec);
+        REPORT(Reporter::DEBUG) << "rotationAB " << rot1;
+        RDGeom::Transform3D rotation1Transform;
+        rotationAB->rotateBond(rot1, superpositionCoordinates, rotation1Transform);
+        rotation1Transform.TransformPoint(yVec);
 
-		double rot1 = torsionAngle(altPoint, conformer.getAtomPos(atomA->getIdx()),
-				conformer.getAtomPos(atomB->getIdx()), yVec);
-		REPORT(Reporter::DEBUG) << "rotationAB " <<  rot1;
-    	rotationAB->rotateBond(rot1, conformer);
-		Coord.transPointInPlace(rotationAB.getTransMatrix(), yVec);
+        if (Reporter::getMinReportingLevel() <= Reporter::DEBUG) {
+            const double sqrDistance = squareDistance(altPoint, yVec);
+            if (sqrDistance > CORNER_FLAP_TOL * CORNER_FLAP_TOL)
+                REPORT(Reporter::DEBUG) << "flipCorner: (1) point mismatch, sqrDistance " << sqrDistance;
+            else
+                REPORT(Reporter::DEBUG) << "flipCorner: (1) sqrDistance check " << sqrDistance;
+        }
 
-		if (logger.isDebugEnabled()) {
-			double dist = Coord.distance(altPoint, yVec);
-			if (dist > CORNER_FLAP_TOL)
-				REPORT(Reporter::DEBUG) << "flipCorner: (1) point mismatch, distance " + dist);
-			else
-				REPORT(Reporter::DEBUG) << "flipCorner: (1) distance check " + dist);
-		}
+        double rot2 = torsionAngle(altPoint, conformer.getAtomPos(atomC->getIdx()),
+                                   conformer.getAtomPos(atomD->getIdx()), conformer.getAtomPos(atomX->getIdx()));
+        REPORT(Reporter::DEBUG) << "rotationCD " << rot2;
+        RDGeom::Transform3D rotation2Transform;
+        rotationCD->rotateBond(rot2, superpositionCoordinates, rotation2Transform);
+        rotation2Transform.TransformPoint(zVec);
 
-		double rot2 = Coord.torsion(altPoint, coords.get(atomC.getNo()),
-				coords.get(atomD.getNo()), coords.get(atomX.getNo()));
-		REPORT(Reporter::DEBUG) << "rotationCD " + rot2);
-		rotationCD.rotateBond(rot2);
-		Coord.transPointInPlace(rotationCD.getTransMatrix(), zVec);
+        if (Reporter::getMinReportingLevel() <= Reporter::DEBUG) {
+            double sqrDistance = squareDistance(altPoint, conformer.getAtomPos(atomX->getIdx()));
+            if (sqrDistance > CORNER_FLAP_TOL * CORNER_FLAP_TOL)
+                REPORT(Reporter::DEBUG) << "flipCorner: (2) point mismatch, sqrDistance " << sqrDistance;
+            else
+                REPORT(Reporter::DEBUG) << "flipCorner: (2) sqrDistance check " << sqrDistance;
+        }
 
-		if (logger.isDebugEnabled()) {
-			double dist = Coord.distance(altPoint, coords.get(atomX.getNo()));
-			if (dist > CORNER_FLAP_TOL)
-				REPORT(Reporter::DEBUG) << "flipCorner: (2) point mismatch, distance " + dist);
-			else
-				REPORT(Reporter::DEBUG) << "flipCorner: (2) distance check " + dist);
-		}
+        double rot3 = torsionAngle(zVec, conformer.getAtomPos(atomX->getIdx()),
+                                   conformer.getAtomPos(atomC->getIdx()), conformer.getAtomPos(atomB->getIdx()));
+        REPORT(Reporter::DEBUG) << "rotationXC " << rot3;
+        RDGeom::Transform3D rotation3Transform;
+        rotationXC->rotateBond(-rot3, superpositionCoordinates, rotation3Transform);
+        rotation3Transform.TransformPoint(zVec);
 
-		double rot3 = Coord.torsion(zVec, coords.get(atomX.getNo()),
-				coords.get(atomC.getNo()), coords.get(atomB.getNo()));
-		REPORT(Reporter::DEBUG) << "rotationXC " + rot3);
-		rotationXC.rotateBond(-rot3);
-		Coord.transPointInPlace(rotationXC.getTransMatrix(), zVec);
+        if (Reporter::getMinReportingLevel() <= Reporter::DEBUG) {
+            double sqrDistance = squareDistance(conformer.getAtomPos(atomB->getIdx()), zVec);
+            if (sqrDistance > CORNER_FLAP_TOL * CORNER_FLAP_TOL)
+                REPORT(Reporter::DEBUG) << "flipCorner: (3) point mismatch, sqrDistance " << sqrDistance;
+            else
+                REPORT(Reporter::DEBUG) << "flipCorner: (3) sqrDistance check " << sqrDistance;
+            // TODO - add atomZ and atomY to molecule to visualize corner flip
+            // conformer.setAtomPos(atomZ->getIdx(), zVec);
+            // conformer.setAtomPos(atomY->getIdx(), yVec);
+        }
+    }
 
-		if (logger.isDebugEnabled()) {
-			double dist = Coord.distance(coords.get(atomB.getNo()), zVec);
-			if (dist > CORNER_FLAP_TOL)
-				REPORT(Reporter::DEBUG) << "flipCorner: (3) point mismatch, distance " + dist);
-			else
-				REPORT(Reporter::DEBUG) << "flipCorner: (3) distance check " + dist);
-			Coord.copy(zVec, coords.get(atomZ.getNo()));
-			Coord.copy(yVec, coords.get(atomY.getNo()));
-		}
-	}
+    void FreeCorner::addTorsions(const SuperpositionMolecule &superpositionMolecule,
+                                 std::vector<TorsionInfo> &torsions) const {
+        const auto mmffMolProperties = superpositionMolecule.getMMFFMolProperties();
+        for (int j = 0; j < 4; j++) {
+            const Bond *bond = nullptr;
+            if (j == 0)
+                bond = bondAB;
+            else if (j == 1)
+                bond = bondBX;
+            else if (j == 2)
+                bond = bondXC;
+            else if (j == 3)
+                bond = bondCD;
+
+            auto atom1 = bond->getBeginAtom();
+            auto atom2 = bond->getEndAtom();
+            const auto &mol = superpositionMolecule.getMol();
+
+            for (const auto atom0: mol.atomNeighbors(atom1)) {
+                if (atom0 != atom2) {
+                    for (const auto atom3: mol.atomNeighbors(atom2)) {
+                        if (atom3 != atom1) {
+                            ForceFields::MMFF::MMFFTor mmffTorsion;
+                            const auto index0 = atom0->getIdx();
+                            const auto index1 = atom1->getIdx();
+                            const auto index2 = atom2->getIdx();
+                            const auto index3 = atom3->getIdx();
+                            unsigned int torsionType;
+                            if (mmffMolProperties->getMMFFTorsionParams(mol, index0, index1, index2, index3,
+                                                                        torsionType,
+                                                                        mmffTorsion)) {
+                                TorsionInfo torsionInfo(index0, index1, index2, index3, mmffTorsion);
+
+                                if (auto it = std::find(torsions.begin(), torsions.end(), torsionInfo);
+                                    it == torsions.end()) {
+                                    torsions.push_back(torsionInfo);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 } // Gape

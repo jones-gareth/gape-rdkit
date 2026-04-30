@@ -5,7 +5,6 @@
 #include "RotatableBond.h"
 #include "SuperpositionMolecule.h"
 #include <ForceField/MMFF/TorsionAngle.h>
-#include <Geometry/Transform3D.h>
 #include "mol/MolUtil.h"
 #include "util/Reporter.h"
 #include "util/TransformOps.h"
@@ -24,6 +23,16 @@ namespace Gape {
                 ForceFields::MMFF::Utils::calcTorsionCosPhi(iPoint, jPoint, kPoint, lPoint);
 
         return ForceFields::MMFF::Utils::calcTorsionEnergy(d_V1, d_V2, d_V3, cosPhi);
+    }
+
+    bool TorsionInfo::operator==(const TorsionInfo &other) const {
+        if (index0 == other.index0 && index1 == other.index1 && index2 == other.index2 && index3 == other.index3) {
+            return true;
+        }
+        if (index3 == other.index0 && index2 == other.index1 && index1 == other.index0 && index0 == other.index3) {
+            return true;
+        }
+        return false;
     }
 
     RotatableBond::RotatableBond(RotatableBondType rotatableBondType, const Bond *const bond,
@@ -142,6 +151,9 @@ namespace Gape {
         return false;
     }
 
+
+
+
     void RotatableBond::rotateBond(double angle, Conformer &conf) const {
         RDGeom::Transform3D rot;
         assert(conf.getNumAtoms() == molecule->getMol().getNumAtoms());
@@ -151,8 +163,8 @@ namespace Gape {
         }
     }
 
-    void RotatableBond::rotateBond(double angle, SuperpositionCoordinates &superpositionCoordinates) const {
-        RDGeom::Transform3D rot;
+    void RotatableBond::rotateBond(double angle, SuperpositionCoordinates &superpositionCoordinates,
+        RDGeom::Transform3D &rot) const {
         auto &conf = superpositionCoordinates.getConformer();
         assert(conf.getNumAtoms() == molecule->getMol().getNumAtoms());
         determineRotation(conf.getAtomPos(atom1->getIdx()), conf.getAtomPos(atom2->getIdx()), angle, rot);
@@ -167,6 +179,11 @@ namespace Gape {
                 }
             }
         }
+    }
+
+    void RotatableBond::rotateBond(double angle, SuperpositionCoordinates &superpositionCoordinates) const {
+        RDGeom::Transform3D rot;
+        rotateBond(angle, superpositionCoordinates, rot);
     }
 
     double RotatableBond::rotatableBondEnergy(const RDKit::Conformer &conformer) const {

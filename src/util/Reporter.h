@@ -96,8 +96,8 @@ namespace Gape {
 }
 
 #define REPORT(level) \
-if (level < MIN_REPORTING_LEVEL) ;\
-else if (level < Gape::Reporter::getMinReportingLevel()) ; \
+if ((level) < MIN_REPORTING_LEVEL) ;\
+else if ((level) < Gape::Reporter::getMinReportingLevel()) ; \
 else Gape::Reporter().get(level) << __FILE__ << ":" << __LINE__ << " "
 
 

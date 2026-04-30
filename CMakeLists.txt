@@ -103,6 +103,7 @@ include_directories(
         "src"
         ${Boost_INCLUDE_DIRS}
         ${RDBASE}/Code
+        ${RDBASE}/External/RingFamilies/RingDecomposerLib/src/RingDecomposerLib
         ${EIGEN_INCLUDE_DIR}
         ${RAPIDJSON_INCLUDE_DIR}
         ${CATCH2_INCLUDE_DIR}

@@ -8,8 +8,9 @@
 #include "util/Reporter.h"
 #include "mol/Solvate.h"
 #include "RotatableBond.h"
-#include <GraphMol/MolOps.h>
+#include "mol/FreeCorner.h"
 #include <boost/format.hpp>
+#include <catch2/catch.hpp>
 #include <GraphMol/DistGeomHelpers/Embedder.h>
 #include <GraphMol/ForceFieldHelpers/MMFF/MMFF.h>
 #include <GraphMol/FileParsers/FileParsers.h>
@@ -61,11 +62,11 @@ namespace Gape {
         // DGeomHelpers::EmbedParameters embedParameters;
         // DGeomHelpers::EmbedMolecule(mol, embedParameters);
         DGeomHelpers::EmbedMolecule(mol, 10, 1);
-        delete mmffMolProperties;
         mmffMolProperties = new MMFF::MMFFMolProperties(mol);
         assert(mmffMolProperties->isValid());
         const auto forceField = MMFF::constructForceField(mol, mmffMolProperties, 1000);
         ForceFieldsHelper::OptimizeMolecule(*forceField);
+        delete mmffMolProperties;
         delete forceField;
         assert(mol.getNumConformers() == 1);
         referenceConformer = mol.getConformer();
@@ -358,10 +359,9 @@ namespace Gape {
         return singleBondCount == 2;
     }
 
-    std::vector<std::shared_ptr<SuperpositionMolecule>> SuperpositionMolecule::loadMolecules(
-        MolSupplier& molSupplier, const GapeSettings &settings) {
-
-        std::vector<std::shared_ptr<SuperpositionMolecule>> molecules;
+    std::vector<std::shared_ptr<SuperpositionMolecule> > SuperpositionMolecule::loadMolecules(
+        MolSupplier &molSupplier, const GapeSettings &settings) {
+        std::vector<std::shared_ptr<SuperpositionMolecule> > molecules;
 
         int ligandNum = 0;
         while (!molSupplier.atEnd()) {
@@ -376,6 +376,9 @@ namespace Gape {
             superpositionMolecule->solvate();
             superpositionMolecule->generate3D();
             superpositionMolecule->findFreelyRotatableBonds();
+            if (settings.) {
+                superpositionMolecule->findFreeCorners();
+            }
             superpositionMolecule->findPairsToCheck();
             superpositionMolecule->findCharges();
             superpositionMolecule->findDonorsAndAcceptors();
@@ -539,6 +542,7 @@ namespace Gape {
         auto volume = gaussians.overlapVolume(otherGaussians);
         REPORT(Reporter::DEBUG) << "1st order Gaussian integral: " << volume;
 
+        // TODO investigate higher orders
         // Java returned here, higher order contributions were not working
         if (true) return volume;
 
@@ -558,5 +562,18 @@ namespace Gape {
         REPORT(Reporter::DEBUG) << "3nd order Gaussian Integral " << diff << " new vol " << volume;
 
         return volume;
+    }
+
+    void SuperpositionMolecule::findFreeCorners() {
+        freeCorners.clear();
+        freeCornerTorsions.clear();
+        for (const auto &atom: mol.atoms()) {
+            auto freeCorner = FreeCorner::isFreeCorner(this, atom);
+            if (freeCorner != nullptr) {
+                freeCorners.push_back(freeCorner);
+                freeCorner->addTorsions(this, freeCornerTorsions);
+            }
+        }
+
     }
 } // namespace GAPE

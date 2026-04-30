@@ -63,6 +63,7 @@ namespace Gape {
 
         static std::shared_ptr<FreeCorner>
         isFreeCorner(const SuperpositionMolecule *superpositionMolecule, Atom *atomX);
-        void flipFreeCorner(Conformer &conformer) const;
+        void flipFreeCorner(SuperpositionCoordinates &superpositionCoordinates) const;
+        void addTorsions(const SuperpositionMolecule &superpositionMolecule, std::vector<TorsionInfo> &torsions) const;
     };
 } // Gape

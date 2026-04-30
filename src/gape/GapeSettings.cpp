@@ -51,7 +51,8 @@ namespace Gape {
         "vdwCutoff": 100,
         "scalePharmacophore": true,
         "geometricWeightCriterion": 0.5,
-        "pharmacophoreFactor": 0.5
+        "pharmacophoreFactor": 0.5,
+        "useFreeCorners": true
     },
     "solvationRules": [
         {

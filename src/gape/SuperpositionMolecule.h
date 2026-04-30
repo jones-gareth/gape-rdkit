@@ -10,6 +10,7 @@
 #include "GapeSettings.h"
 #include "mol/Feature.h"
 #include "SuperpositionCoordinates.h"
+#include "TorsionInfo.h"
 
 
 namespace RDKit {
@@ -37,6 +38,8 @@ namespace Gape {
     };
 
     class RotatableBond;
+
+    class FreeCorner;
 
     class VdwInfo {
     public:
@@ -75,6 +78,8 @@ namespace Gape {
         MMFF::MMFFMolProperties* getMMFFMolProperties() const { return mmffMolProperties; }
 
         void findFreelyRotatableBonds();
+
+        void findFreeCorners();
 
         const std::vector<std::shared_ptr<RotatableBond>>& getRotatableBonds() const { return rotatableBonds; }
 
@@ -147,6 +152,8 @@ namespace Gape {
         MMFF::MMFFMolProperties* mmffMolProperties;
         const GapeSettings& settings;
         std::vector<std::shared_ptr<RotatableBond>> rotatableBonds;
+        std::vector<std::shared_ptr<FreeCorner>> freeCorners;
+        std::vector<TorsionInfo> freeCornerTorsions;
         std::vector<VdwInfo> pairsToCheck;
         std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>> donors;
         std::map<const Atom *, std::shared_ptr<const HydrogenBondingType>> acceptors;

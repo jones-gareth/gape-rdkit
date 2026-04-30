@@ -8,6 +8,8 @@
 #include <GraphMol/GraphMol.h>
 #include "SuperpositionMolecule.h"
 #include <ForceField/MMFF/Contribs.h>
+#include <Geometry/Transform3D.h>
+#include "TorsionInfo.h"
 
 namespace Gape
 {
@@ -15,22 +17,6 @@ namespace Gape
 
 	class SuperpositionMolecule;
 	class CornerRotation;
-
-	class TorsionInfo
-	{
-	public:
-		const unsigned int index0, index1, index2, index3;
-		const ForceFields::MMFF::MMFFTor mmffTorsion;
-		double referenceAngle;
-
-		TorsionInfo(unsigned int idx0, unsigned int idx1, unsigned int idx2, unsigned int idx3,
-		            ForceFields::MMFF::MMFFTor mmffTor) : index0(idx0), index1(idx1), index2(idx2), index3(idx3),
-		                                                  mmffTorsion(mmffTor)
-		{
-		}
-
-        double torsionEnergy(const Conformer& conformer) const;
-	};
 
 	class RotatableBond
 	{
@@ -55,6 +41,8 @@ namespace Gape
 		RotatableBondType getRotatableBondType() const { return rotatableBondType; }
 
 		void rotateBond(double angle, Conformer& conf) const;
+
+		void rotateBond(double angle, SuperpositionCoordinates& superpositionCoordinates, RDGeom::Transform3D &rot) const;
 
 		void rotateBond(double angle, SuperpositionCoordinates& superpositionCoordinates) const;
 
